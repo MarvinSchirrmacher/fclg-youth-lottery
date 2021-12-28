@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { LotteryarchiveService } from './lotteryarchive.service';
+import { LotteryArchiveService } from './lotteryarchive.service';
 
 describe('LotteryarchiveService', () => {
-  let service: LotteryarchiveService;
+  let service: LotteryArchiveService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(LotteryarchiveService);
+    service = TestBed.inject(LotteryArchiveService);
   });
 
   it('should be created', () => {
