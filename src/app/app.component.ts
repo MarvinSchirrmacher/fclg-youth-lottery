@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +8,17 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = 'fc-youth-lottery';
+  title = 'FCLG Jugendlotto';
+  noUser = true;
+
+  constructor(
+    public authService: AuthService,
+    private router: Router) {
+  }
+
+  onLogout() {
+    this.authService
+      .logout()
+      .then(r => this.router.navigate(['login-component']));
+  }
 }

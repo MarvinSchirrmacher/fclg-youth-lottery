@@ -1,0 +1,60 @@
+<div class="login-form top-space">
+    <div [formGroup]="formGroup">
+        <mat-toolbar class="toolbar" color="primary">Register</mat-toolbar>
+        <mat-card>
+        <mat-form-field class="form-field">
+            <input type="text" matInput placeholder="User Email" formControlName="email">
+        </mat-form-field>
+        <br/>
+
+        <div *ngIf="email.invalid && (email.dirty || email.touched)"
+                class="alert">
+            <div *ngIf="email.errors?.['required']" class="form-field error">
+            Email ID is required.
+            </div>
+            <div *ngIf="email.errors?.['email']" class="form-field error">
+            ID must be a valid email
+            </div>
+        </div>
+
+        <mat-form-field class="form-field">
+            <input type="password" matInput placeholder="Password" formControlName="password">
+        </mat-form-field>
+        <br/>
+        <div *ngIf="password.invalid && (password.dirty || password.touched)"
+                class="alert">
+            <div *ngIf="password.errors?.['required']" class="form-field error">
+            Password is required.
+            </div>
+        </div>
+
+        <mat-form-field class="form-field">
+            <input type="password" matInput placeholder="Retype password" formControlName="retype">
+        </mat-form-field>
+        <br/>
+        <div *ngIf="(password.dirty || password.touched) && (retype.dirty || retype.touched) && (password.value != retype.value)"
+                class="form-field error">
+            Passwords not the same.
+        </div>
+        <div *ngIf="isVerifying">
+            A verification code has been emailed to you.
+        </div>
+        <mat-form-field *ngIf="isVerifying" class="form-field">
+            <input type="text" matInput placeholder="Verification code" formControlName="verify">
+        </mat-form-field>
+        <br/>
+
+        <div class="center">
+            <button mat-raised-button color="primary" (click)="onSubmit()">Submit</button>
+        </div>
+        <div *ngIf="errorMessage != ''" class="form-field error">
+            {{ errorMessage }}
+        </div>
+        <div class="right-just">
+            <button mat-flat-button class="blue-text" (click)="onAlreadyRegistered()">
+            Already have an account?
+            </button>
+        </div>
+        </mat-card>
+    </div>
+</div>  

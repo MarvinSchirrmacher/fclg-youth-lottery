@@ -1,0 +1,41 @@
+<mat-tab-group>
+    <mat-tab label="Übersicht">
+        List with draw, winningnumber, winning person and a checkbox. The checkbox
+        is ticked, if the money was transfered.
+    </mat-tab>
+    <mat-tab label="Ziehungen">
+        <app-lotterydata></app-lotterydata>
+    </mat-tab>
+    <mat-tab label="Teilnehmer">
+        <div id="participant-input" class="card">
+            <form novalidate (ngSubmit)="onAddParticipant()" [formGroup]="participantGroup">
+                <label>
+                    <span>Teilnehmer</span>
+                    <input type="text" placeholder="Name" formControlName="name">
+                </label>
+                <div class="form-field error"
+                     *ngIf="participantGroup.get('name')!.hasError('required') && participantGroup.get('name')!.touched">
+                    Name is required
+                </div>
+                <button class="btn" type="submit" [disabled]="participantGroup.invalid">Speichern</button>
+            </form>
+        </div>
+
+        <div id="participants" class="card">
+            <div id="participant-actions">
+                <button class="btn btn-alt">In Datenbank speichern</button>
+                <button class="btn btn-alt">Von Datenbank abrufen</button>
+            </div>
+            <ul>
+                <li class="participant" *ngFor="let participant of participants; let i = index">
+                <h1>{{ participant.name }}</h1>
+                <button class="btn btn-danger" (click)="onRemoveParticipant(i)">Löschen</button>
+                </li>
+            </ul>
+        </div>
+    </mat-tab>
+    <mat-tab label="Listen">
+        assignment of participants to the entries -> array of drawobjects, each
+        object having 49 number attributes, in which the id of the participant is in
+    </mat-tab>
+</mat-tab-group>  

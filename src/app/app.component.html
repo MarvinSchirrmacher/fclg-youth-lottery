@@ -1,16 +1,13 @@
-<mat-tab-group>
-  <mat-tab label="Worklist">
-    List with draw, winningnumber, winning person and a checkbox. The checkbox
-    is ticked, if the money was transfered.
-  </mat-tab>
-  <mat-tab label="All draws this year">
-    <app-lotterydata></app-lotterydata>
-  </mat-tab>
-  <mat-tab label="Participants">
-    Data with all persons, including id, name, email and iban
-  </mat-tab>
-  <mat-tab label="Assignments">
-    assignment of participants to the entries -> array of drawobjects, each
-    object having 49 number attributes, in which the id of the participant is in
-  </mat-tab>
-</mat-tab-group>
+<mat-toolbar color="primary">
+  <span>{{title}}</span>
+  <span class="example-spacer"></span>
+  <button mat-icon-button class="example-icon" [matMenuTriggerFor]="menu"
+          aria-label="Example icon-button with menu icon">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item [disabled]="!authService.isLoggedIn()" routerLink="/change-password-component">Change Password</button>
+    <button mat-menu-item [disabled]="!authService.isLoggedIn()" (click)="onLogout()">Logout</button>
+  </mat-menu>
+</mat-toolbar>
+<router-outlet></router-outlet>
