@@ -1,0 +1,56 @@
+<div>
+  <mat-table [dataSource]="participations" class="mat-elevation-z8">
+    <ng-container matColumnDef="firstName">
+      <mat-header-cell *matHeaderCellDef>firstName</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row.firstName }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="lastName">
+      <mat-header-cell *matHeaderCellDef>lastName</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row.lastName }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="number">
+      <mat-header-cell *matHeaderCellDef>number</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row.number }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="start">
+      <mat-header-cell *matHeaderCellDef>start</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row.start }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="end">
+      <mat-header-cell *matHeaderCellDef>end</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row.end }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="delete">
+      <mat-header-cell *matHeaderCellDef>options</mat-header-cell>
+      <mat-cell *matCellDEf="let row">
+        <button class="btn btn-danger" (click)="onRemoveParticipation(row.index)">Löschen</button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"
+             (click)="onRowClicked(row)">
+    </mat-row>
+  </mat-table>
+</div>
+  
+<div id="participation-input" class="card">
+  <form novalidate (ngSubmit)="onAddParticipation()" [formGroup]="addForm">
+    <label>
+      <span>Vorname</span>
+      <input type="text" placeholder="Vorname" formControlName="firstName">
+    </label>
+    <div class="form-field error"
+         *ngIf="addForm.get('firstName')!.hasError('required') && addForm.get('firstName')!.touched">
+        Vorname ist verpflichtend
+    </div>
+    <button class="btn" type="submit" [disabled]="addForm.invalid">Speichern</button>
+  </form>
+</div>
+
+<div id="participations" class="card">
+  <div id="participation-actions">
+    <button class="btn btn-alt" (click)="onUploadParticipations()">Hochladen</button>
+    <button class="btn btn-alt" (click)="onDownloadParticipations()">Herunterladen</button>
+  </div>
+</div>

@@ -1,7 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit } from '@angular/core';
 import { LotteryArchiveService } from '../lotteryarchive.service';
-import { MatTable } from '@angular/material/table';
 
 interface LotteryDraw {
   date: Date;
@@ -38,11 +36,7 @@ export class LotterydataComponent implements OnInit {
   private setLotterydraws() {
     this.lotteryArchive
       .getAllDrawsOfYear(this.today.getFullYear())
-      .then((success: LotteryDraw[]) => {
-        this.lotteryDraws = success;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      .then((draws: LotteryDraw[]) => this.lotteryDraws = draws)
+      .catch((error) => console.log(error));
   }
 }

@@ -5,8 +5,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule} from "@angular/material/input";
+import { MatInputModule } from "@angular/material/input";
 import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -19,6 +22,7 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { LotterydataComponent } from './lotterydata/lotterydata.component';
+import { ParticipationComponent } from './participation/participation.component';
 import { RegisterComponent } from './register/register.component';
 
 
@@ -30,7 +34,8 @@ import { RegisterComponent } from './register/register.component';
     LoginComponent,
     RegisterComponent,
     ChangePasswordComponent,
-    LotterydataComponent
+    LotterydataComponent,
+    ParticipationComponent
   ],
   imports: [
     BrowserModule,
@@ -42,7 +47,11 @@ import { RegisterComponent } from './register/register.component';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatTableModule,
     MatMenuModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatSortModule,
     MatTabsModule,
     MatTableModule,
     MatToolbarModule,

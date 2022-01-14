@@ -1,18 +1,21 @@
 import { Injectable } from '@angular/core';
 import * as Realm from "realm-web";
 import { Credentials, User } from 'realm-web';
+import { REALM_APP_ID } from './common/mongodb';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  app: Realm.App = new Realm.App({ id: "fclg-youth-lottery-nmhhi" });
+  app: Realm.App = new Realm.App({ id: REALM_APP_ID });
   user =  {} as Realm.User;
   loggedIn = false;
   email = "";
 
   public getCurrentUser() { return this.app.currentUser; }
+
+  public getAccessToken() { return this.app.currentUser?.accessToken; }
 
   public isLoggedIn(): boolean { return this.loggedIn; }
 
