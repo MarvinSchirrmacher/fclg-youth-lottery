@@ -1,9 +1,8 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+// import { MongoClient } from 'mongodb';
 import { BSON } from 'realm-web';
-import { map } from 'rxjs';
 import { AuthService } from './auth.service';
-import { MONGODB_API } from './common/mongodb';
 
 export interface Participation {
   _id: BSON.ObjectID;
@@ -32,19 +31,23 @@ export class ParticipationService {
     ]
   }
 
-  findParticipations(
-      filter: string = '', sortOrder: string = 'asc',
-      page: number = 0, pageSize: number = 10) {
-        // return this.http.get(MONGODB_API, {
-        //     params: new HttpParams()
-        //         .set('filter', filter)
-        //         .set('sortOrder', sortOrder)
-        //         .set('pageNumber', page.toString())
-        //         .set('pageSize', pageSize.toString())
-        // }).pipe(
-        //     map(res =>  res["payload"])
-        // );
-  }
+  // findParticipations(): Observable<Participation[]> {
+  //     return this.http.post(MONGODB_API + '/action/findOne',
+  //       {
+  //         'dataSource':'Cluster0',
+  //         'database':'fclg-youth-lottery',
+  //         'collection':'participations',
+  //         'filter': { 'firstName': 'Marvin' }
+  //       },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'Access-Control-Request-Headers': '*',
+  //           'Access-Control-Allow-Origin': 'https://data.mongodb-api.com',
+  //           'api-key': MONGODB_API_KEY
+  //         }
+  //       }) as Observable<Participation[]>;
+  // }
 
   addParticipation(firstName: string) {
     

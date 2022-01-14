@@ -1,4 +1,4 @@
-curl --request POST \ 'https://data.mongodb-api.com/app/data-zxqge/endpoint/data/beta/action/findOne' \
+curl --request POST 'https://data.mongodb-api.com/app/data-zxqge/endpoint/data/beta/action/findOne' \
     --header 'Content-Type: application/json' \
     --header 'Access-Control-Request-Headers: *' \
     --header 'api-key: idcvmeus' \

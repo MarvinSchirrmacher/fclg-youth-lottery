@@ -23,11 +23,9 @@ export class LoginComponent extends LoginBaseComponent {
   getFormGroup(): FormGroup {
     return new FormGroup({
       email: new FormControl(this.userCredentials.email,
-        { validators: [ Validators.required, Validators.email ],
-          updateOn: 'blur' }),
+        { validators: [ Validators.required, Validators.email ] }),
       password: new FormControl(this.userCredentials.password,
-        { validators: [ Validators.required ],
-          updateOn: 'blur' })
+        { validators: [ Validators.required ] })
     });
   }
 

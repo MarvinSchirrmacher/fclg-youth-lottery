@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AuthService } from '../auth.service';
+import { gql } from '@apollo/client/core';
+import { Apollo } from 'apollo-angular';
+import { Observable } from 'rxjs';
 import { Participation, ParticipationService } from '../participation.service';
 
 @Component({
@@ -12,40 +14,34 @@ export class ParticipationComponent implements OnInit {
 
   addForm = {} as FormGroup;
   participation = {} as Participation;
-  participations = {} as Participation[];
+  participations = {} as Observable<Participation[]>;
   displayedColumns = [] as string[];
   loading = true;
   error: any;
 
   constructor(private formBuilder: FormBuilder,
               private participationService: ParticipationService,
-              private authService: AuthService) { }
+              private apollo: Apollo) { }
 
   ngOnInit(): void {
     this.addForm = this.formBuilder.group({
       firstName: [this.participation.firstName, Validators.required]
     })
     this.displayedColumns = this.participationService.getFieldLabels();
-    console.log('access token is ' + this.authService.getAccessToken());
-    // const db = user?.mongoClient("mongodb-atlas");
-    // const collection = db?.db("fclg-youth-lottery").collection<Participation>("participations");
-    // collection?.watch(?.find()
-    //   .then(value => this.participations = value)
-    //   .catch(error => console.log(error));
-    // this.apollo
-    //   .watchQuery({query: gql`{
-    //     participations {
-    //       firstName,
-    //       lastName,
-    //       number,
-    //       start,
-    //       end
-    //     }}`})
-    //   .valueChanges.subscribe((result: any) => {
-    //     this.participations = result?.data?.participations;
-    //     this.loading = result.loading;
-    //     this.error = result.error;
-    //   });
+    this.apollo
+      .watchQuery({query: gql`{
+        participations {
+          firstName,
+          lastName,
+          number,
+          start,
+          end
+        }}`})
+      .valueChanges.subscribe((result: any) => {
+        this.participations = result?.data?.participations;
+        this.loading = result.loading;
+        this.error = result.error;
+      });
   }
 
   onRowClicked(row: any): void {

@@ -67,7 +67,7 @@
             },
             "development": {
               "browserTarget": "fc-youth-lottery:build:development",
-              "port": 3000
+              "port": 4200
             }
           },
           "defaultConfiguration": "development"

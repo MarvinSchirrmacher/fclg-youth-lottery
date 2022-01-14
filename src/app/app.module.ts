@@ -24,6 +24,7 @@ import { LoginComponent } from './login/login.component';
 import { LotterydataComponent } from './lotterydata/lotterydata.component';
 import { ParticipationComponent } from './participation/participation.component';
 import { RegisterComponent } from './register/register.component';
+import { GraphQLModule } from './graphql.module';
 
 
 @NgModule({
@@ -55,7 +56,8 @@ import { RegisterComponent } from './register/register.component';
     MatTabsModule,
     MatTableModule,
     MatToolbarModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    GraphQLModule
   ],
   providers: [],
   bootstrap: [AppComponent],
