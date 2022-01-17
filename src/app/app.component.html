@@ -6,8 +6,8 @@
     <mat-icon>menu</mat-icon>
   </button>
   <mat-menu #menu="matMenu">
-    <button mat-menu-item [disabled]="!authService.isLoggedIn()" routerLink="/change-password-component">Change Password</button>
-    <button mat-menu-item [disabled]="!authService.isLoggedIn()" (click)="onLogout()">Logout</button>
+    <button mat-menu-item [disabled]="!auth.isLoggedIn" routerLink="/change-password-component">Change Password</button>
+    <button mat-menu-item [disabled]="!auth.isLoggedIn" (click)="onLogout()">Logout</button>
   </mat-menu>
 </mat-toolbar>
 <router-outlet></router-outlet>

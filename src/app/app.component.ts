@@ -12,12 +12,12 @@ export class AppComponent {
   noUser = true;
 
   constructor(
-    public authService: AuthService,
+    public auth: AuthService,
     private router: Router) {
   }
 
   onLogout() {
-    this.authService
+    this.auth
       .logout()
       .then(r => this.router.navigate(['login-component']));
   }

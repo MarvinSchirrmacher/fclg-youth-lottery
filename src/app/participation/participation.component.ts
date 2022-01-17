@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { gql } from '@apollo/client/core';
 import { Apollo } from 'apollo-angular';
-import { Observable } from 'rxjs';
 import { Participation, ParticipationService } from '../participation.service';
 
 @Component({
@@ -10,11 +9,11 @@ import { Participation, ParticipationService } from '../participation.service';
   templateUrl: './participation.component.html',
   styleUrls: ['./participation.component.css']
 })
-export class ParticipationComponent implements OnInit {
+export class ParticipationComponent implements OnInit, AfterViewInit {
 
   addForm = {} as FormGroup;
   participation = {} as Participation;
-  participations = {} as Observable<Participation[]>;
+  participations = [] as Participation[];
   displayedColumns = [] as string[];
   loading = true;
   error: any;
@@ -28,6 +27,10 @@ export class ParticipationComponent implements OnInit {
       firstName: [this.participation.firstName, Validators.required]
     })
     this.displayedColumns = this.participationService.getFieldLabels();
+  }
+
+  ngAfterViewInit(): void {
+    console.debug('watch query for participations');
     this.apollo
       .watchQuery({query: gql`{
         participations {
@@ -38,6 +41,7 @@ export class ParticipationComponent implements OnInit {
           end
         }}`})
       .valueChanges.subscribe((result: any) => {
+        console.debug('participations changed');
         this.participations = result?.data?.participations;
         this.loading = result.loading;
         this.error = result.error;
@@ -45,11 +49,11 @@ export class ParticipationComponent implements OnInit {
   }
 
   onRowClicked(row: any): void {
-    console.log('Row clicked was ' + row);
+    console.log(`Row clicked was ${row}`);
   }
 
   onAddParticipation(): void {
-    console.log('add participation for ' + this.firstName.value);
+    console.log(`add participation for ${this.firstName.value}`);
     this.participationService.addParticipation(this.firstName.value);
     this.addForm.reset();
   }

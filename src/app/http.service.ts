@@ -7,15 +7,15 @@ import { Injectable } from '@angular/core';
 export class HttpService {
   constructor(private httpClient: HttpClient) {}
 
-  public get(url: string) {
-    return this.httpClient.get(url, {
+  public get<Type>(url: string) {
+    return this.httpClient.get<Type>(url, {
       observe: 'body',
       responseType: 'json',
     });
   }
 
-  public getSingle(url: string, id: string) {
-    return this.httpClient.get(url + '/' + id, {
+  public getSingle<Type>(url: string, id: string) {
+    return this.httpClient.get<Type>(url + '/' + id, {
       observe: 'body',
       responseType: 'json',
     });

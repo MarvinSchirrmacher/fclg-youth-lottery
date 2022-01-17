@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LotterydataComponent } from './lotterydata.component';
+import { LotteryArchiveComponent } from './lotteryarchive.component';
 
-describe('LotterydataComponent', () => {
-  let component: LotterydataComponent;
-  let fixture: ComponentFixture<LotterydataComponent>;
+describe('LotteryArchiveComponent', () => {
+  let component: LotteryArchiveComponent;
+  let fixture: ComponentFixture<LotteryArchiveComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LotterydataComponent ]
+      declarations: [ LotteryArchiveComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LotterydataComponent);
+    fixture = TestBed.createComponent(LotteryArchiveComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

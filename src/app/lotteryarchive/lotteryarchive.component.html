@@ -1,0 +1,23 @@
+<div>
+  <mat-table [dataSource]="lotteryDraws" class="mat-elevation-z8">
+    <ng-container matColumnDef="calendarweek">
+      <mat-header-cell *matHeaderCellDef>calendarweek</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row.calendarweek }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="date">
+      <mat-header-cell *matHeaderCellDef>date</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row.date | date: "fullDate" }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="numbers">
+      <mat-header-cell *matHeaderCellDef>numbers</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row.numbers }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="winningNumber">
+      <mat-header-cell *matHeaderCellDef>winningNumber</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row.winningNumber }}</mat-cell>
+    </ng-container>
+  
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  </mat-table>  
+</div>

@@ -1,13 +1,23 @@
 import { HttpService } from './http.service';
 import { Injectable } from '@angular/core';
-import { formatDate } from '@angular/common';
+import { map, Observable } from 'rxjs';
 
-interface LotteryDraw {
+export interface LotteryDraw {
   date: Date;
   id: number;
   calendarweek: number;
   numbers: number[];
   winningNumber: number;
+}
+
+interface ArchiveEntry {
+  id: number,
+  date: string,
+  Lottozahl: number[]
+}
+
+interface Archive {
+  data: ArchiveEntry[]
 }
 
 @Injectable({
@@ -17,121 +27,64 @@ export class LotteryArchiveService {
   private urlAllDraws: string =
     'https://johannesfriedrich.github.io/LottoNumberArchive/Lottonumbers_complete.json';
 
-  constructor(private httpService: HttpService) {}
+  constructor(private http: HttpService) {}
 
-  public async getAllDrawsAfter(date: Date): Promise<LotteryDraw[]> {
-    return new Promise((resolve, reject) => {
-      this.httpGetAllDraws()
-        .then((success: LotteryDraw[]) => {
-          var lotteryDraws: LotteryDraw[] = [];
-          for (let draw of success) {
-            if (draw.date.getTime() >= date.getTime()) {
-              lotteryDraws.push(draw);
-            }
-          }
-          resolve(lotteryDraws);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+  public getLatestDraw(): Observable<LotteryDraw> {
+    return this.fetchAllDraws(d => true)
+        .pipe(map((entries: LotteryDraw[]) => entries[entries.length - 1]));
   }
 
-  public async getAllDrawsBefore(date: Date): Promise<LotteryDraw[]> {
-    return new Promise((resolve, reject) => {
-      this.httpGetAllDraws()
-        .then((success: LotteryDraw[]) => {
-          var lotteryDraws: LotteryDraw[] = [];
-          for (let draw of success) {
-            if (draw.date.getTime() <= date.getTime()) {
-              lotteryDraws.push(draw);
-            }
-          }
-          resolve(lotteryDraws);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+  public getAllDrawsAfter(date: Date): Observable<LotteryDraw[]> {
+    return this.fetchAllDraws(d => d.date.getTime() >= date.getTime());
   }
 
-  public async getAllDrawsOfYear(year: number): Promise<LotteryDraw[]> {
-    return new Promise((resolve, reject) => {
-      this.httpGetAllDraws()
-        .then((success: LotteryDraw[]) => {
-          var lotteryDraws: LotteryDraw[] = [];
-          for (let draw of success) {
-            if (draw.date.getFullYear() == year) {
-              lotteryDraws.push(draw);
-            }
-          }
-          resolve(lotteryDraws);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+  public getAllDrawsBefore(date: Date): Observable<LotteryDraw[]> {
+    return this.fetchAllDraws(d => d.date.getTime() <= date.getTime());
   }
 
-  public getLatestDraw(): Promise<LotteryDraw> {
-    return new Promise((resolve, reject) => {
-      this.httpGetAllDraws()
-        .then((success: LotteryDraw[]) => {
-          resolve(success[success.length - 1]);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+  public getAllDrawsOfYear(year: number): Observable<LotteryDraw[]> {
+    return this.fetchAllDraws(d => d.date.getFullYear() == year);
   }
 
-  public async httpGetAllDraws(): Promise<LotteryDraw[]> {
-    return new Promise((resolve, reject) => {
-      this.httpService.get(this.urlAllDraws).subscribe({
-        next: (value: any) => resolve(this.convertHttpInput(value.data)),
-        error: (error) => reject(error),
-      });
-    });
+  public fetchAllDraws(where: (d: LotteryDraw) => boolean): Observable<LotteryDraw[]> {
+    console.debug('fetch all draws');
+    return this.http
+      .get<Archive>(this.urlAllDraws)
+      .pipe(map((archive: Archive) => this.fromArchiveEntry(archive.data)))
+      .pipe(map((entries: LotteryDraw[]) => entries.filter(e => where(e))));
   }
 
-  convertHttpInput(data: any[]): LotteryDraw[] {
-    var lotteryDraws: LotteryDraw[] = [];
-    data.forEach((element) => {
-      var datestring: string = element.date;
-      var day = Number(datestring.substring(0, 2));
-      var month = Number(datestring.substring(3, 5));
-      var year = Number(datestring.substring(6, 10));
-
-      lotteryDraws.push({
-        id: element.id,
-        date: new Date(year, month - 1, day),
-        calendarweek: this.getWeekNumber(new Date(year, month - 1, day)),
-        numbers: element.Lottozahl,
-        winningNumber: element.Lottozahl[0],
-      });
-    });
-
-    lotteryDraws.sort(this.sortIdDesc);
-    return lotteryDraws;
+  private fromArchiveEntry(entries: ArchiveEntry[]): LotteryDraw[] {
+    console.debug('from archive entry');
+    return entries
+      .map(e => {
+        return {
+          id: e.id,
+          date: this.dateFromString(e.date),
+          calendarweek: this.getWeekNumber(e.date),
+          numbers: e.Lottozahl,
+          winningNumber: e.Lottozahl[0],
+        };})
+      .sort(this.sortIdDesc);
   }
 
-  private sortIdDesc(draw1: LotteryDraw, draw2: LotteryDraw): number {
-    if (draw1.id > draw2.id) {
-      return -1;
-    } else {
-      return 1;
-    }
+  private sortIdDesc(d1: LotteryDraw, d2: LotteryDraw): number {
+    return d1.id > d2.id ? -1 : 1;
   }
 
-  private sortDateDesc(draw1: LotteryDraw, draw2: LotteryDraw): number {
-    if (draw1.date.getTime() > draw2.date.getTime()) {
-      return -1;
-    } else {
-      return 1;
-    }
+  private sortDateDesc(d1: LotteryDraw, d2: LotteryDraw): number {
+    return d1.date.getTime() > d2.date.getTime() ? -1 : 1;
   }
 
-  private getWeekNumber(date: Date): number {
+  private dateFromString(date: string): Date {
+    var day = Number(date.substring(0, 2));
+    var month = Number(date.substring(3, 5));
+    var year = Number(date.substring(6, 10));
+    return new Date(year, month - 1, day);
+  }
+
+  private getWeekNumber(dateString: string): number {
+    const date = this.dateFromString(dateString);
     const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
     const pastDaysOfYear =
       (date.getTime() - firstDayOfYear.getTime()) / 86400000;

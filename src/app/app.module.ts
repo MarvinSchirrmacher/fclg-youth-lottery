@@ -21,7 +21,7 @@ import { AppComponent } from './app.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
-import { LotterydataComponent } from './lotterydata/lotterydata.component';
+import { LotteryArchiveComponent } from './lotteryarchive/lotteryarchive.component';
 import { ParticipationComponent } from './participation/participation.component';
 import { RegisterComponent } from './register/register.component';
 import { GraphQLModule } from './graphql.module';
@@ -35,20 +35,20 @@ import { GraphQLModule } from './graphql.module';
     LoginComponent,
     RegisterComponent,
     ChangePasswordComponent,
-    LotterydataComponent,
-    ParticipationComponent
+    LotteryArchiveComponent,
+    ParticipationComponent,
   ],
   imports: [
-    BrowserModule,
     AppRoutingModule,
-    HttpClientModule,
+    BrowserModule,
     BrowserAnimationsModule,
+    GraphQLModule,
+    HttpClientModule,
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatTableModule,
     MatMenuModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
@@ -57,7 +57,6 @@ import { GraphQLModule } from './graphql.module';
     MatTableModule,
     MatToolbarModule,
     ReactiveFormsModule,
-    GraphQLModule
   ],
   providers: [],
   bootstrap: [AppComponent],
