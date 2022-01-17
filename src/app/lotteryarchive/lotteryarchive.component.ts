@@ -18,7 +18,6 @@ export class LotteryArchiveComponent implements AfterViewInit {
   constructor(private lotteryArchive: LotteryArchiveService) {}
 
   public ngAfterViewInit(): void {
-    console.debug('after view init');
     this.lotteryArchive
       .getAllDrawsOfYear(new Date().getFullYear())
       .subscribe({

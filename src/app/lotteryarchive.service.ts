@@ -47,7 +47,6 @@ export class LotteryArchiveService {
   }
 
   public fetchAllDraws(where: (d: LotteryDraw) => boolean): Observable<LotteryDraw[]> {
-    console.debug('fetch all draws');
     return this.http
       .get<Archive>(this.urlAllDraws)
       .pipe(map((archive: Archive) => this.fromArchiveEntry(archive.data)))
@@ -55,7 +54,6 @@ export class LotteryArchiveService {
   }
 
   private fromArchiveEntry(entries: ArchiveEntry[]): LotteryDraw[] {
-    console.debug('from archive entry');
     return entries
       .map(e => {
         return {

@@ -16,7 +16,7 @@ export function createApollo(httpLink: HttpLink, authService: AuthService): Apol
     const token = authService.accessToken;
     return token === null
       ? {}
-      : { headers: { Authorization: `JWT ${token}` }
+      : { headers: { Authorization: `Bearer ${token}` }
     }
   });
 

@@ -30,7 +30,6 @@ export class ParticipationComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    console.debug('watch query for participations');
     this.apollo
       .watchQuery({query: gql`{
         participations {
@@ -49,11 +48,11 @@ export class ParticipationComponent implements OnInit, AfterViewInit {
   }
 
   onRowClicked(row: any): void {
-    console.log(`Row clicked was ${row}`);
+    console.debug(`Row clicked was ${row}`);
   }
 
   onAddParticipation(): void {
-    console.log(`add participation for ${this.firstName.value}`);
+    console.debug(`add participation for ${this.firstName.value}`);
     this.participationService.addParticipation(this.firstName.value);
     this.addForm.reset();
   }
@@ -63,11 +62,11 @@ export class ParticipationComponent implements OnInit, AfterViewInit {
   }
 
   onUploadParticipations() {
-    console.log('upload participations');
+    console.debug('upload participations');
   }
 
   onDownloadParticipations() {
-    console.log('download participations');
+    console.debug('download participations');
   }
 
   get firstName() { return this.addForm.controls['firstName']; }

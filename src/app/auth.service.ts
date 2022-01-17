@@ -13,7 +13,11 @@ export class AuthService {
 
   get user(): Realm.User | null { return this.app.currentUser; }
 
-  get accessToken(): string | null { return this.user ? this.user.accessToken : ''; }
+  get accessToken(): string | null {
+    var token = this.user ? this.user.accessToken : '';
+    console.debug(`current access token ${token}`);
+    return token;
+  }
 
   get isLoggedIn(): boolean { return this.user ? this.user.isLoggedIn : false; }
 
@@ -57,7 +61,7 @@ export class AuthService {
     });
     return passwordResetResponse;
   }
-  
+
   private loginWith(credentials: Credentials): Promise<string> {
     let userPromise = this.app.logIn(credentials);
     return new Promise<string>((resolve, reject) => {
