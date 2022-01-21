@@ -1,11 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
-// import { MongoClient } from 'mongodb';
+import { gql } from '@apollo/client/core';
+import { Apollo, QueryRef } from 'apollo-angular';
 import { BSON } from 'realm-web';
-import { AuthService } from './auth.service';
 
 export interface Participation {
-  _id: BSON.ObjectID;
+  _id?: BSON.ObjectID;
   firstName: string;
   lastName: string;
   number: number;
@@ -17,11 +17,27 @@ export interface Participation {
   providedIn: 'root'
 })
 export class ParticipationService {
+  query = {} as QueryRef<Participation>;
   
-  constructor(private authService: AuthService,
-              private http: HttpClient) { }
+  constructor(private apollo: Apollo,
+              private datePipe: DatePipe) {
 
-  getFieldLabels(): string[] {
+    this.query = this.apollo
+      .watchQuery<Participation>({
+        query: gql`{
+          participations {
+            _id,
+            firstName,
+            lastName,
+            number,
+            start,
+            end
+          }}`,
+        fetchPolicy: 'cache-and-network'
+      });
+  }
+
+  getFields(): string[] {
     return [
       'firstName',
       'lastName',
@@ -31,29 +47,39 @@ export class ParticipationService {
     ]
   }
 
-  // findParticipations(): Observable<Participation[]> {
-  //     return this.http.post(MONGODB_API + '/action/findOne',
-  //       {
-  //         'dataSource':'Cluster0',
-  //         'database':'fclg-youth-lottery',
-  //         'collection':'participations',
-  //         'filter': { 'firstName': 'Marvin' }
-  //       },
-  //       {
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           'Access-Control-Request-Headers': '*',
-  //           'Access-Control-Allow-Origin': 'https://data.mongodb-api.com',
-  //           'api-key': MONGODB_API_KEY
-  //         }
-  //       }) as Observable<Participation[]>;
-  // }
-
-  addParticipation(firstName: string) {
-    
+  onChange(next: (value: any) => void): void {
+    this.query.valueChanges.subscribe(next);
   }
 
-  removeParticipation(index: number) {
-    
+  addParticipation(participation: Participation) {
+    this.apollo.mutate<Participation>({
+      mutation: gql`mutation {
+        insertOneParticipation(data: {
+          firstName: "${participation.firstName}",
+          lastName: "${participation.lastName}",
+          number: ${participation.number},
+          start: "${this.toString(participation.start)}",
+          end: "${this.toString(participation.end)}"
+        }) { _id } }`
+    }).subscribe({
+      next: ({data}) => this.query.refetch(),
+      error: (error) => console.error(error)
+    })
+  }
+
+  removeParticipation(id: BSON.ObjectID) {
+    this.apollo.mutate<Participation>({
+      mutation: gql`mutation {
+        deleteOneParticipation(query: {
+          _id:"${id}"
+        }) { _id } }`
+    }).subscribe({
+      next: ({data}) => this.query.refetch(),
+      error: (error) => console.error(error)
+    })
+  }
+
+  private toString(date: Date): string | null {
+    return this.datePipe.transform(date, 'yyyy-MM-dd');
   }
 }

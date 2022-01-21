@@ -7,7 +7,6 @@ import { AuthService } from './auth.service';
 
 const uri = 'https://eu-central-1.aws.realm.mongodb.com/api/client/v2.0/app/fclg-youth-lottery-nmhhi/graphql';
 export function createApollo(httpLink: HttpLink, authService: AuthService): ApolloClientOptions<any> {
-  console.log('create apollo');
   const basic = setContext((_operation, _context) => ({
     headers: { Accept: 'charset=utf-8' }
   }));

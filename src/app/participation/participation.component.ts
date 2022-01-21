@@ -1,15 +1,18 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { gql } from '@apollo/client/core';
-import { Apollo } from 'apollo-angular';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { BSON } from 'realm-web';
 import { Participation, ParticipationService } from '../participation.service';
 
 @Component({
   selector: 'app-participation',
   templateUrl: './participation.component.html',
-  styleUrls: ['./participation.component.css']
+  styleUrls: ['./participation.component.css'],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
+  ]
 })
-export class ParticipationComponent implements OnInit, AfterViewInit {
+export class ParticipationComponent implements OnInit {
 
   addForm = {} as FormGroup;
   participation = {} as Participation;
@@ -19,56 +22,51 @@ export class ParticipationComponent implements OnInit, AfterViewInit {
   error: any;
 
   constructor(private formBuilder: FormBuilder,
-              private participationService: ParticipationService,
-              private apollo: Apollo) { }
+              private participationService: ParticipationService) { }
 
   ngOnInit(): void {
     this.addForm = this.formBuilder.group({
-      firstName: [this.participation.firstName, Validators.required]
+      firstName: [this.participation.firstName, Validators.required],
+      lastName: [this.participation.lastName, Validators.required],
+      number: [this.participation.number, Validators.required],
+      start: [this.participation.start, Validators.required],
+      end: [this.participation.end]
+    });
+    this.displayedColumns = this.participationService.getFields();
+    // this.displayedColumns.push("actions");
+    this.participationService.onChange(({ data, loading }) => {
+      console.debug(`on change (loading: ${loading})`);
+      this.participations = data.participations;
+      this.loading = loading;
     })
-    this.displayedColumns = this.participationService.getFieldLabels();
-  }
-
-  ngAfterViewInit(): void {
-    this.apollo
-      .watchQuery({query: gql`{
-        participations {
-          firstName,
-          lastName,
-          number,
-          start,
-          end
-        }}`})
-      .valueChanges.subscribe((result: any) => {
-        console.debug('participations changed');
-        this.participations = result?.data?.participations;
-        this.loading = result.loading;
-        this.error = result.error;
-      });
-  }
-
-  onRowClicked(row: any): void {
-    console.debug(`Row clicked was ${row}`);
   }
 
   onAddParticipation(): void {
-    console.debug(`add participation for ${this.firstName.value}`);
-    this.participationService.addParticipation(this.firstName.value);
+    this.participationService.addParticipation({
+      firstName: this.firstName.value,
+      lastName: this.lastName.value,
+      number: this.number.value,
+      start: this.start.value,
+      end: this.end.value
+    });
     this.addForm.reset();
   }
 
-  onRemoveParticipation(index: number) {
-    this.participationService.removeParticipation(index);
+  onRemoveParticipation(row: Participation): void {
+    if (row._id)
+      this.participationService.removeParticipation(row._id);
   }
 
-  onUploadParticipations() {
-    console.debug('upload participations');
-  }
-
-  onDownloadParticipations() {
-    console.debug('download participations');
+  onRowClicked(row: Participation): void {
+    console.debug(`remove participation with id ${row._id}`);
+    if (row._id)
+      this.participationService.removeParticipation(row._id);
   }
 
   get firstName() { return this.addForm.controls['firstName']; }
+  get lastName() { return this.addForm.controls['lastName']; }
+  get number() { return this.addForm.controls['number']; }
+  get start() { return this.addForm.controls['start']; }
+  get end() { return this.addForm.controls['end']; }
 
 }

@@ -3,10 +3,12 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from "@angular/material/input";
 import { MatMenuModule } from '@angular/material/menu';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSortModule } from '@angular/material/sort';
@@ -25,6 +27,7 @@ import { LotteryArchiveComponent } from './lotteryarchive/lotteryarchive.compone
 import { ParticipationComponent } from './participation/participation.component';
 import { RegisterComponent } from './register/register.component';
 import { GraphQLModule } from './graphql.module';
+import { DatePipe } from '@angular/common';
 
 
 @NgModule({
@@ -46,10 +49,12 @@ import { GraphQLModule } from './graphql.module';
     HttpClientModule,
     MatButtonModule,
     MatCardModule,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatMenuModule,
+    MatNativeDateModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatSortModule,
@@ -58,7 +63,7 @@ import { GraphQLModule } from './graphql.module';
     MatToolbarModule,
     ReactiveFormsModule,
   ],
-  providers: [],
+  providers: [DatePipe],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

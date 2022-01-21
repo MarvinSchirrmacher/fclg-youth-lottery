@@ -1,29 +1,33 @@
 <div>
   <mat-table [dataSource]="participations" class="mat-elevation-z8">
+    <ng-container matColumnDef="_id">
+      <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row._id }}</mat-cell>
+    </ng-container>
     <ng-container matColumnDef="firstName">
-      <mat-header-cell *matHeaderCellDef>firstName</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef>Vorname</mat-header-cell>
       <mat-cell *matCellDef="let row">{{ row.firstName }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="lastName">
-      <mat-header-cell *matHeaderCellDef>lastName</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef>Nachname</mat-header-cell>
       <mat-cell *matCellDef="let row">{{ row.lastName }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="number">
-      <mat-header-cell *matHeaderCellDef>number</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef>Nummer</mat-header-cell>
       <mat-cell *matCellDef="let row">{{ row.number }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="start">
-      <mat-header-cell *matHeaderCellDef>start</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef>Start</mat-header-cell>
       <mat-cell *matCellDef="let row">{{ row.start }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="end">
-      <mat-header-cell *matHeaderCellDef>end</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef>Ende</mat-header-cell>
       <mat-cell *matCellDef="let row">{{ row.end }}</mat-cell>
     </ng-container>
-    <ng-container matColumnDef="delete">
-      <mat-header-cell *matHeaderCellDef>options</mat-header-cell>
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
       <mat-cell *matCellDEf="let row">
-        <button class="btn btn-danger" (click)="onRemoveParticipation(row.index)">Löschen</button>
+        <button class="btn btn-danger" (click)="onRemoveParticipation(row._id)">Löschen</button>
       </mat-cell>
     </ng-container>
 
@@ -34,23 +38,63 @@
   </mat-table>
 </div>
   
-<div id="participation-input" class="card">
+<div id="add-participation" class="card">
   <form novalidate (ngSubmit)="onAddParticipation()" [formGroup]="addForm">
-    <label>
-      <span>Vorname</span>
-      <input type="text" placeholder="Vorname" formControlName="firstName">
-    </label>
-    <div class="form-field error"
-         *ngIf="addForm.get('firstName')!.hasError('required') && addForm.get('firstName')!.touched">
+
+    <mat-form-field class="form-field">
+      <input type="text" matInput placeholder="Vorname" formControlName="firstName">
+    </mat-form-field>
+    <br/>
+    <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)" class="alert">
+      <div *ngIf="firstName.errors?.['required']" class="form-field error">
         Vorname ist verpflichtend
+      </div>
     </div>
+
+    <mat-form-field class="form-field">
+      <input type="text" matInput placeholder="Nachname" formControlName="lastName">
+    </mat-form-field>
+    <br/>
+    <div *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)" class="alert">
+      <div *ngIf="lastName.errors?.['required']" class="form-field error">
+        Nachname ist verpflichtend
+      </div>
+    </div>
+
+    <mat-form-field class="form-field">
+      <input type="text" matInput placeholder="Nummer" formControlName="number">
+    </mat-form-field>
+    <br/>
+    <div *ngIf="number.invalid && (number.dirty || number.touched)" class="alert">
+      <div *ngIf="number.errors?.['required']" class="form-field error">
+        Nummer ist verpflichtend
+      </div>
+    </div>
+
+    <mat-form-field>
+      <input matInput [matDatepicker]="startDatePicker" placeholder="Start" formControlName="start">
+      <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #startDatePicker></mat-datepicker>
+    </mat-form-field>
+    <br/>
+    <div *ngIf="start.invalid && (start.dirty || start.touched)" class="alert">
+      <div *ngIf="start.errors?.['required']" class="form-field error">
+        Startdatum ist verpflichtend
+      </div>
+    </div>
+
+    <mat-form-field>
+      <input matInput [matDatepicker]="endDatePicker" placeholder="Ende" formControlName="end">
+      <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+      <mat-datepicker #endDatePicker></mat-datepicker>
+    </mat-form-field>
+    <br/>
+    <div *ngIf="end.invalid && (end.dirty || end.touched)" class="alert">
+      <div *ngIf="end.errors?.['required']" class="form-field error">
+        Enddatum ist verpflichtend
+      </div>
+    </div>
+
     <button class="btn" type="submit" [disabled]="addForm.invalid">Speichern</button>
   </form>
-</div>
-
-<div id="participations" class="card">
-  <div id="participation-actions">
-    <button class="btn btn-alt" (click)="onUploadParticipations()">Hochladen</button>
-    <button class="btn btn-alt" (click)="onDownloadParticipations()">Herunterladen</button>
-  </div>
 </div>
