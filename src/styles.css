@@ -20,6 +20,10 @@ table {
     background-color: #25ac00;
 }
 
+.mat-raised-button.mat-primary {
+    background: #25ac00;
+}
+
 .tile {
     background: #f2f3f4;
     padding: 5px;

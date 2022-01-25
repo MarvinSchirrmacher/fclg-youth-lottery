@@ -11,7 +11,7 @@ import { LoginBaseComponent } from '../common/login-base.component';
 })
 export class LoginComponent extends LoginBaseComponent {
               
-  logonTitle = "Logon";
+  logonTitle = "Anmelden";
   showRetype = false;
   showChangePassword = false;
 
