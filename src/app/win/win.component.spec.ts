@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LotteryArchiveComponent } from './lotteryarchive.component';
+import { WinComponent } from './win.component';
 
-describe('LotteryArchiveComponent', () => {
-  let component: LotteryArchiveComponent;
-  let fixture: ComponentFixture<LotteryArchiveComponent>;
+describe('WinComponent', () => {
+  let component: WinComponent;
+  let fixture: ComponentFixture<WinComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LotteryArchiveComponent ]
+      declarations: [ WinComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LotteryArchiveComponent);
+    fixture = TestBed.createComponent(WinComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

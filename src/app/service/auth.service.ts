@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as Realm from "realm-web";
 import { Credentials } from 'realm-web';
-import { REALM_APP_ID } from './common/mongodb';
+import { REALM_APP_ID } from '../common/mongodb';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,14 @@ export class AuthService {
 
   get user(): Realm.User | null { return this.app.currentUser; }
 
-  get accessToken(): string | null { return this.user ? this.user.accessToken : ''; }
+  get accessToken(): string | null {
+    if (this.user) {
+      this.user.refreshAccessToken();
+      return this.user.accessToken;
+    }
+
+    return null;
+  }
 
   get isLoggedIn(): boolean { return this.user ? this.user.isLoggedIn : false; }
 

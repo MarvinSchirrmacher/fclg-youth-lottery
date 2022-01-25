@@ -1,13 +1,12 @@
 import { HttpService } from './http.service';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
+import { LotteryDraw } from '../common/lotterydraw';
 
-export interface LotteryDraw {
-  date: Date;
-  id: number;
-  calendarweek: number;
-  numbers: number[];
-  winningNumber: number;
+export enum DrawDay {
+  Wednesday = 3,
+  Saturday = 6,
+  All = 7
 }
 
 interface ArchiveEntry {
@@ -29,40 +28,40 @@ export class LotteryArchiveService {
 
   constructor(private http: HttpService) {}
 
-  public getLatestDraw(): Observable<LotteryDraw> {
-    return this.fetchAllDraws(d => true)
+  public getLatestDraw(day: DrawDay = DrawDay.All): Observable<LotteryDraw> {
+    return this.fetchAllDraws(d => true, day)
         .pipe(map((entries: LotteryDraw[]) => entries[entries.length - 1]));
   }
 
-  public getAllDrawsAfter(date: Date): Observable<LotteryDraw[]> {
-    return this.fetchAllDraws(d => d.date.getTime() >= date.getTime());
+  public getAllDrawsAfter(date: Date, day: DrawDay = DrawDay.All): Observable<LotteryDraw[]> {
+    return this.fetchAllDraws(d => d.date.getTime() >= date.getTime(), day);
   }
 
-  public getAllDrawsBefore(date: Date): Observable<LotteryDraw[]> {
-    return this.fetchAllDraws(d => d.date.getTime() <= date.getTime());
+  public getAllDrawsBefore(date: Date, day: DrawDay = DrawDay.All): Observable<LotteryDraw[]> {
+    return this.fetchAllDraws(d => d.date.getTime() <= date.getTime(), day);
   }
 
-  public getAllDrawsOfYear(year: number): Observable<LotteryDraw[]> {
-    return this.fetchAllDraws(d => d.date.getFullYear() == year);
+  public getAllDrawsOfYear(year: number, day: DrawDay = DrawDay.All): Observable<LotteryDraw[]> {
+    return this.fetchAllDraws(d => d.date.getFullYear() == year, day);
   }
 
-  public fetchAllDraws(where: (d: LotteryDraw) => boolean): Observable<LotteryDraw[]> {
+  private fetchAllDraws(
+      where: (d: LotteryDraw) => boolean, day: DrawDay): Observable<LotteryDraw[]> {
     return this.http
       .get<Archive>(this.urlAllDraws)
       .pipe(map((archive: Archive) => this.fromArchiveEntry(archive.data)))
-      .pipe(map((entries: LotteryDraw[]) => entries.filter(e => where(e))));
+      .pipe(map((entries: LotteryDraw[]) =>
+        entries.filter(e => where(e) && this.isDay(e, day))
+      ));
   }
 
   private fromArchiveEntry(entries: ArchiveEntry[]): LotteryDraw[] {
     return entries
-      .map(e => {
-        return {
+      .map(e => ({
           id: e.id,
           date: this.dateFromString(e.date),
-          calendarweek: this.getWeekNumber(e.date),
-          numbers: e.Lottozahl,
-          winningNumber: e.Lottozahl[0],
-        };})
+          numbers: e.Lottozahl
+        } as LotteryDraw))
       .sort(this.sortIdDesc);
   }
 
@@ -72,6 +71,11 @@ export class LotteryArchiveService {
 
   private sortDateDesc(d1: LotteryDraw, d2: LotteryDraw): number {
     return d1.date.getTime() > d2.date.getTime() ? -1 : 1;
+  }
+
+  private isDay(draw: LotteryDraw, day: DrawDay): boolean {
+    if (day === DrawDay.All) return true;
+    return day === draw.date.getDay();
   }
 
   private dateFromString(date: string): Date {

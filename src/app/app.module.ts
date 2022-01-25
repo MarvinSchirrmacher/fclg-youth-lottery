@@ -23,11 +23,12 @@ import { AppComponent } from './app.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
-import { LotteryArchiveComponent } from './lotteryarchive/lotteryarchive.component';
+import { LotteryComponent } from './lottery/lottery.component';
 import { ParticipationComponent } from './participation/participation.component';
 import { RegisterComponent } from './register/register.component';
 import { GraphQLModule } from './graphql.module';
 import { DatePipe } from '@angular/common';
+import { WinComponent } from './win/win.component';
 
 
 @NgModule({
@@ -38,8 +39,9 @@ import { DatePipe } from '@angular/common';
     LoginComponent,
     RegisterComponent,
     ChangePasswordComponent,
-    LotteryArchiveComponent,
+    LotteryComponent,
     ParticipationComponent,
+    WinComponent,
   ],
   imports: [
     AppRoutingModule,

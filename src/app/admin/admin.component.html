@@ -1,16 +1,8 @@
 <mat-tab-group>
-    <mat-tab label="Übersicht">
-        List with draw, winningnumber, winning person and a checkbox. The checkbox
-        is ticked, if the money was transfered.
-    </mat-tab>
     <mat-tab label="Ziehungen">
-        <app-lotteryarchive></app-lotteryarchive>
+        <app-lottery></app-lottery>
     </mat-tab>
-    <mat-tab label="Teilnehmer">
+    <mat-tab label="Teilnahmen">
         <app-participation></app-participation>
     </mat-tab>
-    <mat-tab label="Listen">
-        assignment of participants to the entries -> array of drawobjects, each
-        object having 49 number attributes, in which the id of the participant is in
-    </mat-tab>
-</mat-tab-group>  
+</mat-tab-group>

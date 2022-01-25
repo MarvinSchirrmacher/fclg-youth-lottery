@@ -6,23 +6,23 @@
     </ng-container>
     <ng-container matColumnDef="firstName">
       <mat-header-cell *matHeaderCellDef>Vorname</mat-header-cell>
-      <mat-cell *matCellDef="let row">{{ row.firstName }}</mat-cell>
+      <mat-cell *matCellDef="let row">{{ row.user.firstName }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="lastName">
       <mat-header-cell *matHeaderCellDef>Nachname</mat-header-cell>
-      <mat-cell *matCellDef="let row">{{ row.lastName }}</mat-cell>
+      <mat-cell *matCellDef="let row">{{ row.user.lastName }}</mat-cell>
     </ng-container>
-    <ng-container matColumnDef="number">
-      <mat-header-cell *matHeaderCellDef>Nummer</mat-header-cell>
-      <mat-cell *matCellDef="let row">{{ row.number }}</mat-cell>
+    <ng-container matColumnDef="ticket">
+      <mat-header-cell *matHeaderCellDef>Gewinnlos</mat-header-cell>
+      <mat-cell *matCellDef="let row">L{{ row.ticket.list }}N{{ row.ticket.number }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="start">
-      <mat-header-cell *matHeaderCellDef>Start</mat-header-cell>
-      <mat-cell *matCellDef="let row">{{ row.start }}</mat-cell>
+      <mat-header-cell *matHeaderCellDef>Beginn</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row.start | date: 'dd.MM.yyyy' }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="end">
       <mat-header-cell *matHeaderCellDef>Ende</mat-header-cell>
-      <mat-cell *matCellDef="let row">{{ row.end }}</mat-cell>
+      <mat-cell *matCellDef="let row">{{ row.end | date: 'dd.MM.yyyy' }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
@@ -62,11 +62,31 @@
     </div>
 
     <mat-form-field class="form-field">
-      <input type="text" matInput placeholder="Nummer" formControlName="number">
+      <input type="text" matInput placeholder="E-Mail" formControlName="email">
     </mat-form-field>
     <br/>
-    <div *ngIf="number.invalid && (number.dirty || number.touched)" class="alert">
-      <div *ngIf="number.errors?.['required']" class="form-field error">
+    <div *ngIf="email.invalid && (email.dirty || email.touched)" class="alert">
+      <div *ngIf="email.errors?.['required']" class="form-field error">
+        Nachname ist verpflichtend
+      </div>
+    </div>
+
+    <mat-form-field class="form-field">
+      <input type="text" matInput placeholder="IBAN" formControlName="iban">
+    </mat-form-field>
+    <br/>
+    <div *ngIf="iban.invalid && (iban.dirty || iban.touched)" class="alert">
+      <div *ngIf="iban.errors?.['required']" class="form-field error">
+        Nachname ist verpflichtend
+      </div>
+    </div>
+
+    <mat-form-field class="form-field">
+      <input type="text" matInput placeholder="Gewinnlos" formControlName="ticket">
+    </mat-form-field>
+    <br/>
+    <div *ngIf="ticket.invalid && (ticket.dirty || ticket.touched)" class="alert">
+      <div *ngIf="ticket.errors?.['required']" class="form-field error">
         Nummer ist verpflichtend
       </div>
     </div>
@@ -95,6 +115,6 @@
       </div>
     </div>
 
-    <button class="btn" type="submit" [disabled]="addForm.invalid">Speichern</button>
+    <button class="btn" type="submit" [disabled]="addForm.invalid">Hinzufügen</button>
   </form>
 </div>

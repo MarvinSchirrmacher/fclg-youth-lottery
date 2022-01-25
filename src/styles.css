@@ -1,4 +1,42 @@
-/* You can add global styles to this file, and also import other style files */
-
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+table {
+    width: 100%;
+}
+
+.mat-toolbar.mat-primary {
+    background: #25ac00 ;
+    display: flex;
+    justify-content: space-between;
+}
+
+.mat-tab-group.mat-primary .mat-ink-bar,
+.mat-tab-nav-bar.mat-primary .mat-ink-bar {
+    background-color: #25ac00;
+}
+
+.tile {
+    background: #f2f3f4;
+    padding: 5px;
+    text-align: center;
+    width: 27px;
+}
+
+.tile + .tile {
+    margin-left: 5px;
+}
+
+.tile:first-of-type {
+    background-color: #25ac00;
+    color: white;
+    font-weight: bold;
+}
+
+.text + .text:before {
+    content: ", ";
+}
