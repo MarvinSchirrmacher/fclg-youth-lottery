@@ -28,7 +28,6 @@ import { ParticipationComponent } from './participation/participation.component'
 import { RegisterComponent } from './register/register.component';
 import { GraphQLModule } from './graphql.module';
 import { DatePipe } from '@angular/common';
-import { WinComponent } from './win/win.component';
 
 
 @NgModule({
@@ -41,7 +40,6 @@ import { WinComponent } from './win/win.component';
     ChangePasswordComponent,
     LotteryComponent,
     ParticipationComponent,
-    WinComponent,
   ],
   imports: [
     AppRoutingModule,
