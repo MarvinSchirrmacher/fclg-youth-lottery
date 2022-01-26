@@ -1,9 +1,5 @@
-<div>
-  <mat-table [dataSource]="wins" class="mat-elevation-z8">
-    <ng-container matColumnDef="calendarweek">
-      <mat-header-cell *matHeaderCellDef>Kalenderwoche</mat-header-cell>
-      <mat-cell *matCellDef="let win">{{ win.draw.week }}</mat-cell>
-    </ng-container>
+<mat-card class="w-70 distant">
+  <mat-table [dataSource]="wins">
     <ng-container matColumnDef="date">
       <mat-header-cell *matHeaderCellDef>Datum</mat-header-cell>
       <mat-cell *matCellDef="let win">{{ win.draw.date | date: 'dd.MM.yyyy' }}</mat-cell>
@@ -28,4 +24,4 @@
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
   </mat-table>  
-</div>
+</mat-card>

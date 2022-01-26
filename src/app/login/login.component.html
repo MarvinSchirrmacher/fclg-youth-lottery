@@ -1,8 +1,8 @@
-<div class="login-form top-space">
-<div [formGroup]="formGroup">
-<mat-toolbar class="toolbar" color="primary">{{logonTitle}}</mat-toolbar>
-<mat-card>
-    <mat-form-field class="form-field">
+<section class="flex center">
+<form [formGroup]="formGroup" class="login-form">
+<mat-toolbar class="toolbar" color="primary">{{ logonTitle }}</mat-toolbar>
+<mat-card class="flex end">
+    <mat-form-field class="form-field w-100">
         <input type="text" matInput placeholder="E-Mail-Adresse" formControlName="email">
     </mat-form-field>
     <br/>
@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <mat-form-field class="form-field">
+    <mat-form-field class="form-field w-100">
     <input type="password" matInput placeholder="Passwort" formControlName="password">
     </mat-form-field>
     <br/>
@@ -60,5 +60,5 @@
         </button>
     </div>
 </mat-card>
-</div>
-</div>  
+</form>
+</section>  

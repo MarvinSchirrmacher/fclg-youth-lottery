@@ -5,6 +5,54 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     box-sizing: border-box;
 }
 
+.flex {
+    display: flex !important;
+    flex-flow: column wrap;
+}
+.flex.center {
+    align-items: center;
+    justify-content: center;
+}
+
+.flex.end {
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+.w-100 { width: 100%; }
+.w-90 { width: 90%; }
+.w-80 { width: 80%; }
+.w-70 { width: 70%; }
+.w-60 { width: 60%; }
+.w-50 { width: 50%; }
+.w-40 { width: 40%; }
+.w-30 { width: 30%; }
+.w-20 { width: 20%; }
+.w-10 { width: 10%; }
+
+.w-100.distant { width: calc(100% - 32px); }
+.w-90.distant { width: calc(90% - 32px); }
+.w-80.distant { width: calc(80% - 32px); }
+.w-70.distant { width: calc(70% - 32px); }
+.w-60.distant { width: calc(60% - 32px); }
+.w-50.distant { width: calc(50% - 32px); }
+.w-40.distant { width: calc(40% - 32px); }
+.w-30.distant { width: calc(30% - 32px); }
+.w-20.distant { width: calc(20% - 32px); }
+.w-10.distant { width: calc(10% - 32px); }
+
+.distant {
+    margin: 16px;
+}
+
+section.flex {
+    height: calc(100% - 64px);
+}
+
+.login-form {
+    width: 300px;
+}
+
 table {
     width: 100%;
 }
@@ -18,6 +66,10 @@ table {
 .mat-tab-group.mat-primary .mat-ink-bar,
 .mat-tab-nav-bar.mat-primary .mat-ink-bar {
     background-color: #25ac00;
+}
+
+.mat-input-color {
+    caret-color: #25ac00;
 }
 
 .mat-raised-button.mat-primary {

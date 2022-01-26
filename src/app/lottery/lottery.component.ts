@@ -10,7 +10,6 @@ import { LotteryWinService } from '../service/lotterywin.service';
 export class LotteryComponent implements OnInit {
   public wins = [] as LotteryWin[];
   public displayedColumns: string[] = [
-    'calendarweek',
     'date',
     'numbers',
     'winners'
