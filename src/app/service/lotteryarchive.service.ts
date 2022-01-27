@@ -84,12 +84,4 @@ export class LotteryArchiveService {
     var year = Number(date.substring(6, 10));
     return new Date(year, month - 1, day);
   }
-
-  private getWeekNumber(dateString: string): number {
-    const date = this.dateFromString(dateString);
-    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-    const pastDaysOfYear =
-      (date.getTime() - firstDayOfYear.getTime()) / 86400000;
-    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-  }
 }

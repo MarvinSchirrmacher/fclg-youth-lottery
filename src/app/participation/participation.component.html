@@ -23,17 +23,19 @@
     </ng-container>
     <ng-container matColumnDef="end">
       <mat-header-cell *matHeaderCellDef>Ende</mat-header-cell>
-      <mat-cell *matCellDef="let row">{{ row.end | date: 'dd.MM.yyyy' }}</mat-cell>
+      <mat-cell *matCellDef="let row">{{ row.end ? (row.end | date: 'dd.MM.yyyy') : 'offen' }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
-      <mat-cell *matCellDEf="let row">
-        <button class="btn btn-danger" (click)="onRemoveParticipation(row._id)">Löschen</button>
+      <mat-cell *matCellDef="let row">
+        <button class="mat-stroked-button mat-primary" (click)="onEndParticipation(row)">Beenden</button>
+        <button class="mat-stroked-button mat-primary" (click)="onRemoveParticipation(row)">Löschen</button>
       </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     <mat-row *matRowDef="let row; columns: displayedColumns"
+             id="{{ row._id }}"
              (click)="onRowClicked(row)">
     </mat-row>
   </mat-table>

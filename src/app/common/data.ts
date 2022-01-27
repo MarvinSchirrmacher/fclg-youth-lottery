@@ -39,5 +39,5 @@ export interface Participation {
   user: User;
   ticket: WinningTicket;
   start: Date;
-  end: Date;
+  end?: Date;
 }

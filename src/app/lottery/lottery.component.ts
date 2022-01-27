@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { LotteryWin } from '../common/lotterywin';
+import { LotteryDraw } from '../common/lotterydraw';
 import { LotteryWinService } from '../service/lotterywin.service';
 
 @Component({
@@ -8,17 +8,18 @@ import { LotteryWinService } from '../service/lotterywin.service';
   styleUrls: ['./lottery.component.css'],
 })
 export class LotteryComponent implements OnInit {
-  public wins = [] as LotteryWin[];
+  public wins = [] as LotteryDraw[];
   public displayedColumns: string[] = [
     'date',
     'numbers',
-    'winners'
+    'winners',
+    'processed'
   ];
 
   constructor(private lotteryWin: LotteryWinService) {}
 
   public ngOnInit(): void {
-    this.lotteryWin.subscribe((value: LotteryWin[]) => {
+    this.lotteryWin.subscribe((value: LotteryDraw[]) => {
       this.wins = value
     })
   }

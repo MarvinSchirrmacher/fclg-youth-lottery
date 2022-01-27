@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { map, zip } from 'rxjs';
-import { Participation, User } from '../common/data';
+import { Participation } from '../common/data';
 import { LotteryDraw } from '../common/lotterydraw';
-import { LotteryWin } from '../common/lotterywin';
 import { DrawDay, LotteryArchiveService } from './lotteryarchive.service';
 import { ParticipationService } from './participation.service';
 
@@ -14,27 +13,32 @@ export class LotteryWinService {
   constructor(private lotteryArchive: LotteryArchiveService,
               private participation: ParticipationService) { }
 
-  public subscribe(next: (value: LotteryWin[]) => void): void {
+  public subscribe(next: (value: LotteryDraw[]) => void): void {
     var allDraws = this.lotteryArchive
         .getAllDrawsOfYear(new Date().getFullYear(), DrawDay.Saturday);
     var allParticipations = this.participation.getAllParticipations();
 
     zip(allDraws, allParticipations)
       .pipe(map( ([draws, participations]) =>
-        draws.map(d => this.createLotteryWin(d, participations))))
+        draws.map(d => this.determineWinners(d, participations))))
       .subscribe(next);
   }
 
-  private createLotteryWin(draw: LotteryDraw, participations: Participation[]): LotteryWin {
-    return {
-      draw: draw,
-      winners: this.determineWinners(draw, participations)
-    } as LotteryWin;
+  private determineWinners(draw: LotteryDraw, participations: Participation[]): LotteryDraw {
+    draw.winners = participations
+        .filter(p => this.isInParticipationPeriod(p, draw))
+        .filter(p => p.ticket.number === draw.numbers[0]);
+    return draw;
   }
 
-  private determineWinners(draw: LotteryDraw, participations: Participation[]): User[] {
-    return participations
-        .filter(p => p.ticket.number === draw.numbers[0])
-        .map(p => p.user);
+  private isInParticipationPeriod(p: Participation, d: LotteryDraw): boolean {
+    var start = new Date(p.start);
+    var end = p.end ? new Date(p.end) : undefined;
+    var draw = new Date(d.date);
+
+    var afterStart = start.getTime() <= draw.getTime();
+    var beforeEnd = end ? end.getTime() >= draw.getTime() : true;
+
+    return afterStart && beforeEnd;
   }
 }

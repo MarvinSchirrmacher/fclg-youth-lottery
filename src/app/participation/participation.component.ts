@@ -49,7 +49,8 @@ export class ParticipationComponent implements OnInit {
     'lastName',
     'ticket',
     'start',
-    'end'
+    'end',
+    'actions'
   ];
   loading = true;
   error: any;
@@ -95,8 +96,11 @@ export class ParticipationComponent implements OnInit {
     this.participationService.removeParticipation(row._id!);
   }
 
+  onEndParticipation(row: Participation): void {
+    this.participationService.endParticipation(row._id!);
+  }
+
   onRowClicked(row: Participation): void {
-    this.participationService.removeParticipation(row._id!);
   }
 
   get firstName() { return this.addForm.controls['firstName']; }
