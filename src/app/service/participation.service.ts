@@ -108,27 +108,26 @@ export class ParticipationService {
       return;
     
     var updated = {
-      end: this.calculateEnd(current.end ? new Date(current.end) : undefined)
+      end: this.endOfQuarter(current.end ? new Date(current.end) : undefined)
     } as Participation;
     this.updateParticipation(id, updated);
   }
 
-  private calculateEnd(end: Date | undefined): Date {
+  private endOfQuarter(end: Date | undefined): Date {
     var today: Date = new Date();
 
     if (end && end.getTime() < today.getTime())
       return end;
 
-    var ref: Date = end ? end : today;
-    var year = ref.getFullYear();
-    var month = this.lastMonthOfQuarter(ref.getMonth());
+    var year = today.getFullYear();
+    var month = this.lastMonthOfQuarter(today.getMonth());
     var day = this.lastDayOf(year, month);
 
     return new Date(year, month, day);
   }
 
   private lastMonthOfQuarter(month: number) {
-    return month - (month % 3) + 3
+    return month - (month % 3) + 2;
   }
 
   private lastDayOf(year: number, month: number): number {
