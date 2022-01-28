@@ -1,0 +1,84 @@
+<form novalidate (ngSubmit)="onAddParticipation()" [formGroup]="form">
+<h1>Neue Teilnahme</h1>
+<div class="flex end">
+
+    <mat-form-field class="form-field w-100">
+    <input type="text" matInput placeholder="Vorname" formControlName="firstName">
+    </mat-form-field>
+    <br/>
+    <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)" class="alert">
+    <div *ngIf="firstName.errors?.['required']" class="form-field error">
+        Vorname ist verpflichtend
+    </div>
+    </div>
+
+    <mat-form-field class="form-field w-100">
+    <input type="text" matInput placeholder="Nachname" formControlName="lastName">
+    </mat-form-field>
+    <br/>
+    <div *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)" class="alert">
+    <div *ngIf="lastName.errors?.['required']" class="form-field error">
+        Nachname ist verpflichtend
+    </div>
+    </div>
+
+    <mat-form-field class="form-field w-100">
+    <input type="text" matInput placeholder="E-Mail" formControlName="email">
+    </mat-form-field>
+    <br/>
+    <div *ngIf="email.invalid && (email.dirty || email.touched)" class="alert">
+    <div *ngIf="email.errors?.['required']" class="form-field error">
+        Nachname ist verpflichtend
+    </div>
+    </div>
+
+    <mat-form-field class="form-field w-100">
+    <input type="text" matInput placeholder="IBAN" formControlName="iban">
+    </mat-form-field>
+    <br/>
+    <div *ngIf="iban.invalid && (iban.dirty || iban.touched)" class="alert">
+    <div *ngIf="iban.errors?.['required']" class="form-field error">
+        Nachname ist verpflichtend
+    </div>
+    </div>
+
+    <mat-form-field class="form-field w-100">
+    <mat-label>Gewinnlos</mat-label>
+    <mat-select formControlName="ticket">
+        <mat-option *ngFor="let ticket of freeTickets" [value]="ticket">L{{ ticket.list }}N{{ ticket.number }}</mat-option>
+    </mat-select>
+    </mat-form-field>
+    <br/>
+    <div *ngIf="ticket.invalid && (ticket.dirty || ticket.touched)" class="alert">
+    <div *ngIf="ticket.errors?.['required']" class="form-field error">
+        Nummer ist verpflichtend
+    </div>
+    </div>
+
+    <mat-form-field class="form-field w-100">
+    <input matInput [matDatepicker]="startDatePicker" placeholder="Start" formControlName="start">
+    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+    <mat-datepicker #startDatePicker></mat-datepicker>
+    </mat-form-field>
+    <br/>
+    <div *ngIf="start.invalid && (start.dirty || start.touched)" class="alert">
+    <div *ngIf="start.errors?.['required']" class="form-field error">
+        Startdatum ist verpflichtend
+    </div>
+    </div>
+
+    <mat-form-field class="form-field w-100">
+    <input matInput [matDatepicker]="endDatePicker" placeholder="Ende" formControlName="end">
+    <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+    <mat-datepicker #endDatePicker></mat-datepicker>
+    </mat-form-field>
+    <br/>
+    <div *ngIf="end.invalid && (end.dirty || end.touched)" class="alert">
+    <div *ngIf="end.errors?.['required']" class="form-field error">
+        Enddatum ist verpflichtend
+    </div>
+    </div>
+
+    <button class="mat-raised-button mat-primary" type="submit" [disabled]="form.invalid">Hinzufügen</button>
+</div>
+</form>

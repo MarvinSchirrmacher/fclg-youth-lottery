@@ -25,10 +25,8 @@ export function createIbanValidator(): ValidatorFn {
 })
 export class ParticipationComponent implements OnInit {
 
-  addForm = {} as FormGroup;
   participation = {} as Participation;
   participations = [] as Participation[];
-  freeTickets = [] as WinningTicket[];
   displayedColumns = [
     'firstName',
     'lastName',
@@ -46,39 +44,10 @@ export class ParticipationComponent implements OnInit {
               private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    this.addForm = this.formBuilder.group({
-      firstName: [null, Validators.required],
-      lastName: [null, Validators.required],
-      email: [null, [Validators.required, Validators.email]],
-      iban: [null, [Validators.required, createIbanValidator()]],
-      ticket: [null, Validators.required],
-      start: [null, Validators.required],
-      end: [null]
-    });
     this.participationService.subscribe(value => {
       this.participations = value.data.participations;
       this.loading = value.loading;
     });
-    this.participationService.observeFreeTickets()
-        .subscribe(tickets => this.freeTickets = tickets);
-  }
-
-  onAddParticipation(): void {
-    this.participationService.addParticipation({
-      user: {
-        firstName: this.firstName.value,
-        lastName: this.lastName.value,
-        email: this.email.value,
-        payment: {
-          mode: ModeOfPayment.BankTransfer,
-          iban: this.iban.value
-        }
-      },
-      ticket: WinningTicket.fromString(this.ticket.value),
-      start: this.start.value,
-      end: this.end.value
-    });
-    this.addForm.reset();
   }
 
   onRemoveParticipation(id: BSON.ObjectID): void {
@@ -110,15 +79,6 @@ export class ParticipationComponent implements OnInit {
       panelClass: ['mat-toolbar', 'mat-primary']
     });
   }
-
-  get firstName() { return this.addForm.controls['firstName']; }
-  get lastName() { return this.addForm.controls['lastName']; }
-  get email() { return this.addForm.controls['email']; }
-  get iban() { return this.addForm.controls['iban']; }
-  get ticket() { return this.addForm.controls['ticket']; }
-  get start() { return this.addForm.controls['start']; }
-  get end() { return this.addForm.controls['end']; }
-
 }
 
 @Component({

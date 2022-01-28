@@ -30,6 +30,7 @@ import { EndPariticipationDialog, ParticipationComponent } from './participation
 import { RegisterComponent } from './register/register.component';
 import { GraphQLModule } from './graphql.module';
 import { MaterialModule } from './material.module';
+import { AddParticipationComponent } from './participation/add-participation.component';
 
 
 @NgModule({
@@ -42,6 +43,7 @@ import { MaterialModule } from './material.module';
     ChangePasswordComponent,
     LotteryComponent,
     ParticipationComponent,
+    AddParticipationComponent,
     EndPariticipationDialog
   ],
   imports: [
