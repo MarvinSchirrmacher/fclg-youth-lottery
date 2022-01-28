@@ -4,6 +4,8 @@ import { Apollo, QueryRef } from 'apollo-angular';
 import { BSON } from 'realm-web';
 import { map, Observable } from 'rxjs';
 import { Participation } from '../common/data';
+import { endOfQuarter } from '../common/dates';
+import { WinningTicket } from '../common/winning-ticket';
 
 interface ParticipationResponse {
   participations: Participation[];
@@ -14,6 +16,7 @@ interface ParticipationResponse {
 })
 export class ParticipationService {
   query = {} as QueryRef<ParticipationResponse>;
+  allTickets = [] as WinningTicket[];
   
   constructor(private apollo: Apollo) {
 
@@ -35,11 +38,17 @@ export class ParticipationService {
           }}`,
         fetchPolicy: 'cache-and-network'
       });
+
+    this.allTickets = this.establishTickets();
   }
 
-  public getAllParticipations(): Observable<Participation[]> {
+  public getParticipation(id: BSON.ObjectID): Participation | undefined {
+    return this.participations.find(p => p._id === id);
+  }
+
+  public observeParticipations(): Observable<Participation[]> {
     return this.query.valueChanges
-        .pipe(map((value: any) => value.data.participations as Participation[]));
+        .pipe(map(result => result.data.participations as Participation[]));
   }
 
   public subscribe(next: (value: any) => void): void {
@@ -103,34 +112,39 @@ export class ParticipationService {
   }
 
   public endParticipation(id: BSON.ObjectID): void {
-    var current = this.query.getCurrentResult().data.participations.find(p => p._id === id);
+    var current = this.getParticipation(id);
     if (current === undefined)
       return;
     
     var updated = {
-      end: this.endOfQuarter(current.end ? new Date(current.end) : undefined)
+      end: endOfQuarter(current.end ? new Date(current.end) : undefined)
     } as Participation;
     this.updateParticipation(id, updated);
   }
 
-  private endOfQuarter(end: Date | undefined): Date {
-    var today: Date = new Date();
+  public establishTickets(): WinningTicket[] {
+    var numbers = Array.from(Array(49).keys()).map(n => n + 1);
+    var lists = Array.from(Array(2).keys()).map(l => l + 1);
+    var tickets = lists.map(l => numbers
+        .map(n => new WinningTicket(l, n)));
 
-    if (end && end.getTime() < today.getTime())
-      return end;
-
-    var year = today.getFullYear();
-    var month = this.lastMonthOfQuarter(today.getMonth());
-    var day = this.lastDayOf(year, month);
-
-    return new Date(year, month, day);
+    return tickets.reduce((a, b) => a.concat(b));
   }
 
-  private lastMonthOfQuarter(month: number) {
-    return month - (month % 3) + 2;
+  public observeUsedTickets(): Observable<WinningTicket[]> {
+    return this.query.valueChanges
+        .pipe(map(result => result.data.participations.map(p => p.ticket)));
   }
 
-  private lastDayOf(year: number, month: number): number {
-    return new Date(year, month + 1, 0).getDate();
+  public observeFreeTickets(): Observable<WinningTicket[]> {
+    return this.observeUsedTickets()
+        .pipe(map(usedTickets => {
+          console.debug(JSON.stringify(usedTickets));
+          return this.allTickets.filter(t => !usedTickets.find(u => t.equals(u)))
+        } ));
+  }
+
+  get participations(): Participation[] {
+    return this.query.getCurrentResult().data.participations;
   }
 }

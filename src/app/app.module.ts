@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from "@angular/material/input";
@@ -11,6 +12,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -24,10 +26,10 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { LotteryComponent } from './lottery/lottery.component';
-import { ParticipationComponent } from './participation/participation.component';
+import { EndPariticipationDialog, ParticipationComponent } from './participation/participation.component';
 import { RegisterComponent } from './register/register.component';
 import { GraphQLModule } from './graphql.module';
-import { DatePipe } from '@angular/common';
+import { MaterialModule } from './material.module';
 
 
 @NgModule({
@@ -40,6 +42,7 @@ import { DatePipe } from '@angular/common';
     ChangePasswordComponent,
     LotteryComponent,
     ParticipationComponent,
+    EndPariticipationDialog
   ],
   imports: [
     AppRoutingModule,
@@ -47,23 +50,12 @@ import { DatePipe } from '@angular/common';
     BrowserAnimationsModule,
     GraphQLModule,
     HttpClientModule,
-    MatButtonModule,
-    MatCardModule,
-    MatDatepickerModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatMenuModule,
-    MatNativeDateModule,
-    MatPaginatorModule,
-    MatProgressSpinnerModule,
-    MatSortModule,
-    MatTabsModule,
-    MatTableModule,
-    MatToolbarModule,
     ReactiveFormsModule,
+    MaterialModule
   ],
-  providers: [DatePipe],
+  entryComponents: [
+    EndPariticipationDialog
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

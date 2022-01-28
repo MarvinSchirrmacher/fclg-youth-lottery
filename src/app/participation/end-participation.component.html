@@ -1,0 +1,18 @@
+<h1>Teilnahme beenden</h1>
+<div mat-dialog-content>
+</div>
+<div mat-dialog-actions class="flex end">
+  <button mat-stroked-button color="primary" mat-dialog-close>Abbrechen</button>
+  <button mat-raised-button color="primary"
+          [mat-dialog-close]="onEndParticipation"
+          [mat-dialog-close]="data._id"
+          cdkFocusInitial >
+    Heute
+  </button>
+  <button mat-raised-button color="primary"
+          [mat-dialog-close]="onEndParticipation"
+          [mat-dialog-close]="data._id"
+          cdkFocusInitial >
+    Zum Quartalsende
+  </button>
+</div>

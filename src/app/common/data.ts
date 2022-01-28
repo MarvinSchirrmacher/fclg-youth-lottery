@@ -1,4 +1,5 @@
 import { BSON } from "realm-web";
+import { WinningTicket } from "./winning-ticket";
 
 export interface UserAddress {
   street?: string;
@@ -27,11 +28,6 @@ export interface User {
   email?: string;
   address?: UserAddress;
   payment: UserPayment;
-}
-
-export interface WinningTicket {
-  list: number;
-  number: number;
 }
 
 export interface Participation {

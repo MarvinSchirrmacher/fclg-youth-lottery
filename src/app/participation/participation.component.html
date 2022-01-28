@@ -28,8 +28,8 @@
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
       <mat-cell *matCellDef="let row">
-        <button class="mat-stroked-button mat-primary" (click)="onEndParticipation(row)">Beenden</button>
-        <button class="mat-stroked-button mat-primary" (click)="onRemoveParticipation(row)">Löschen</button>
+        <button class="mat-stroked-button mat-primary" (click)="onEndParticipation(row._id)">Beenden</button>
+        <button class="mat-stroked-button mat-primary" (click)="onRemoveParticipation(row._id)">Löschen</button>
       </mat-cell>
     </ng-container>
 
@@ -88,7 +88,10 @@
       </div>
 
       <mat-form-field class="form-field w-100">
-        <input type="text" matInput placeholder="Gewinnlos" formControlName="ticket">
+        <mat-label>Gewinnlos</mat-label>
+        <mat-select formControlName="ticket">
+          <mat-option *ngFor="let ticket of freeTickets" [value]="ticket">L{{ ticket.list }}N{{ ticket.number }}</mat-option>
+        </mat-select>
       </mat-form-field>
       <br/>
       <div *ngIf="ticket.invalid && (ticket.dirty || ticket.touched)" class="alert">

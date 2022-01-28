@@ -1,28 +1,12 @@
-import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
-import { ModeOfPayment, Participation, WinningTicket } from '../common/data';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { BSON } from 'realm-web';
+import { ModeOfPayment, Participation } from '../common/data';
+import { WinningTicket } from '../common/winning-ticket';
 import { ParticipationService } from '../service/participation.service';
-
-export class ParticipationTickets {
-  private static regexp = new RegExp(/^L(?<list>\d+)N(?<number>\d+)$/gm)
-
-  public static toString(ticket: WinningTicket): string {
-    return ticket ? `L${ticket.list}N${ticket.number}` : '';
-  }
-
-  public static fromString(value: string): WinningTicket {
-    var exec = this.regexp.exec(value);
-    if (exec?.groups === undefined)
-      throw new Error(`value "${value}" does not match ticket pattern L<list>N<number>`);
-
-    return {
-      list: parseInt(exec?.groups['list']),
-      number: parseInt(exec?.groups['number'])
-    };
-  }
-}
 
 export function createIbanValidator(): ValidatorFn {
   const regexp: RegExp = /^([A-Z]{2})(\d{2})(\d{18})$/gm;
@@ -44,6 +28,7 @@ export class ParticipationComponent implements OnInit {
   addForm = {} as FormGroup;
   participation = {} as Participation;
   participations = [] as Participation[];
+  freeTickets = [] as WinningTicket[];
   displayedColumns = [
     'firstName',
     'lastName',
@@ -56,22 +41,26 @@ export class ParticipationComponent implements OnInit {
   error: any;
 
   constructor(private formBuilder: FormBuilder,
-              private participationService: ParticipationService) { }
+              private participationService: ParticipationService,
+              private dialog: MatDialog,
+              private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
     this.addForm = this.formBuilder.group({
-      firstName: [this.participation.user?.firstName, Validators.required],
-      lastName: [this.participation.user?.lastName, Validators.required],
-      email: [this.participation.user?.email, [Validators.required, Validators.email]],
-      iban: [this.participation.user?.payment?.iban, [Validators.required, createIbanValidator()]],
-      ticket: [ParticipationTickets.toString(this.participation.ticket), Validators.required],
-      start: [this.participation.start, Validators.required],
-      end: [this.participation.end]
+      firstName: [null, Validators.required],
+      lastName: [null, Validators.required],
+      email: [null, [Validators.required, Validators.email]],
+      iban: [null, [Validators.required, createIbanValidator()]],
+      ticket: [null, Validators.required],
+      start: [null, Validators.required],
+      end: [null]
     });
     this.participationService.subscribe(value => {
       this.participations = value.data.participations;
       this.loading = value.loading;
-    })
+    });
+    this.participationService.observeFreeTickets()
+        .subscribe(tickets => this.freeTickets = tickets);
   }
 
   onAddParticipation(): void {
@@ -85,22 +74,41 @@ export class ParticipationComponent implements OnInit {
           iban: this.iban.value
         }
       },
-      ticket: ParticipationTickets.fromString(this.ticket.value),
+      ticket: WinningTicket.fromString(this.ticket.value),
       start: this.start.value,
       end: this.end.value
     });
     this.addForm.reset();
   }
 
-  onRemoveParticipation(row: Participation): void {
-    this.participationService.removeParticipation(row._id!);
+  onRemoveParticipation(id: BSON.ObjectID): void {
+    this.participationService.removeParticipation(id!);
   }
 
-  onEndParticipation(row: Participation): void {
-    this.participationService.endParticipation(row._id!);
+  onEndParticipation(id: BSON.ObjectID): void {
+    var participation = this.participationService.getParticipation(id);  
+    const dialogRef = this.dialog.open(EndPariticipationDialog, {
+      data: { p: participation }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      console.debug(`dialog closed ${JSON.stringify(result)}`);
+      if (result) {
+        this.openSnackBar(`Message From Dialog: ${result}`, 'Close');
+      }
+    });
+    //this.participationService.endParticipation(row._id!);
   }
 
   onRowClicked(row: Participation): void {
+  }
+
+  openSnackBar(message: string, action: string) {
+    this.snackBar.open(message, action, {
+      duration: 5000,
+      verticalPosition: 'bottom',
+      panelClass: ['mat-toolbar', 'mat-primary']
+    });
   }
 
   get firstName() { return this.addForm.controls['firstName']; }
@@ -111,4 +119,24 @@ export class ParticipationComponent implements OnInit {
   get start() { return this.addForm.controls['start']; }
   get end() { return this.addForm.controls['end']; }
 
+}
+
+@Component({
+  selector: 'end-participation',
+  templateUrl: './end-participation.component.html',
+  styleUrls: ['./end-participation.component.scss'],
+})
+export class EndPariticipationDialog {
+
+  constructor(
+    public dialogRef: MatDialogRef<EndPariticipationDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: Participation) {}
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+  onEndParticipation(): void {
+    console.debug(`clicked on end ${JSON.stringify(this.data)}`);
+  }
 }

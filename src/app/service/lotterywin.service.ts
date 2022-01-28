@@ -16,7 +16,7 @@ export class LotteryWinService {
   public subscribe(next: (value: LotteryDraw[]) => void): void {
     var allDraws = this.lotteryArchive
         .getAllDrawsOfYear(new Date().getFullYear(), DrawDay.Saturday);
-    var allParticipations = this.participation.getAllParticipations();
+    var allParticipations = this.participation.observeParticipations();
 
     zip(allDraws, allParticipations)
       .pipe(map( ([draws, participations]) =>
