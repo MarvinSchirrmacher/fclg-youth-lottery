@@ -1,3 +1,4 @@
+import { MatSnackBarConfig } from "@angular/material/snack-bar";
 import { BSON } from "realm-web";
 import { WinningTicket } from "./winning-ticket";
 
@@ -7,17 +8,16 @@ export interface UserAddress {
   postalCode?: number;
 }
 
-export enum ModeOfPayment {
-  BankTransfer,
-  PayPal,
-  Cash,
-  Donation,
-  None
+export enum ProfitDistributionMethod {
+  BankTransfer = 'Überweisung',
+  PayPal = 'PayPal',
+  Cash = 'Bar',
+  Donation = 'Spende'
 }
 
 export interface UserPayment {
-  mode: ModeOfPayment;
-  iban?: string;
+  distribution: ProfitDistributionMethod;
+  iban: string;
   paypal?: string;
 }
 
@@ -38,3 +38,9 @@ export interface Participation {
   start: Date;
   end?: Date;
 }
+
+export var snackBarConfig = {
+  duration: 5000,
+  verticalPosition: 'bottom',
+  panelClass: ['mat-toolbar', 'mat-primary']
+} as MatSnackBarConfig; 

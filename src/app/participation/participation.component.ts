@@ -4,7 +4,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BSON } from 'realm-web';
-import { Participation } from '../common/data';
+import { Participation, snackBarConfig } from '../common/data';
 import { ParticipationEnd, ParticipationService } from '../service/participation.service';
 import { EndPariticipationDialog as EndParticipationDialog } from './end-participation.component';
 
@@ -51,41 +51,42 @@ export class ParticipationComponent implements OnInit {
   }
 
   onRemoveParticipation(id: BSON.ObjectID): void {
-    this.participationService.removeParticipation(id!);
+    this.participationService.removeParticipation(id!)
+      .subscribe({
+        next: result => {
+          this.participationService.refetch();
+          this.snackBar.open(`Teilnahme wurde entfernt`, 'Schließen', snackBarConfig);
+        },
+        error: error => {
+          this.snackBar.open(`Teilnahme mit der ID ${id} konnte nicht entfernt werden: ${error}`, 'Schließen', snackBarConfig);
+        }
+      });
   }
 
   onEndParticipation(id: BSON.ObjectID): void {
     var participation = this.participationService.getParticipation(id);
     if (participation === undefined) {
-      this.openSnackBar(`Für die ID ${id} gibt es keine Teilnahme`, 'Schließen');
+      this.snackBar.open(`Für die ID ${id} gibt es keine Teilnahme`, 'Schließen', snackBarConfig);
       return;
     }
 
     const dialogRef = this.dialog
-        .open(EndParticipationDialog, { data: participation });
+      .open(EndParticipationDialog, { data: participation });
 
     dialogRef.afterClosed().subscribe((end: ParticipationEnd) => {
       if (end === undefined)
         return;
-        
+
       this.participationService.endParticipation(participation?._id!, end);
       if (end === ParticipationEnd.Today)
-        this.openSnackBar('Die Teilnahme wird heute beendet', 'Schließen');
+        this.snackBar.open('Die Teilnahme wird heute beendet', 'Schließen', snackBarConfig);
       if (end === ParticipationEnd.EndOfQuarter)
-        this.openSnackBar('Die Teilnahme wird zum Quartalsende beendet', 'Schließen');
+        this.snackBar.open('Die Teilnahme wird zum Quartalsende beendet', 'Schließen', snackBarConfig);
       if (end === ParticipationEnd.None)
-        this.openSnackBar('Die Teilnahme wird nicht beendet', 'Schließen');
+        this.snackBar.open('Die Teilnahme wird nicht beendet', 'Schließen', snackBarConfig);
     });
   }
 
   onRowClicked(row: Participation): void {
-  }
-
-  openSnackBar(message: string, action: string) {
-    this.snackBar.open(message, action, {
-      duration: 5000,
-      verticalPosition: 'bottom',
-      panelClass: ['mat-toolbar', 'mat-primary']
-    });
   }
 }

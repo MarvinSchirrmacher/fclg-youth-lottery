@@ -1,14 +1,21 @@
 import { Injectable } from '@angular/core';
 import { ApolloQueryResult, gql } from '@apollo/client/core';
-import { Apollo, QueryRef } from 'apollo-angular';
+import { Apollo, MutationResult, QueryRef } from 'apollo-angular';
 import { BSON } from 'realm-web';
 import { map, Observable } from 'rxjs';
 import { Participation } from '../common/data';
 import { endOfQuarter, endOfToday } from '../common/dates';
+import { toGraphQL } from '../common/graphql';
 import { WinningTicket } from '../common/winning-ticket';
 
 interface ParticipationResponse {
   participations: Participation[];
+}
+
+interface AddParticipationResult {
+  insertOneParticipation: {
+    _id: BSON.ObjectID
+  }
 }
 
 export enum ParticipationEnd {
@@ -23,7 +30,7 @@ export enum ParticipationEnd {
 export class ParticipationService {
   query = {} as QueryRef<ParticipationResponse>;
   allTickets = [] as WinningTicket[];
-  
+
   constructor(private apollo: Apollo) {
 
     this.query = this.apollo
@@ -48,44 +55,28 @@ export class ParticipationService {
     this.allTickets = this.establishTickets();
   }
 
+  public refetch(): void {
+    this.query.refetch();
+  }
+
   public getParticipation(id: BSON.ObjectID): Participation | undefined {
     return this.participations.find(p => p._id === id);
   }
 
   public observeParticipations(): Observable<Participation[]> {
     return this.query.valueChanges
-        .pipe(map(result => result.data.participations as Participation[]));
+      .pipe(map(result => result.data.participations as Participation[]));
   }
 
   public subscribe(next: (result: ApolloQueryResult<ParticipationResponse>) => void): void {
     this.query.valueChanges.subscribe(next);
   }
 
-  public addParticipation(participation: Participation): void {
-    this.apollo.mutate<any>({
+  public addParticipation(participation: Participation): Observable<MutationResult<AddParticipationResult>> {
+    return this.apollo.mutate<AddParticipationResult>({
       mutation: gql`mutation {
-        insertOneParticipation(data: {
-            user: {
-              firstName: "${participation.user.firstName}"
-              lastName: "${participation.user.lastName}"
-              email: "${participation.user.email}"
-              payment: {
-                mode: "${participation.user.payment.mode}"
-                iban: "${participation.user.payment.iban}"
-              }
-            }
-            ticket: {
-              list: ${participation.ticket.list}
-              number: ${participation.ticket.number}
-            }
-            start: "${participation.start.toISOString()}"
-            ${participation.end ? 'end: "' + participation.end.toISOString() + '"' : ''}
-          }
-        ) { _id } }`
-    }).subscribe({
-      next: value => this.query.refetch(),
-      error: error => console.error(error)
-    })
+        insertOneParticipation(data: ${toGraphQL(participation)} ) { _id } }`
+    });
   }
 
   public updateParticipation(id: BSON.ObjectID, participation: Participation): void {
@@ -102,26 +93,23 @@ export class ParticipationService {
       next: value => this.query.refetch(),
       error: error => console.error(error)
     })
-  } 
+  }
 
-  public removeParticipation(id: BSON.ObjectID): void {
-    this.apollo.mutate<Participation>({
+  public removeParticipation(id: BSON.ObjectID): Observable<any> {
+    return this.apollo.mutate<Participation>({
       mutation: gql`mutation {
         deleteOneParticipation(query: {
             _id:"${id}"
           }
         ) { _id } }`
-    }).subscribe({
-      next: value => this.query.refetch(),
-      error: error => console.error(error)
-    })
+    });
   }
 
   public endParticipation(id: BSON.ObjectID, end: ParticipationEnd): void {
     var current = this.getParticipation(id);
     if (current === undefined)
       return;
-    
+
     var endDate = current.end;
     if (end === ParticipationEnd.Today)
       endDate = endOfToday();
@@ -136,20 +124,20 @@ export class ParticipationService {
     var numbers = Array.from(Array(49).keys()).map(n => n + 1);
     var lists = Array.from(Array(2).keys()).map(l => l + 1);
     var tickets = lists.map(l => numbers
-        .map(n => new WinningTicket(l, n)));
+      .map(n => new WinningTicket(l, n)));
 
     return tickets.reduce((a, b) => a.concat(b));
   }
 
   public observeUsedTickets(): Observable<WinningTicket[]> {
     return this.query.valueChanges
-        .pipe(map(result => result.data.participations.map(p => p.ticket)));
+      .pipe(map(result => result.data.participations.map(p => p.ticket)));
   }
 
   public observeFreeTickets(): Observable<WinningTicket[]> {
     return this.observeUsedTickets()
-        .pipe(map(usedTickets => this.allTickets
-            .filter(t => !usedTickets.find(u => t.equals(u)))));
+      .pipe(map(usedTickets => this.allTickets
+        .filter(t => !usedTickets.find(u => t.equals(u)))));
   }
 
   get participations(): Participation[] {

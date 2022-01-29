@@ -13,8 +13,22 @@ export function endOfQuarter(): Date {
     return new Date(year, month, day);
 }
 
+export function startOfNextQuarter(): Date {
+    var today: Date = new Date();
+
+    var year = today.getFullYear();
+    var month = firstMonthOfNextQuarter(today.getMonth());
+    var day = 1;
+
+    return new Date(year, month, day);
+}
+
 function lastMonthOfQuarter(month: number) {
     return month - (month % 3) + 2;
+}
+
+function firstMonthOfNextQuarter(month: number) {
+    return lastMonthOfQuarter(month) + 1;
 }
 
 function lastDayOf(year: number, month: number): number {
