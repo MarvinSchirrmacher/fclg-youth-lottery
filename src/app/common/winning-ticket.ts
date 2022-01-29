@@ -14,7 +14,7 @@ export class WinningTicket {
       return other.list === this.list && other.number === this.number;
     }
   
-    public toString(): string {
+    public toString = () : string => {
       return `L${this.list}N${this.number}`;
     }
   

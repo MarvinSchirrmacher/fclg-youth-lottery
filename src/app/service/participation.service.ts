@@ -1,14 +1,20 @@
 import { Injectable } from '@angular/core';
-import { gql } from '@apollo/client/core';
+import { ApolloQueryResult, gql } from '@apollo/client/core';
 import { Apollo, QueryRef } from 'apollo-angular';
 import { BSON } from 'realm-web';
 import { map, Observable } from 'rxjs';
 import { Participation } from '../common/data';
-import { endOfQuarter } from '../common/dates';
+import { endOfQuarter, endOfToday } from '../common/dates';
 import { WinningTicket } from '../common/winning-ticket';
 
 interface ParticipationResponse {
   participations: Participation[];
+}
+
+export enum ParticipationEnd {
+  Today,
+  EndOfQuarter,
+  None
 }
 
 @Injectable({
@@ -51,7 +57,7 @@ export class ParticipationService {
         .pipe(map(result => result.data.participations as Participation[]));
   }
 
-  public subscribe(next: (value: any) => void): void {
+  public subscribe(next: (result: ApolloQueryResult<ParticipationResponse>) => void): void {
     this.query.valueChanges.subscribe(next);
   }
 
@@ -111,15 +117,19 @@ export class ParticipationService {
     })
   }
 
-  public endParticipation(id: BSON.ObjectID): void {
+  public endParticipation(id: BSON.ObjectID, end: ParticipationEnd): void {
     var current = this.getParticipation(id);
     if (current === undefined)
       return;
     
-    var updated = {
-      end: endOfQuarter(current.end ? new Date(current.end) : undefined)
-    } as Participation;
-    this.updateParticipation(id, updated);
+    var endDate = current.end;
+    if (end === ParticipationEnd.Today)
+      endDate = endOfToday();
+    else if (end === ParticipationEnd.EndOfQuarter)
+      endDate = endOfQuarter();
+
+    var update = { end: endDate } as Participation;
+    this.updateParticipation(id, update);
   }
 
   public establishTickets(): WinningTicket[] {
@@ -138,10 +148,8 @@ export class ParticipationService {
 
   public observeFreeTickets(): Observable<WinningTicket[]> {
     return this.observeUsedTickets()
-        .pipe(map(usedTickets => {
-          console.debug(JSON.stringify(usedTickets));
-          return this.allTickets.filter(t => !usedTickets.find(u => t.equals(u)))
-        } ));
+        .pipe(map(usedTickets => this.allTickets
+            .filter(t => !usedTickets.find(u => t.equals(u)))));
   }
 
   get participations(): Participation[] {

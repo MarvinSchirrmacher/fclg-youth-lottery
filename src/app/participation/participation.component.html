@@ -28,8 +28,8 @@
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
       <mat-cell *matCellDef="let row">
-        <button class="mat-stroked-button mat-primary" (click)="onEndParticipation(row._id)">Beenden</button>
-        <button class="mat-stroked-button mat-primary" (click)="onRemoveParticipation(row._id)">Löschen</button>
+        <button class="mat-icon-button mat-primary" (click)="onEndParticipation(row._id)"><mat-icon>exit_to_app</mat-icon></button>
+        <button class="mat-icon-button mat-primary" (click)="onRemoveParticipation(row._id)"><mat-icon>delete_outline</mat-icon></button>
       </mat-cell>
     </ng-container>
 

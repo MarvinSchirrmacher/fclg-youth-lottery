@@ -1,8 +1,10 @@
-export function endOfQuarter(end: Date | undefined): Date {
+export function endOfToday(): Date {
     var today: Date = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), today.getDate());
+}
 
-    if (end && end.getTime() < today.getTime())
-        return end;
+export function endOfQuarter(): Date {
+    var today: Date = new Date();
 
     var year = today.getFullYear();
     var month = lastMonthOfQuarter(today.getMonth());
@@ -11,10 +13,10 @@ export function endOfQuarter(end: Date | undefined): Date {
     return new Date(year, month, day);
 }
 
-export function lastMonthOfQuarter(month: number) {
+function lastMonthOfQuarter(month: number) {
     return month - (month % 3) + 2;
 }
 
-export function lastDayOf(year: number, month: number): number {
+function lastDayOf(year: number, month: number): number {
     return new Date(year, month + 1, 0).getDate();
 }

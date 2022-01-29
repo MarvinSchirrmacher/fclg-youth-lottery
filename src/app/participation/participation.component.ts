@@ -1,12 +1,12 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BSON } from 'realm-web';
-import { ModeOfPayment, Participation } from '../common/data';
-import { WinningTicket } from '../common/winning-ticket';
-import { ParticipationService } from '../service/participation.service';
+import { Participation } from '../common/data';
+import { ParticipationEnd, ParticipationService } from '../service/participation.service';
+import { EndPariticipationDialog as EndParticipationDialog } from './end-participation.component';
 
 export function createIbanValidator(): ValidatorFn {
   const regexp: RegExp = /^([A-Z]{2})(\d{2})(\d{18})$/gm;
@@ -38,15 +38,15 @@ export class ParticipationComponent implements OnInit {
   loading = true;
   error: any;
 
-  constructor(private formBuilder: FormBuilder,
-              private participationService: ParticipationService,
-              private dialog: MatDialog,
-              private snackBar: MatSnackBar) { }
+  constructor(
+    private participationService: ParticipationService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    this.participationService.subscribe(value => {
-      this.participations = value.data.participations;
-      this.loading = value.loading;
+    this.participationService.subscribe(result => {
+      this.participations = result.data.participations;
+      this.loading = result.loading;
     });
   }
 
@@ -55,18 +55,27 @@ export class ParticipationComponent implements OnInit {
   }
 
   onEndParticipation(id: BSON.ObjectID): void {
-    var participation = this.participationService.getParticipation(id);  
-    const dialogRef = this.dialog.open(EndPariticipationDialog, {
-      data: { p: participation }
+    var participation = this.participationService.getParticipation(id);
+    if (participation === undefined) {
+      this.openSnackBar(`Für die ID ${id} gibt es keine Teilnahme`, 'Schließen');
+      return;
+    }
+
+    const dialogRef = this.dialog
+        .open(EndParticipationDialog, { data: participation });
+
+    dialogRef.afterClosed().subscribe((end: ParticipationEnd) => {
+      if (end === undefined)
+        return;
+        
+      this.participationService.endParticipation(participation?._id!, end);
+      if (end === ParticipationEnd.Today)
+        this.openSnackBar('Die Teilnahme wird heute beendet', 'Schließen');
+      if (end === ParticipationEnd.EndOfQuarter)
+        this.openSnackBar('Die Teilnahme wird zum Quartalsende beendet', 'Schließen');
+      if (end === ParticipationEnd.None)
+        this.openSnackBar('Die Teilnahme wird nicht beendet', 'Schließen');
     });
-  
-    dialogRef.afterClosed().subscribe(result => {
-      console.debug(`dialog closed ${JSON.stringify(result)}`);
-      if (result) {
-        this.openSnackBar(`Message From Dialog: ${result}`, 'Close');
-      }
-    });
-    //this.participationService.endParticipation(row._id!);
   }
 
   onRowClicked(row: Participation): void {
@@ -78,25 +87,5 @@ export class ParticipationComponent implements OnInit {
       verticalPosition: 'bottom',
       panelClass: ['mat-toolbar', 'mat-primary']
     });
-  }
-}
-
-@Component({
-  selector: 'end-participation',
-  templateUrl: './end-participation.component.html',
-  styleUrls: ['./end-participation.component.scss'],
-})
-export class EndPariticipationDialog {
-
-  constructor(
-    public dialogRef: MatDialogRef<EndPariticipationDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: Participation) {}
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-  onEndParticipation(): void {
-    console.debug(`clicked on end ${JSON.stringify(this.data)}`);
   }
 }
