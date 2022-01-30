@@ -1,19 +1,11 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BSON } from 'realm-web';
 import { ProfitDistributionMethod, Participation, snackBarConfig } from '../common/data';
 import { startOfNextQuarter } from '../common/dates';
 import { WinningTicket } from '../common/winning-ticket';
 import { ParticipationService } from '../service/participation.service';
-
-export function createIbanValidator(): ValidatorFn {
-  const regexp: RegExp = /^([A-Z]{2})(\d{2})(\d{18})$/gm;
-
-  return (control: AbstractControl): ValidationErrors | null =>
-    regexp.test(control.value) ? null : { iban: true };
-}
 
 @Component({
   selector: 'app-add-participation',

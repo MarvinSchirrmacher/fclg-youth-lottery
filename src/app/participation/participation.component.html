@@ -1,5 +1,6 @@
 <section class="flex">
 <mat-card class="w-70 distant">
+  <h2>Teilnahmen</h2>
   <mat-table [dataSource]="participations">
     <ng-container matColumnDef="_id">
       <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
@@ -28,8 +29,12 @@
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
       <mat-cell *matCellDef="let row">
-        <button class="mat-icon-button mat-primary" (click)="onEndParticipation(row._id)"><mat-icon>exit_to_app</mat-icon></button>
-        <button class="mat-icon-button mat-primary" (click)="onRemoveParticipation(row._id)"><mat-icon>delete_outline</mat-icon></button>
+        <button class="mat-icon-button mat-primary" (click)="onEndParticipation(row._id)">
+          <span class="mat-button-wrapper"><mat-icon>exit_to_app</mat-icon></span>
+        </button>
+        <button class="mat-icon-button mat-primary" (click)="onDeleteParticipation(row._id)">
+          <span class="mat-button-wrapper"><mat-icon>delete_outline</mat-icon></span>
+        </button>
       </mat-cell>
     </ng-container>
 
@@ -42,6 +47,7 @@
 </mat-card>
   
 <mat-card id="add-participation" class="w-30 distant">
+  <h2>Neue Teilnahme</h2>
   <app-add-participation></app-add-participation>
 </mat-card>
 </section>

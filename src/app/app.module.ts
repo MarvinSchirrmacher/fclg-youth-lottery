@@ -16,6 +16,7 @@ import { GraphQLModule } from './graphql.module';
 import { MaterialModule } from './material.module';
 import { AddParticipationComponent } from './participation/add-participation.component';
 import { EndPariticipationDialog } from './participation/end-participation.component';
+import { DeletePariticipationDialog } from './participation/delete-participation.component';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { EndPariticipationDialog } from './participation/end-participation.compo
     LotteryComponent,
     ParticipationComponent,
     AddParticipationComponent,
-    EndPariticipationDialog
+    EndPariticipationDialog,
+    DeletePariticipationDialog
   ],
   imports: [
     AppRoutingModule,

@@ -1,5 +1,4 @@
 <form novalidate (ngSubmit)="onAddParticipation()" [formGroup]="form">
-    <h1>Neue Teilnahme</h1>
     <div class="flex end">
 
         <mat-form-field class="form-field w-100">
@@ -72,8 +71,7 @@
 
             <mat-form-field class="form-field w-100">
                 <input type="text" matInput placeholder="PLZ" formControlName="postalCode">
-                <mat-error
-                    *ngIf="postalCode.dirty && postalCode.invalid">
+                <mat-error *ngIf="postalCode.dirty && postalCode.invalid">
                     Keine valide Postleitzahl
                 </mat-error>
             </mat-form-field>
