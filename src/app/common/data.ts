@@ -3,9 +3,9 @@ import { BSON } from "realm-web";
 import { WinningTicket } from "./winning-ticket";
 
 export interface UserAddress {
-  street?: string;
-  city?: string;
-  postalCode?: number;
+  street: string;
+  city: string;
+  postalCode: number;
 }
 
 export enum ProfitDistributionMethod {
