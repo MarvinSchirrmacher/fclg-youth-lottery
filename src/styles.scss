@@ -5,6 +5,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     box-sizing: border-box;
 }
 
+p {
+    line-height: 1.5;
+}
+
 .flex {
     display: flex;
     flex-wrap: wrap;
@@ -64,6 +68,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-flat-button {
     overflow: hidden !important;
     text-overflow: ellipsis;
+}
+
+.mat-dialog-container {
+    min-width: 400px;
 }
 
 ul {
