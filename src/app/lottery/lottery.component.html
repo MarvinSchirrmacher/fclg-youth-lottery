@@ -1,4 +1,5 @@
 <mat-card class="w-70 distant">
+  <h2>Ziehungen</h2>
   <mat-table [dataSource]="wins">
     <ng-container matColumnDef="date">
       <mat-header-cell *matHeaderCellDef>Datum</mat-header-cell>
@@ -7,27 +8,23 @@
     <ng-container matColumnDef="numbers">
       <mat-header-cell *matHeaderCellDef>Gewinnzahlen</mat-header-cell>
       <mat-cell *matCellDef="let draw">
-        <span *ngFor="let n of draw.numbers" class="tile">
-          {{n}}
-        </span>
+        <span *ngFor="let n of draw.numbers" class="tile">{{n}}</span>
       </mat-cell>
     </ng-container>
     <ng-container matColumnDef="winners">
-        <mat-header-cell *matHeaderCellDef>Gewinner</mat-header-cell>
-        <mat-cell *matCellDef="let draw">
-          <ul>
-            <li *ngFor="let winner of draw.winners">
-              L{{ winner.ticket.list }}N{{ winner.ticket.number }} {{ winner.user.firstName }} {{ winner.user.lastName }}
-            </li>
-          </ul>
-        </mat-cell>
+      <mat-header-cell *matHeaderCellDef>Gewinner</mat-header-cell>
+      <mat-cell *matCellDef="let draw">
+        <span class="w-100" *ngFor="let winner of draw.winners">
+          L{{ winner.ticket.list }}N{{ winner.ticket.number }} {{ winner.user.firstName }} {{ winner.user.lastName }}
+        </span>
+      </mat-cell>
     </ng-container>
     <ng-container matColumnDef="processed">
       <mat-header-cell *matHeaderCellDef>Bearbeitet</mat-header-cell>
       <mat-cell *matCellDef="let draw">{{ draw.processed ? 'Ja' : 'Nein' }}</mat-cell>
     </ng-container>
-  
+
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     <mat-row *matRowDef="let draw; columns: displayedColumns"></mat-row>
-  </mat-table>  
+  </mat-table>
 </mat-card>

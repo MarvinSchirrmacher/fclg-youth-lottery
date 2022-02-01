@@ -1,4 +1,4 @@
-import { Participation, User } from "./data";
+import { Participation } from "./data";
 
 export class LotteryDraw {
     private daysPerWeek: number = 7;

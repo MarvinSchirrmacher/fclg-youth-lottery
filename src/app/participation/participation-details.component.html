@@ -1,0 +1,51 @@
+<h2 mat-dialog-title>Teilnahmedetails</h2>
+
+<mat-dialog-content>
+  <table class="mat-table">
+    <tr class="mat-row">
+      <td class="mat-cell"><strong>Name</strong></td>
+      <td class="mat-cell">{{ participation.user.firstName }} {{ participation.user.lastName }}</td>
+    </tr>
+    <tr class="mat-row">
+      <td class="mat-cell"><strong>Gewinnlos</strong></td>
+      <td class="mat-cell">L{{ participation.ticket.list }}N{{ participation.ticket.number }}</td>
+    </tr>
+    <tr class="mat-row">
+      <td class="mat-cell"><strong>Beginn</strong></td>
+      <td class="mat-cell">{{ participation.start | date: 'dd.MM.yyyy' }}</td>
+    </tr>
+    <tr class="mat-row">
+      <td class="mat-cell"><strong>Ende</strong></td>
+      <td class="mat-cell">{{ participation.end ? (participation.end | date: 'dd.MM.yyyy') : 'offen' }}</td>
+    </tr>
+    <tr class="mat-row">
+      <td class="mat-cell"><strong>E-Mail</strong></td>
+      <td class="mat-cell">{{ participation.user.email }}</td>
+    </tr>
+    <tr class="mat-row">
+      <td class="mat-cell"><strong>Telefon</strong></td>
+      <td class="mat-cell">{{ participation.user.phone }}</td>
+    </tr>
+    <tr class="mat-row">
+      <td class="mat-cell"><strong>Adresse</strong></td>
+      <td class="mat-cell" *ngIf="participation.user.address">
+        <p>{{ participation.user.address.street }}<br/>{{ participation.user.address.postalCode }} {{ participation.user.address.city }}</p>
+      </td>
+      <td class="mat-cell" *ngIf="!participation.user.address"></td>
+    </tr>
+    <tr class="mat-row">
+      <td class="mat-cell"><strong>IBAN</strong></td>
+      <td class="mat-cell" *ngIf="participation.user.payment">{{ participation.user.payment.iban }}</td>
+      <td class="mat-cell" *ngIf="!participation.user.payment"></td>
+    </tr>
+    <tr class="mat-row">
+      <td class="mat-cell"><strong>Auszahlung</strong></td>
+      <td class="mat-cell" *ngIf="participation.user.payment">{{ participation.user.payment.distribution }}</td>
+      <td class="mat-cell" *ngIf="!participation.user.payment"></td>
+    </tr>
+  </table>
+</mat-dialog-content>
+
+<mat-dialog-actions class="flex end">
+  <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>
+</mat-dialog-actions>

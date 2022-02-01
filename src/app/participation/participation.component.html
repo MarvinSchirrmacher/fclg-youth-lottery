@@ -1,18 +1,19 @@
 <section class="flex">
 <mat-card class="w-70 distant">
   <h2>Teilnahmen</h2>
-  <mat-table [dataSource]="participations">
+  <div *ngIf="participations.length == 0">
+    <p>Es sind keine Teilnahmen registriert.</p>
+    <p>Über das Formular <i>Neue Teilnahme</i> kannst du neue Registrierungen vornehmen. Diese werden dann hier
+      tabellarisch aufgelistet.</p>
+  </div>
+  <mat-table *ngIf="participations.length > 0" [dataSource]="participations">
     <ng-container matColumnDef="_id">
       <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
       <mat-cell *matCellDef="let row">{{ row._id }}</mat-cell>
     </ng-container>
-    <ng-container matColumnDef="firstName">
-      <mat-header-cell *matHeaderCellDef>Vorname</mat-header-cell>
-      <mat-cell *matCellDef="let row">{{ row.user.firstName }}</mat-cell>
-    </ng-container>
-    <ng-container matColumnDef="lastName">
-      <mat-header-cell *matHeaderCellDef>Nachname</mat-header-cell>
-      <mat-cell *matCellDef="let row">{{ row.user.lastName }}</mat-cell>
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ row.user.firstName }} {{ row.user.lastName }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="ticket">
       <mat-header-cell *matHeaderCellDef>Gewinnlos</mat-header-cell>
@@ -29,19 +30,22 @@
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
       <mat-cell *matCellDef="let row">
-        <button class="mat-icon-button mat-primary" (click)="onEndParticipation(row._id)">
+        <button class="mat-icon-button mat-primary" (click)="onInfo(row._id)">
+          <span class="mat-button-wrapper">
+            <mat-icon>info_outline</mat-icon>
+          </span>
+        </button>
+        <button class="mat-icon-button mat-primary" (click)="onEnd(row._id)">
           <span class="mat-button-wrapper"><mat-icon>exit_to_app</mat-icon></span>
         </button>
-        <button class="mat-icon-button mat-primary" (click)="onDeleteParticipation(row._id)">
+        <button class="mat-icon-button mat-primary" (click)="onDelete(row._id)">
           <span class="mat-button-wrapper"><mat-icon>delete_outline</mat-icon></span>
         </button>
       </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns"
-             id="{{ row._id }}"
-             (click)="onRowClicked(row)">
+    <mat-row *matRowDef="let row; columns: displayedColumns" id="{{ row._id }}">
     </mat-row>
   </mat-table>
 </mat-card>

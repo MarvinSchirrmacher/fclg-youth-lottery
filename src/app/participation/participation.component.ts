@@ -6,6 +6,8 @@ import { Participation, snackBarConfig } from '../common/data';
 import { ParticipationEnd, ParticipationService } from '../service/participation.service';
 import { EndPariticipationDialog as EndParticipationDialog } from './end-participation.component';
 import { DeletePariticipationDialog as RemoveParticipationDialog } from './delete-participation.component';
+import { PariticipationDetailsDialog } from './participation-details.component';
+import { ApolloError } from '@apollo/client/errors';
 
 @Component({
   selector: 'app-participation',
@@ -16,15 +18,12 @@ export class ParticipationComponent implements OnInit {
   participation = {} as Participation;
   participations = [] as Participation[];
   displayedColumns = [
-    'firstName',
-    'lastName',
+    'name',
     'ticket',
     'start',
     'end',
     'actions'
   ];
-  loading = true;
-  error: any;
 
   constructor(
     private participationService: ParticipationService,
@@ -32,41 +31,28 @@ export class ParticipationComponent implements OnInit {
     private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    this.participationService.subscribe(result => {
-      this.participations = result.data.participations;
-      this.loading = result.loading;
-    });
+    this.participationService.observeParticipations()
+      .subscribe({
+        next: ps => {
+          console.debug(JSON.stringify(ps));
+          this.participations = ps;
+        },
+        error: (error: ApolloError) => this.snackBar.open(`Teilnehmerliste konnte nicht bezogen werden: ${JSON.stringify(error)}`, 'Schließen', snackBarConfig)
+      });
   }
 
-  onDeleteParticipation(id: BSON.ObjectID): void {
-    var participation = this.participationService.getParticipation(id);
+  onInfo(id: BSON.ObjectID): void {
+    var participation = this.participationService.getCurrentParticipation(id);
     if (participation === undefined) {
       this.snackBar.open(`Für die ID ${id} gibt es keine Teilnahme`, 'Schließen', snackBarConfig);
       return;
     }
 
-    const dialogRef = this.dialog
-      .open(RemoveParticipationDialog, { data: participation });
-
-    dialogRef.afterClosed().subscribe((remove: boolean) => {
-      if (remove === undefined || !remove)
-        return;
-
-      this.participationService.removeParticipation(id!)
-        .subscribe({
-          next: result => {
-            this.participationService.refetch();
-            this.snackBar.open(`Teilnahme wurde entfernt`, 'Schließen', snackBarConfig);
-          },
-          error: error => {
-            this.snackBar.open(`Teilnahme mit der ID ${id} konnte nicht entfernt werden: ${error}`, 'Schließen', snackBarConfig);
-          }
-        });
-    });
+    this.dialog.open(PariticipationDetailsDialog, { data: participation });
   }
 
-  onEndParticipation(id: BSON.ObjectID): void {
-    var participation = this.participationService.getParticipation(id);
+  onEnd(id: BSON.ObjectID): void {
+    var participation = this.participationService.getCurrentParticipation(id);
     if (participation === undefined) {
       this.snackBar.open(`Für die ID ${id} gibt es keine Teilnahme`, 'Schließen', snackBarConfig);
       return;
@@ -79,16 +65,45 @@ export class ParticipationComponent implements OnInit {
       if (end === undefined)
         return;
 
-      this.participationService.endParticipation(participation?._id!, end);
-      if (end === ParticipationEnd.Today)
-        this.snackBar.open('Die Teilnahme wird heute beendet', 'Schließen', snackBarConfig);
-      if (end === ParticipationEnd.EndOfQuarter)
-        this.snackBar.open('Die Teilnahme wird zum Quartalsende beendet', 'Schließen', snackBarConfig);
-      if (end === ParticipationEnd.None)
-        this.snackBar.open('Die Teilnahme wird nicht beendet', 'Schließen', snackBarConfig);
-    });
+      this.participationService.endParticipation(participation?._id!, end, (id, error) => {
+        if (id) {
+          if (end === ParticipationEnd.Today)
+            this.snackBar.open('Die Teilnahme wird heute beendet', 'Schließen', snackBarConfig);
+          if (end === ParticipationEnd.EndOfQuarter)
+            this.snackBar.open('Die Teilnahme wird zum Quartalsende beendet', 'Schließen', snackBarConfig);
+          if (end === ParticipationEnd.None)
+            this.snackBar.open('Die Teilnahme wird nicht beendet', 'Schließen', snackBarConfig);
+        }
+        if (error) {
+          this.snackBar.open('Die Teilnahme konnte nicht beendet werden', 'Schließen', snackBarConfig);
+        }
+      })
+    })
   }
 
-  onRowClicked(row: Participation): void {
+  onDelete(id: BSON.ObjectID): void {
+    var participation = this.participationService.getCurrentParticipation(id);
+    if (participation === undefined) {
+      this.snackBar.open(`Für die ID ${id} gibt es keine Teilnahme`, 'Schließen', snackBarConfig);
+      return;
+    }
+
+    const dialogRef = this.dialog
+      .open(RemoveParticipationDialog, { data: participation });
+
+    dialogRef.afterClosed().subscribe((remove: boolean) => {
+      if (remove === undefined || !remove)
+        return;
+
+      this.participationService.deleteParticipation(id!, (id, error) => {
+        if (id) {
+          this.participationService.refetch();
+          this.snackBar.open(`Teilnahme wurde entfernt`, 'Schließen', snackBarConfig);
+        }
+        if (error) {
+          this.snackBar.open(`Teilnahme mit der ID ${id} konnte nicht entfernt werden: ${error}`, 'Schließen', snackBarConfig);
+        }
+      });
+    });
   }
 }

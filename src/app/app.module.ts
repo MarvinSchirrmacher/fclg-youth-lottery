@@ -17,6 +17,7 @@ import { MaterialModule } from './material.module';
 import { AddParticipationComponent } from './participation/add-participation.component';
 import { EndPariticipationDialog } from './participation/end-participation.component';
 import { DeletePariticipationDialog } from './participation/delete-participation.component';
+import { PariticipationDetailsDialog } from './participation/participation-details.component';
 
 
 @NgModule({
@@ -30,6 +31,7 @@ import { DeletePariticipationDialog } from './participation/delete-participation
     LotteryComponent,
     ParticipationComponent,
     AddParticipationComponent,
+    PariticipationDetailsDialog,
     EndPariticipationDialog,
     DeletePariticipationDialog
   ],

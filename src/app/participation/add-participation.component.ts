@@ -54,34 +54,36 @@ export class AddParticipationComponent implements OnInit {
   }
 
   onAddParticipation(): void {
-    this.participationService.addParticipation({
+    var user = {
+      firstName: this.form.get('firstName')!.value,
+      lastName: this.form.get('lastName')!.value,
+      email: this.form.get('email')!.value,
+      phone: this.form.get('phone')!.value,
+      address: {
+        street: this.form.get('address.street')!.value,
+        postalCode: parseInt(this.form.get('address.postalCode')!.value),
+        city: this.form.get('address.city')!.value
+      },
+      payment: {
+        distribution: this.form.get('payment.distribution')!.value,
+        iban: this.form.get('payment.iban')!.value
+      }
+    };
+
+    var participation = {
       ticket: WinningTicket.fromString(this.form.get('ticket')!.value),
       start: this.form.get('start')!.value,
-      end: this.form.get('end')!.value,
-      user: {
-        firstName: this.form.get('firstName')!.value,
-        lastName: this.form.get('lastName')!.value,
-        email: this.form.get('email')!.value,
-        phone: this.form.get('phone')!.value,
-        address: {
-          street: this.form.get('address.street')!.value,
-          postalCode: parseInt(this.form.get('address.postalCode')!.value),
-          city: this.form.get('address.city')!.value
-        },
-        payment: {
-          distribution: this.form.get('payment.distribution')!.value,
-          iban: this.form.get('payment.iban')!.value
-        }
-      }
-    }).subscribe({
-      next: result => {
+      end: this.form.get('end')!.value
+    } as Participation;
+
+    this.participationService.addParticipationWithNewUser(participation, user, (addedId, error) => {
+      if (addedId) {
         this.participationService.refetch();
         this.form.reset();
-        var id = result.data!.insertOneParticipation._id;
         this.snackBar.open(`Teilnahme wurde registriert`, 'Schließen', snackBarConfig);
-      },
-      error: error => {
-        this.snackBar.open(`Teilname konnte nicht registriert werden: ${error}` , 'Schließen', snackBarConfig);
+      }
+      if (error) {
+        this.snackBar.open(`Teilname konnte nicht registriert werden: ${addedId}`, 'Schließen', snackBarConfig);
       }
     });
   }
