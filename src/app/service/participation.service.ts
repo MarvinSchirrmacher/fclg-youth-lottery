@@ -41,12 +41,14 @@ export class ParticipationService {
       this.participationsQuery.valueChanges,
       this.usersQuery.valueChanges])
       .pipe(map(([ps, us]) =>
-        ps.data.participations.map(p => ({
+        ps.data.participations
+        .map(p => ({
           _id: p._id,
           user: us.data.users.find(u => u._id === p.user),
           ticket: WinningTicket.fromObject(p.ticket),
           term: Term.fromObject(p.term)
         } as Participation))
+        .sort((a, b) => a.ticket.compareTo(b.ticket))
       ))
   }
 
