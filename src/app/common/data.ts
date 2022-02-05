@@ -1,5 +1,6 @@
 import { MatSnackBarConfig } from "@angular/material/snack-bar";
 import { BSON } from "realm-web";
+import { Term } from "./term";
 import { WinningTicket } from "./winning-ticket";
 
 export interface UserAddress {
@@ -35,12 +36,12 @@ export interface Participation {
   _id?: BSON.ObjectID;
   user: User;
   ticket: WinningTicket;
-  start: Date;
-  end?: Date;
+  term: Term;
 }
 
 export var snackBarConfig = {
   duration: 5000,
   verticalPosition: 'bottom',
-  panelClass: ['mat-toolbar', 'mat-primary']
+  panelClass: ['mat-primary-100'],
+
 } as MatSnackBarConfig; 

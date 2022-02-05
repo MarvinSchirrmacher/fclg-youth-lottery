@@ -13,7 +13,7 @@
     </ng-container>
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
-      <mat-cell *matCellDef="let row">{{ row.user.firstName }} {{ row.user.lastName }}</mat-cell>
+      <mat-cell *matCellDef="let row">{{ row.user ? row.user.firstName + ' ' + row.user.lastName : 'unbekannt' }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="ticket">
       <mat-header-cell *matHeaderCellDef>Gewinnlos</mat-header-cell>
@@ -21,11 +21,11 @@
     </ng-container>
     <ng-container matColumnDef="start">
       <mat-header-cell *matHeaderCellDef>Beginn</mat-header-cell>
-      <mat-cell *matCellDef="let row">{{ row.start | date: 'dd.MM.yyyy' }}</mat-cell>
+      <mat-cell *matCellDef="let row">{{ row.term.start | date: 'dd.MM.yyyy' }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="end">
       <mat-header-cell *matHeaderCellDef>Ende</mat-header-cell>
-      <mat-cell *matCellDef="let row">{{ row.end ? (row.end | date: 'dd.MM.yyyy') : 'offen' }}</mat-cell>
+      <mat-cell *matCellDef="let row">{{ row.term.end ? (row.term.end | date: 'dd.MM.yyyy') : 'offen' }}</mat-cell>
     </ng-container>
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>

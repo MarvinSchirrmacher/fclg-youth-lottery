@@ -4,6 +4,7 @@ import { BSON } from "realm-web";
 import { Observable } from "rxjs";
 import { Participation, User } from "../common/data";
 import { toGraphQL } from "../common/graphql";
+import { Term } from "../common/term";
 import { WinningTicket } from "../common/winning-ticket";
 
 
@@ -11,8 +12,7 @@ export interface ParticipationDocument {
   _id?: BSON.ObjectID;
   user: BSON.ObjectID;
   ticket: WinningTicket;
-  start: Date;
-  end?: Date;
+  term: Term;
 }
 
 export interface QueryParticipationsResult {
@@ -61,8 +61,10 @@ export class DatabaseService {
               list
               number
             }
-            start
-            end
+            term {
+              start
+              end
+            }
           }}`,
         fetchPolicy: 'cache-and-network'
       });
@@ -102,8 +104,7 @@ export class DatabaseService {
         insertOneParticipation(data: ${toGraphQL({
         user: participation.user?._id,
         ticket: participation.ticket,
-        start: participation.start,
-        end: participation.end
+          term: participation.term
       })} ) { _id } }`
     });
   }

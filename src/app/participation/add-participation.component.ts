@@ -1,11 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MAT_DATE_LOCALE } from '@angular/material/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { ProfitDistributionMethod, Participation, snackBarConfig } from '../common/data';
-import { startOfNextQuarter } from '../common/dates';
-import { WinningTicket } from '../common/winning-ticket';
-import { ParticipationService } from '../service/participation.service';
+import { Component, OnInit } from '@angular/core'
+import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms'
+import { MAT_DATE_LOCALE } from '@angular/material/core'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { BSON } from 'realm-web'
+import { ProfitDistributionMethod, Participation, snackBarConfig, User } from '../common/data'
+import { startOfNextQuarter } from '../common/dates'
+import { Term } from '../common/term'
+import { WinningTicket } from '../common/winning-ticket'
+import { ParticipationService } from '../service/participation.service'
+
+
+export enum AddMode {
+  RegisteredUser = 'Registrierter Teilnehmer',
+  NewUser = 'Neuer Teilnehmer'
+}
 
 @Component({
   selector: 'app-add-participation',
@@ -16,23 +24,29 @@ import { ParticipationService } from '../service/participation.service';
 })
 export class AddParticipationComponent implements OnInit {
 
-  readonly nameValidator = Validators.pattern(/^([a-zA-Z]+( |-)?)+$/);
-  readonly phoneValidator = Validators.pattern(/^(\+\d{2}|0)( )?(\d{3})( )?(\d{4,9})$/);
-  readonly ibanValidator = Validators.pattern(/^([A-Za-z]{2})(\d{2})(\d{18})$/);
+  readonly nameValidator = Validators.pattern(/^(\S+( |-)?)+$/)
+  readonly phoneValidator = Validators.pattern(/^(\+\d{2}|0)( )?(\d{3})( )?(\d{4,9})$/)
+  readonly ibanValidator = Validators.pattern(/^([A-Za-z]{2})(\d{2})(\d{18})$/)
 
-  form = {} as FormGroup;
-  participation = {} as Participation;
-  freeTickets = [] as WinningTicket[];
-  profitDistributionMethods: string[] = Object.values(ProfitDistributionMethod);
+  AddMode = AddMode
 
-  constructor(private formBuilder: FormBuilder,
-              private snackBar: MatSnackBar,
-              private participationService: ParticipationService) { }
+  form = {} as FormGroup
+  registeredUsers = [] as User[]
+  freeTickets = [] as WinningTicket[]
+  addModes: string[] = Object.values(AddMode)
+  profitDistributionMethods: string[] = Object.values(ProfitDistributionMethod)
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private snackBar: MatSnackBar,
+    private participationService: ParticipationService) { }
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
-      firstName: ['', Validators.required, this.nameValidator],
-      lastName: ['', Validators.required, this.nameValidator],
+      addMode: [AddMode.RegisteredUser, [Validators.required]],
+      user: ['', Validators.required],
+      firstName: ['', this.nameValidator],
+      lastName: ['', this.nameValidator],
       ticket: ['', Validators.required],
       start: ['', Validators.required],
       end: [''],
@@ -44,64 +58,126 @@ export class AddParticipationComponent implements OnInit {
         postalCode: ['']
       }),
       payment: this.formBuilder.group({
-        distribution: [ProfitDistributionMethod.BankTransfer, [Validators.required]],
-        iban: ['', [Validators.required, this.ibanValidator]],
+        distribution: [ProfitDistributionMethod.BankTransfer],
+        iban: ['', [this.ibanValidator]],
         paypal: ['', [Validators.email]]
       })
-    });
+    })
+    this.addMode.valueChanges
+      .subscribe(mode => this.resetRequiredFields(mode))
+    this.participationService.observeUsers()
+      .subscribe(users => this.registeredUsers = users)
     this.participationService.observeFreeTickets()
-        .subscribe(tickets => this.freeTickets = tickets);
+      .subscribe(tickets => this.freeTickets = tickets)
   }
 
-  onAddParticipation(): void {
-    var user = {
-      firstName: this.form.get('firstName')!.value,
-      lastName: this.form.get('lastName')!.value,
-      email: this.form.get('email')!.value,
-      phone: this.form.get('phone')!.value,
-      address: {
-        street: this.form.get('address.street')!.value,
-        postalCode: parseInt(this.form.get('address.postalCode')!.value),
-        city: this.form.get('address.city')!.value
-      },
-      payment: {
-        distribution: this.form.get('payment.distribution')!.value,
-        iban: this.form.get('payment.iban')!.value
-      }
-    };
-
+  public onAddParticipation(): void {
+    console.debug('onAddParticipation')
     var participation = {
-      ticket: WinningTicket.fromString(this.form.get('ticket')!.value),
-      start: this.form.get('start')!.value,
-      end: this.form.get('end')!.value
-    } as Participation;
+      ticket: WinningTicket.fromString(this.ticket.value),
+      term: Term.fromObject({ start: this.start.value, end: this.end.value })
+    } as Participation
 
-    this.participationService.addParticipationWithNewUser(participation, user, (addedId, error) => {
-      if (addedId) {
-        this.participationService.refetch();
-        this.form.reset();
-        this.snackBar.open(`Teilnahme wurde registriert`, 'Schließen', snackBarConfig);
-      }
-      if (error) {
-        this.snackBar.open(`Teilname konnte nicht registriert werden: ${addedId}`, 'Schließen', snackBarConfig);
-      }
-    });
+    if (this.addMode.value == AddMode.NewUser) {
+      var user = this.createUserFromFields()
+      this.participationService.addParticipationWithNewUser(participation, user, (i, e) => this.onAdded(i, e))
+    } else if (this.addMode.value == AddMode.RegisteredUser) {
+      participation.user = this.registeredUser.value
+      this.participationService.addParticipation(participation, (i, e) => this.onAdded(i, e))
+    }
   }
 
   public onFromNextQuarter(): void {
-    this.start.setValue(startOfNextQuarter());
+    this.start.setValue(startOfNextQuarter())
   }
 
-  get firstName() { return this.form.get('firstName')!; }
-  get lastName() { return this.form.get('lastName')!; }
-  get ticket() { return this.form.get('ticket')!; }
-  get start() { return this.form.get('start')!; }
-  get end() { return this.form.get('end')!; }
-  get email() { return this.form.get('email')!; }
-  get phone() { return this.form.get('phone')!; }
-  get street() { return this.form.get('address.street')!; }
-  get city() { return this.form.get('address.city')!; }
-  get postalCode() { return this.form.get('address.postalCode')!; }
-  get distribution() { return this.form.get('payment.distribution')!; }
-  get iban() { return this.form.get('payment.iban')!; }
+  private createUserFromFields(): User {
+    console.debug('createUserFromFields')
+    return {
+      firstName: this.firstName.value,
+      lastName: this.lastName.value,
+      email: this.email.value,
+      phone: this.phone.value,
+      address: {
+        street: this.street.value,
+        postalCode: parseInt(this.postalCode.value),
+        city: this.city.value
+      },
+      payment: {
+        distribution: this.distribution.value,
+        iban: this.iban.value
+      }
+    }
+  }
+
+  private onAdded<E extends Error>(addedId?: BSON.ObjectID, error?: E): void {
+    console.debug('onAdded')
+    if (addedId) {
+      this.participationService.refetch()
+      this.resetAllFieldsButAddMode();
+      this.snackBar.open(`Teilnahme wurde registriert`, 'Schließen', snackBarConfig)
+    }
+    if (error) {
+      this.snackBar.open(`Teilname konnte nicht registriert werden: ${error}`, 'Schließen', snackBarConfig)
+    }
+  }
+
+  private resetAllFieldsButAddMode(): void {
+    var mode = this.addMode.value
+    this.form.reset()
+    this.addMode.setValue(mode)
+  }
+
+  private resetRequiredFields(addMode: AddMode): void {
+    console.debug('resetRequiredFields')
+    if (addMode == AddMode.RegisteredUser) {
+      console.debug('AddMode.RegisteredUser')
+      this.requiredFieldsForNewUser.forEach(f => this.removeValidatorAndUpdate(f))
+      this.requiredFieldsForRegisteredUser.forEach(f => this.addValidatorAndUpdate(f))
+    } else if (addMode == AddMode.NewUser) {
+      console.debug('AddMode.NewUser')
+      this.requiredFieldsForNewUser.forEach(f => this.addValidatorAndUpdate(f))
+      this.requiredFieldsForRegisteredUser.forEach(f => this.removeValidatorAndUpdate(f))
+    }
+  }
+
+  private addValidatorAndUpdate(control: AbstractControl): void {
+    control.addValidators(Validators.required)
+    control.updateValueAndValidity()
+  }
+
+  private removeValidatorAndUpdate(control: AbstractControl): void {
+    control.removeValidators(Validators.required)
+    control.updateValueAndValidity()
+  }
+
+  get addMode() { return this.form.get('addMode')! }
+  get registeredUser() { return this.form.get('user')! }
+  get firstName() { return this.form.get('firstName')! }
+  get lastName() { return this.form.get('lastName')! }
+  get ticket() { return this.form.get('ticket')! }
+  get start() { return this.form.get('start')! }
+  get end() { return this.form.get('end')! }
+  get email() { return this.form.get('email')! }
+  get phone() { return this.form.get('phone')! }
+  get street() { return this.form.get('address.street')! }
+  get city() { return this.form.get('address.city')! }
+  get postalCode() { return this.form.get('address.postalCode')! }
+  get distribution() { return this.form.get('payment.distribution')! }
+  get iban() { return this.form.get('payment.iban')! }
+
+  get requiredFieldsForRegisteredUser(): AbstractControl[] {
+    return [
+      this.registeredUser
+    ]
+  }
+
+  get requiredFieldsForNewUser(): AbstractControl[] {
+    return [
+      this.firstName,
+      this.lastName,
+      this.distribution,
+      this.iban
+    ]
+  }
 }

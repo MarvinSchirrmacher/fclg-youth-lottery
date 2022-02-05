@@ -23,6 +23,16 @@ export function startOfNextQuarter(): Date {
     return new Date(year, month, day);
 }
 
+export function endOfYear(): Date {
+    var today: Date = new Date();
+
+    var year = today.getFullYear();
+    var month = 11;
+    var day = lastDayOf(year, month);
+
+    return new Date(year, month, day);
+}
+
 function lastMonthOfQuarter(month: number) {
     return month - (month % 3) + 2;
 }

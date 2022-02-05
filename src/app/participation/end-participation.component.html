@@ -4,6 +4,7 @@
 </mat-dialog-content>
 <mat-dialog-actions class="flex end">
   <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>
-  <button mat-raised-button color="primary" (click)="endToday()">Heute</button>
   <button mat-raised-button color="primary" (click)="endAtEndOfQuarter()">Zum Quartalsende</button>
+  <button mat-raised-button color="primary" (click)="endAtEndOfYear()">Zum Jahresende</button>
+  <button mat-raised-button color="warn" (click)="endToday()">Heute</button>
 </mat-dialog-actions>

@@ -12,11 +12,11 @@
     </tr>
     <tr class="mat-row">
       <td class="mat-cell"><strong>Beginn</strong></td>
-      <td class="mat-cell">{{ participation.start | date: 'dd.MM.yyyy' }}</td>
+      <td class="mat-cell">{{ participation.term.start | date: 'dd.MM.yyyy' }}</td>
     </tr>
     <tr class="mat-row">
       <td class="mat-cell"><strong>Ende</strong></td>
-      <td class="mat-cell">{{ participation.end ? (participation.end | date: 'dd.MM.yyyy') : 'offen' }}</td>
+      <td class="mat-cell">{{ participation.term.end ? (participation.term.end | date: 'dd.MM.yyyy') : 'offen' }}</td>
     </tr>
     <tr class="mat-row">
       <td class="mat-cell"><strong>E-Mail</strong></td>

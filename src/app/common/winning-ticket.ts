@@ -28,4 +28,8 @@ export class WinningTicket {
         parseInt(exec?.groups['number'])
       );
     }
+
+  public static fromObject(ticket: WinningTicket): WinningTicket {
+    return new WinningTicket(ticket.list, ticket.number)
+  }
   }

@@ -26,14 +26,14 @@ export class LotteryWinService {
 
   private determineWinners(draw: LotteryDraw, participations: Participation[]): LotteryDraw {
     draw.winners = participations
-        .filter(p => this.isInParticipationPeriod(p, draw))
+      .filter(p => this.isInParticipationTerm(p, draw))
         .filter(p => p.ticket.number === draw.numbers[0]);
     return draw;
   }
 
-  private isInParticipationPeriod(p: Participation, d: LotteryDraw): boolean {
-    var start = new Date(p.start);
-    var end = p.end ? new Date(p.end) : undefined;
+  private isInParticipationTerm(p: Participation, d: LotteryDraw): boolean {
+    var start = new Date(p.term.start);
+    var end = p.term.end ? new Date(p.term.end) : undefined;
     var draw = new Date(d.date);
 
     var afterStart = start.getTime() <= draw.getTime();

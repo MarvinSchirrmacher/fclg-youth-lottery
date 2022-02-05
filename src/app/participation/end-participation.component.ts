@@ -34,6 +34,10 @@ export class EndPariticipationDialog {
         this.dialogRef.close(ParticipationEnd.EndOfQuarter);
     }
 
+    endAtEndOfYear(): void {
+        this.dialogRef.close(ParticipationEnd.EndOfYear);
+    }
+
     close(): void {
         this.dialogRef.close();
     }
