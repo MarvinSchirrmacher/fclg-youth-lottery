@@ -1,30 +1,56 @@
-<mat-card class="w-70 distant">
-  <h2>Ziehungen</h2>
-  <mat-table [dataSource]="wins">
-    <ng-container matColumnDef="date">
-      <mat-header-cell *matHeaderCellDef>Datum</mat-header-cell>
-      <mat-cell *matCellDef="let draw">{{ draw.date | date: 'dd.MM.yyyy' }}</mat-cell>
-    </ng-container>
-    <ng-container matColumnDef="numbers">
-      <mat-header-cell *matHeaderCellDef>Gewinnzahlen</mat-header-cell>
-      <mat-cell *matCellDef="let draw">
-        <span *ngFor="let n of draw.numbers" class="tile">{{n}}</span>
-      </mat-cell>
-    </ng-container>
-    <ng-container matColumnDef="winners">
-      <mat-header-cell *matHeaderCellDef>Gewinner</mat-header-cell>
-      <mat-cell *matCellDef="let draw">
-        <span class="w-100" *ngFor="let winner of draw.winners">
-          L{{ winner.ticket.list }}N{{ winner.ticket.number }} {{ winner.user.firstName }} {{ winner.user.lastName }}
-        </span>
-      </mat-cell>
-    </ng-container>
-    <ng-container matColumnDef="processed">
-      <mat-header-cell *matHeaderCellDef>Bearbeitet</mat-header-cell>
-      <mat-cell *matCellDef="let draw">{{ draw.processed ? 'Ja' : 'Nein' }}</mat-cell>
-    </ng-container>
+<section class="flex">
+  <mat-card class="w-40 distant">
+    <h2>Gewinner</h2>
+    <mat-table [dataSource]="winners">
+      <ng-container matColumnDef="date">
+        <mat-header-cell *matHeaderCellDef>Datum</mat-header-cell>
+        <mat-cell *matCellDef="let winner">{{ winner.date | date: 'dd.MM.yyyy' }}</mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+        <mat-cell *matCellDef="let winner">{{ winner.participation.user.firstName }} {{ winner.participation.user.lastName }}</mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="ticket">
+        <mat-header-cell *matHeaderCellDef>Gewinnlos</mat-header-cell>
+        <mat-cell *matCellDef="let winner">L{{ winner.participation.ticket.list }}N{{ winner.participation.ticket.number }}</mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
+        <mat-cell *matCellDef="let winner">
+          <button class="mat-icon-button mat-primary" (click)="onInform(winner._id)" [disabled]="winner.informed">
+            <span class="mat-button-wrapper">
+              <mat-icon>mail_outline</mat-icon>
+            </span>
+          </button>
+          <button class="mat-icon-button mat-primary" (click)="onPay(winner._id)" [disabled]="winner.paid">
+            <span class="mat-button-wrapper">
+              <mat-icon>payment</mat-icon>
+            </span>
+          </button>
+        </mat-cell>
+      </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let draw; columns: displayedColumns"></mat-row>
-  </mat-table>
-</mat-card>
+      <mat-header-row *matHeaderRowDef="winnersColumns"></mat-header-row>
+      <mat-row *matRowDef="let winner; columns: winnersColumns"></mat-row>
+    </mat-table>
+  </mat-card>
+
+  <mat-card class="w-30 distant">
+    <h2>Ziehungen</h2>
+    <mat-table [dataSource]="draws">
+      <ng-container matColumnDef="date">
+        <mat-header-cell *matHeaderCellDef>Datum</mat-header-cell>
+        <mat-cell *matCellDef="let draw">{{ draw.date | date: 'dd.MM.yyyy' }}</mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="numbers">
+        <mat-header-cell *matHeaderCellDef>Gewinnzahlen</mat-header-cell>
+        <mat-cell *matCellDef="let draw">
+          <span *ngFor="let n of draw.numbers" class="tile">{{n}}</span>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="drawsColumns"></mat-header-row>
+      <mat-row *matRowDef="let draw; columns: drawsColumns"></mat-row>
+    </mat-table>
+  </mat-card>
+</section>

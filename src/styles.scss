@@ -70,6 +70,11 @@ p {
     text-overflow: ellipsis;
 }
 
+.mat-icon-button.mat-primary[disabled] {
+    color: grey;
+    cursor: default;
+}
+
 .mat-dialog-container {
     min-width: 400px;
 }
