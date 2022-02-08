@@ -41,7 +41,8 @@ enum Currency {
 }
 
 enum EpcDta {
-  Char = 'CHAR'
+  Char = 'CHAR',
+  None = ''
 }
 
 class EpcQrCode {
@@ -50,7 +51,7 @@ class EpcQrCode {
   encoding = EpcEncoding.ISO88591
   transfer = EpcTransfer.SepaCreditTransfer
   currency = Currency.Euro
-  dta = EpcDta.Char
+  dta = EpcDta.None
 
   name: string
   iban: string
@@ -70,21 +71,19 @@ class EpcQrCode {
   }
 
   public toString = (): string => {
-    const sep = "\n";
-    let s = this.service.toString();
-    s += sep + this.version;
-    s += sep + this.encoding;
-    s += sep + this.transfer;
-    s += sep + this.bic;
-    s += sep + this.name;
-    s += sep + this.iban;
-    s += sep + this.currency + this.amount;
-    s += sep + this.dta;
-    s += sep + this.reference;
-    s += sep + this.purpose;
+    const nl = "\n"
+    let str = this.service.toString() + nl
+    str += this.version + nl
+    str += this.encoding + nl
+    str += this.transfer + nl
+    str += this.bic + nl
+    str += this.name + nl
+    str += this.iban + nl
+    str += this.currency + this.amount + nl
+    str += this.dta + nl
+    str += this.reference + nl
+    str += this.purpose
 
-    console.debug(s)
-
-    return s;
+    return str
   }
 }
