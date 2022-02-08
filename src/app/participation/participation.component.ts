@@ -18,8 +18,8 @@ export class ParticipationComponent implements OnInit {
   participation = {} as Participation
   participations = [] as Participation[]
   displayedColumns = [
-    'name',
     'ticket',
+    'name',
     'start',
     'end',
     'actions'
@@ -57,10 +57,9 @@ export class ParticipationComponent implements OnInit {
       return
     }
 
-    const dialogRef = this.dialog
-      .open(EndParticipationDialog, { data: participation })
-
-    dialogRef.afterClosed().subscribe((end: ParticipationEnd) => {
+    this.dialog
+      .open(EndParticipationDialog, { data: participation, panelClass: 'w-600p' })
+      .afterClosed().subscribe((end: ParticipationEnd) => {
       if (end === undefined)
         return
 
@@ -89,10 +88,9 @@ export class ParticipationComponent implements OnInit {
       return
     }
 
-    const dialogRef = this.dialog
-      .open(RemoveParticipationDialog, { data: participation })
-
-    dialogRef.afterClosed().subscribe((remove: boolean) => {
+    this.dialog
+      .open(RemoveParticipationDialog, { data: participation, panelClass: 'w-600p' })
+      .afterClosed().subscribe((remove: boolean) => {
       if (remove === undefined || !remove)
         return
 

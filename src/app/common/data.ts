@@ -3,6 +3,12 @@ import { BSON } from "realm-web";
 import { Term } from "./term";
 import { WinningTicket } from "./winning-ticket";
 
+export enum Gender {
+  Male = 'Herr',
+  Female = 'Frau',
+  Diverse = 'Divers'
+}
+
 export interface UserAddress {
   street: string;
   city: string;
@@ -24,6 +30,7 @@ export interface UserPayment {
 
 export interface User {
   _id?: BSON.ObjectID;
+  gender: Gender;
   firstName: string;
   lastName: string;
   email?: string;

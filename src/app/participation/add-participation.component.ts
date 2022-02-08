@@ -3,8 +3,8 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 import { MAT_DATE_LOCALE } from '@angular/material/core'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
-import { ProfitDistributionMethod, Participation, snackBarConfig, User } from '../common/data'
-import { startOfNextQuarter } from '../common/dates'
+import { ProfitDistributionMethod, Participation, snackBarConfig, User, Gender } from '../common/data'
+import { startOfNextQuarter, startOfYear } from '../common/dates'
 import { Term } from '../common/term'
 import { WinningTicket } from '../common/winning-ticket'
 import { ParticipationService } from '../service/participation.service'
@@ -34,6 +34,7 @@ export class AddParticipationComponent implements OnInit {
   registeredUsers = [] as User[]
   freeTickets = [] as WinningTicket[]
   addModes: string[] = Object.values(AddMode)
+  genders: string[] = Object.values(Gender)
   profitDistributionMethods: string[] = Object.values(ProfitDistributionMethod)
 
   constructor(
@@ -45,6 +46,7 @@ export class AddParticipationComponent implements OnInit {
     this.form = this.formBuilder.group({
       addMode: [AddMode.RegisteredUser, [Validators.required]],
       user: ['', Validators.required],
+      gender: [''],
       firstName: ['', this.nameValidator],
       lastName: ['', this.nameValidator],
       ticket: ['', Validators.required],
@@ -91,9 +93,14 @@ export class AddParticipationComponent implements OnInit {
     this.start.setValue(startOfNextQuarter())
   }
 
+  public onFromStartOfYear(): void {
+    this.start.setValue(startOfYear())
+  }
+
   private createUserFromFields(): User {
     console.debug('createUserFromFields')
     return {
+      gender: this.gender.value,
       firstName: this.firstName.value,
       lastName: this.lastName.value,
       email: this.email.value,
@@ -153,6 +160,7 @@ export class AddParticipationComponent implements OnInit {
 
   get addMode() { return this.form.get('addMode')! }
   get registeredUser() { return this.form.get('user')! }
+  get gender() { return this.form.get('gender')! }
   get firstName() { return this.form.get('firstName')! }
   get lastName() { return this.form.get('lastName')! }
   get ticket() { return this.form.get('ticket')! }
@@ -174,6 +182,7 @@ export class AddParticipationComponent implements OnInit {
 
   get requiredFieldsForNewUser(): AbstractControl[] {
     return [
+      this.gender,
       this.firstName,
       this.lastName,
       this.distribution,

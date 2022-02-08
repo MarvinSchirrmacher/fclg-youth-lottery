@@ -18,9 +18,19 @@
                 </mat-option>
             </mat-select>
         </mat-form-field>
+
     </section>
 
     <section class="w-100" *ngIf="addMode.value == AddMode.NewUser">
+
+        <mat-form-field class="form-field w-100">
+            <mat-label>Anrede</mat-label>
+            <mat-select formControlName="gender">
+                <mat-option *ngFor="let gender of genders" [value]="gender">
+                    {{ gender }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
 
         <mat-form-field class="form-field w-100">
             <input type="text" matInput placeholder="Vorname" formControlName="firstName">
@@ -119,9 +129,14 @@
         <mat-datepicker #startDatePicker></mat-datepicker>
     </mat-form-field>
 
-    <button class="mat-stroked-button mat-primary right" type="button" (click)="onFromNextQuarter()">
-        Ab nächstem Quartal
-    </button>
+    <div class="flex end">
+        <button class="mat-stroked-button mat-primary" type="button" (click)="onFromStartOfYear()">
+            Ab Jahresbeginn
+        </button>
+        <button class="mat-stroked-button mat-primary" type="button" (click)="onFromNextQuarter()">
+            Ab nächstem Quartal
+        </button>
+    </div>
 
     <mat-form-field class="form-field w-100">
         <input matInput [matDatepicker]="endDatePicker" placeholder="Ende" formControlName="end">

@@ -23,6 +23,16 @@ export function startOfNextQuarter(): Date {
     return new Date(year, month, day);
 }
 
+export function startOfYear(): Date {
+    var today: Date = new Date();
+
+    var year = today.getFullYear();
+    var month = 0;
+    var day = 1;
+
+    return new Date(year, month, day);
+}
+
 export function endOfYear(): Date {
     var today: Date = new Date();
 

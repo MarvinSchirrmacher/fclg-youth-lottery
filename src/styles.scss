@@ -7,6 +7,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 p {
     line-height: 1.5;
+    hyphens: auto;
+}
+
+.right {
+    float: right;
 }
 
 .flex {
@@ -24,7 +29,7 @@ p {
 }
 
 .flex.end {
-    align-items: flex-end;
+    align-items: center;
     justify-content: flex-end;
 }
 
@@ -83,10 +88,6 @@ p {
     margin: 16px;
 }
 
-.right {
-    float: right;
-}
-
 .h-100 {
     min-height: calc(100% - 64px);
 }
@@ -115,11 +116,6 @@ p {
     min-width: 400px;
 }
 
-ul {
-    list-style: none;
-    padding-left: 0;
-}
-
 .mat-toolbar.mat-primary {
     display: flex;
     justify-content: space-between;
@@ -129,8 +125,12 @@ ul {
     align-items: flex-start;
 }
 
-.mat-cell button + button {
-    margin-left: 4px;
+.mat-card,
+.mat-dialog-content,
+.mat-dialog-actions {
+    & .flex > * + * {
+        margin-left: 8px;
+    }
 }
 
 .tile {
