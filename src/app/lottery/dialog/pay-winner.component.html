@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>Gewinn auszahlen</h2>
+<mat-dialog-content>
+  <section class="flex">
+    <div>
+      <p><strong>{{ firstName }} {{ lastName }}</strong> hat am <strong>{{ date | date: 'shortDate' }}</strong> mit seinem Los <strong>{{ profit }} €</strong> gewonnen.</p>
+      <p>Für die Gewinnausschüttung per Banküberweisung einfach den nebenstehenden <strong>Giro Pay Code</strong> mit deiner Bank-App scannen und die vorausgefüllte Überweisung tätigen. Anschließend bitte die Gewinnausschüttung hier mit <i>Ausgezahlt</i> bestätigen.</p>  
+    </div>
+    <div>
+      <qr-code class="qrcode" [value]="giroCode" [size]="160"></qr-code>
+    </div>
+  </section>
+</mat-dialog-content>
+<mat-dialog-actions class="flex end">
+  <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>
+  <button mat-raised-button color="primary" (click)="paid()">Ausgezahlt</button>
+</mat-dialog-actions>

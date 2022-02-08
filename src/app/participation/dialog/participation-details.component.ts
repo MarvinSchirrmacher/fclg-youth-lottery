@@ -1,6 +1,6 @@
 import { Component, Inject } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Participation } from "../common/data";
+import { Participation } from "../../common/data";
 
 @Component({
     selector: 'participation-details',

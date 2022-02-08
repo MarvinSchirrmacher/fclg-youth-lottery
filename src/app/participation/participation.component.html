@@ -1,5 +1,5 @@
-<section class="flex">
-  <mat-card class="w-70 distant">
+<section class="flex wrap">
+  <mat-card class="grow-3 basis-500 distant">
     <h2>Teilnahmen</h2>
     <div *ngIf="participations.length == 0">
       <p>Es sind keine Teilnahmen registriert.</p>
@@ -8,29 +8,29 @@
     </div>
     <mat-table *ngIf="participations.length > 0" [dataSource]="participations">
       <ng-container matColumnDef="_id">
-        <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
-        <mat-cell *matCellDef="let row">{{ row._id }}</mat-cell>
+        <mat-header-cell *matHeaderCellDef class="grow-1">ID</mat-header-cell>
+        <mat-cell *matCellDef="let row" class="grow-1">{{ row._id }}</mat-cell>
       </ng-container>
       <ng-container matColumnDef="name">
-        <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
-        <mat-cell *matCellDef="let row">{{ row.user ? row.user.firstName + ' ' + row.user.lastName : 'unbekannt' }}
+        <mat-header-cell *matHeaderCellDef class="grow-3">Name</mat-header-cell>
+        <mat-cell *matCellDef="let row" class="grow-3">{{ row.user ? row.user.firstName + ' ' + row.user.lastName : 'unbekannt' }}
         </mat-cell>
       </ng-container>
       <ng-container matColumnDef="ticket">
-        <mat-header-cell *matHeaderCellDef>Gewinnlos</mat-header-cell>
-        <mat-cell *matCellDef="let row">L{{ row.ticket.list }}N{{ row.ticket.number }}</mat-cell>
+        <mat-header-cell *matHeaderCellDef class="grow-1">Gewinnlos</mat-header-cell>
+        <mat-cell *matCellDef="let row" class="grow-1">L{{ row.ticket.list }}N{{ row.ticket.number }}</mat-cell>
       </ng-container>
       <ng-container matColumnDef="start">
-        <mat-header-cell *matHeaderCellDef>Beginn</mat-header-cell>
-        <mat-cell *matCellDef="let row">{{ row.term.start | date: 'dd.MM.yyyy' }}</mat-cell>
+        <mat-header-cell *matHeaderCellDef class="grow-2">Beginn</mat-header-cell>
+        <mat-cell *matCellDef="let row" class="grow-2">{{ row.term.start | date: 'dd.MM.yyyy' }}</mat-cell>
       </ng-container>
       <ng-container matColumnDef="end">
-        <mat-header-cell *matHeaderCellDef>Ende</mat-header-cell>
-        <mat-cell *matCellDef="let row">{{ row.term.end ? (row.term.end | date: 'dd.MM.yyyy') : 'offen' }}</mat-cell>
+        <mat-header-cell *matHeaderCellDef class="grow-2">Ende</mat-header-cell>
+        <mat-cell *matCellDef="let row" class="grow-2">{{ row.term.end ? (row.term.end | date: 'dd.MM.yyyy') : 'offen' }}</mat-cell>
       </ng-container>
       <ng-container matColumnDef="actions">
-        <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
-        <mat-cell *matCellDef="let row">
+        <mat-header-cell *matHeaderCellDef class="grow-2">Aktionen</mat-header-cell>
+        <mat-cell *matCellDef="let row" class="grow-2">
           <button class="mat-icon-button mat-primary" (click)="onInfo(row._id)">
             <span class="mat-button-wrapper">
               <mat-icon>info_outline</mat-icon>
@@ -55,7 +55,7 @@
     </mat-table>
   </mat-card>
 
-  <mat-card id="add-participation" class="w-30 distant">
+  <mat-card id="add-participation" class="distant grow-1 basis-300">
     <h2>Neue Teilnahme</h2>
     <app-add-participation></app-add-participation>
   </mat-card>

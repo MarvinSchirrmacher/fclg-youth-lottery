@@ -42,6 +42,5 @@ export interface Participation {
 export var snackBarConfig = {
   duration: 5000,
   verticalPosition: 'bottom',
-  panelClass: ['mat-primary-100'],
-
+  panelClass: ['mat-primary'],
 } as MatSnackBarConfig; 

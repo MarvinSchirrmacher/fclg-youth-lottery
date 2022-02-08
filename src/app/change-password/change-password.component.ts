@@ -6,8 +6,7 @@ import { LoginBaseComponent } from '../common/login-base.component';
 
 @Component({
   selector: 'app-change-password',
-  templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.css']
+  templateUrl: './change-password.component.html'
 })
 export class ChangePasswordComponent extends LoginBaseComponent {
 

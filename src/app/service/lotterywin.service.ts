@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core'
+import { BSON } from 'realm-web'
 import { map, Observable, zip } from 'rxjs'
 import { Participation } from '../common/data'
 import { LotteryWinner } from '../common/lottery-winner'
@@ -11,8 +12,13 @@ import { ParticipationService } from './participation.service'
 })
 export class LotteryWinService {
 
-  constructor(private lotteryArchive: LotteryArchiveService,
-    private participation: ParticipationService) { }
+  public profitPerWin: number
+
+  constructor(
+      private lotteryArchive: LotteryArchiveService,
+      private participation: ParticipationService) {
+    this.profitPerWin = 13
+  }
 
   public observeDraws(): Observable<LotteryDraw[]> {
     return this.lotteryArchive
@@ -36,7 +42,22 @@ export class LotteryWinService {
     return participations
       .filter(p => this.isInParticipationTerm(p, draw))
       .filter(p => p.ticket.number === draw.numbers[0])
-      .map(p => new LotteryWinner(draw.date, p))
+      .map(p => new LotteryWinner(draw, p.user, [p.ticket], this.profitPerWin))
+      // .reduce((map, winner) => {
+      //   const id = winner.user._id
+      //   map[id] = map[id] ?? []
+      //   map[id].push(winner)
+      //   return map
+      // }, {} as Map<BSON.ObjectID, LotteryWinner>)
+      
+  }
+
+  public setWinnerInformed(id: BSON.ObjectID): void {
+    
+  }
+
+  public setWinnerPaid(id: BSON.ObjectID): void {
+    
   }
 
   private isInParticipationTerm(p: Participation, d: LotteryDraw): boolean {

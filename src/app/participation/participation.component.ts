@@ -4,9 +4,9 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
 import { Participation, snackBarConfig } from '../common/data'
 import { ParticipationEnd, ParticipationService } from '../service/participation.service'
-import { EndPariticipationDialog as EndParticipationDialog } from './end-participation.component'
-import { DeletePariticipationDialog as RemoveParticipationDialog } from './delete-participation.component'
-import { PariticipationDetailsDialog } from './participation-details.component'
+import { EndPariticipationDialog as EndParticipationDialog } from './dialog/end-participation.component'
+import { DeletePariticipationDialog as RemoveParticipationDialog } from './dialog/delete-participation.component'
+import { PariticipationDetailsDialog } from './dialog/participation-details.component'
 import { ApolloError } from '@apollo/client/errors'
 
 @Component({

@@ -1,7 +1,7 @@
 import { Component, Inject } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Participation } from "../common/data";
-import { WinningTicket } from "../common/winning-ticket";
+import { Participation } from "../../common/data";
+import { WinningTicket } from "../../common/winning-ticket";
 
 @Component({
     selector: 'delete-participation',

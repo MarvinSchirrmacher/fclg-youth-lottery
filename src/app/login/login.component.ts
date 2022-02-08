@@ -6,12 +6,10 @@ import { LoginBaseComponent } from '../common/login-base.component';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  templateUrl: './login.component.html'
 })
 export class LoginComponent extends LoginBaseComponent {
               
-  logonTitle = "Anmelden";
   showRetype = false;
   showChangePassword = false;
 

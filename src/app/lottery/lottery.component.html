@@ -1,28 +1,46 @@
-<section class="flex">
-  <mat-card class="w-40 distant">
+<section class="flex wrap">
+  <mat-card class="grow-3 basis-600 distant">
     <h2>Gewinner</h2>
-    <mat-table [dataSource]="winners">
+    <div *ngIf="winners.length == 0">
+      <p>Für den gewählten Zeitraum gibt es keine Gewinner</p>
+    </div>
+    <mat-table [dataSource]="winners" *ngIf="winners.length > 0">
+      <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef class="grow-1">Status</mat-header-cell>
+        <mat-cell *matCellDef="let winner" class="grow-1">
+          <mat-icon *ngIf="!(winner.informed && winner.paid)" title="Noch zu bearbeiten">schedule</mat-icon>
+          <mat-icon *ngIf="winner.informed && winner.paid" title="Bearbeitet" color="primary">check_circle_outline</mat-icon>
+        </mat-cell>
+      </ng-container>
       <ng-container matColumnDef="date">
-        <mat-header-cell *matHeaderCellDef>Datum</mat-header-cell>
-        <mat-cell *matCellDef="let winner">{{ winner.date | date: 'dd.MM.yyyy' }}</mat-cell>
+        <mat-header-cell *matHeaderCellDef class="grow-2">Datum</mat-header-cell>
+        <mat-cell *matCellDef="let winner" class="grow-2">{{ winner.draw.date | date: 'dd.MM.yyyy' }}</mat-cell>
       </ng-container>
       <ng-container matColumnDef="name">
-        <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
-        <mat-cell *matCellDef="let winner">{{ winner.participation.user.firstName }} {{ winner.participation.user.lastName }}</mat-cell>
+        <mat-header-cell *matHeaderCellDef class="grow-3">Name</mat-header-cell>
+        <mat-cell *matCellDef="let winner" class="grow-3">{{ winner.user.firstName }} {{ winner.user.lastName }}</mat-cell>
       </ng-container>
       <ng-container matColumnDef="ticket">
-        <mat-header-cell *matHeaderCellDef>Gewinnlos</mat-header-cell>
-        <mat-cell *matCellDef="let winner">L{{ winner.participation.ticket.list }}N{{ winner.participation.ticket.number }}</mat-cell>
+        <mat-header-cell *matHeaderCellDef class="grow-1">Gewinnlos</mat-header-cell>
+        <mat-cell *matCellDef="let winner" class="grow-1">
+          <span *ngFor="let ticket of winner.tickets">L{{ ticket.list }}N{{ ticket.number }}</span>
+        </mat-cell>
       </ng-container>
       <ng-container matColumnDef="actions">
-        <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
-        <mat-cell *matCellDef="let winner">
-          <button class="mat-icon-button mat-primary" (click)="onInform(winner._id)" [disabled]="winner.informed">
+        <mat-header-cell *matHeaderCellDef class="grow-1">Aktionen</mat-header-cell>
+        <mat-cell *matCellDef="let winner" class="grow-1">
+          <button class="mat-icon-button mat-primary"
+                  *ngIf="winner.user.email"
+                  title="{{ winner.informed ? 'Gewinner wurde benachrichtigt' : 'Gewinner benachrichtigen' }}"
+                  (click)="onInform(winner._id)" [disabled]="winner.informed">
             <span class="mat-button-wrapper">
               <mat-icon>mail_outline</mat-icon>
             </span>
           </button>
-          <button class="mat-icon-button mat-primary" (click)="onPay(winner._id)" [disabled]="winner.paid">
+          <button class="mat-icon-button mat-primary"
+                  *ngIf="winner.user.payment.iban"
+                  title="{{ winner.paid ? 'Gewinn wurde ausgezahlt' : 'Gewinn auszahlen' }}"
+                  (click)="onPay(winner._id)" [disabled]="winner.paid">
             <span class="mat-button-wrapper">
               <mat-icon>payment</mat-icon>
             </span>
@@ -35,16 +53,20 @@
     </mat-table>
   </mat-card>
 
-  <mat-card class="w-30 distant">
+  <mat-card class="grow-1 basis-400 distant">
     <h2>Ziehungen</h2>
     <mat-table [dataSource]="draws">
+      <ng-container matColumnDef="week">
+        <mat-header-cell *matHeaderCellDef class="grow-1">Woche</mat-header-cell>
+        <mat-cell *matCellDef="let draw" class="grow-1">{{ draw.date | date: 'w' }}</mat-cell>
+      </ng-container>
       <ng-container matColumnDef="date">
-        <mat-header-cell *matHeaderCellDef>Datum</mat-header-cell>
-        <mat-cell *matCellDef="let draw">{{ draw.date | date: 'dd.MM.yyyy' }}</mat-cell>
+        <mat-header-cell *matHeaderCellDef class="grow-2">Datum</mat-header-cell>
+        <mat-cell *matCellDef="let draw" class="grow-2">{{ draw.date | date: 'dd.MM.yyyy' }}</mat-cell>
       </ng-container>
       <ng-container matColumnDef="numbers">
-        <mat-header-cell *matHeaderCellDef>Gewinnzahlen</mat-header-cell>
-        <mat-cell *matCellDef="let draw">
+        <mat-header-cell *matHeaderCellDef class="grow-3">Gewinnzahlen</mat-header-cell>
+        <mat-cell *matCellDef="let draw" class="grow-3">
           <span *ngFor="let n of draw.numbers" class="tile">{{n}}</span>
         </mat-cell>
       </ng-container>

@@ -14,10 +14,13 @@ import { ParticipationComponent } from './participation/participation.component'
 import { RegisterComponent } from './register/register.component';
 import { GraphQLModule } from './graphql.module';
 import { MaterialModule } from './material.module';
+import { QRCodeModule } from 'angular2-qrcode';
 import { AddParticipationComponent } from './participation/add-participation.component';
-import { EndPariticipationDialog } from './participation/end-participation.component';
-import { DeletePariticipationDialog } from './participation/delete-participation.component';
-import { PariticipationDetailsDialog } from './participation/participation-details.component';
+import { EndPariticipationDialog } from './participation/dialog/end-participation.component';
+import { DeletePariticipationDialog } from './participation/dialog/delete-participation.component';
+import { PariticipationDetailsDialog } from './participation/dialog/participation-details.component';
+import { InformWinnerDialog } from './lottery/dialog/inform-winner';
+import { PayWinnerDialog } from './lottery/dialog/pay-winner';
 
 
 @NgModule({
@@ -33,7 +36,9 @@ import { PariticipationDetailsDialog } from './participation/participation-detai
     AddParticipationComponent,
     PariticipationDetailsDialog,
     EndPariticipationDialog,
-    DeletePariticipationDialog
+    DeletePariticipationDialog,
+    InformWinnerDialog,
+    PayWinnerDialog
   ],
   imports: [
     AppRoutingModule,
@@ -42,7 +47,8 @@ import { PariticipationDetailsDialog } from './participation/participation-detai
     GraphQLModule,
     HttpClientModule,
     ReactiveFormsModule,
-    MaterialModule
+    MaterialModule,
+    QRCodeModule
   ],
   entryComponents: [
     EndPariticipationDialog
