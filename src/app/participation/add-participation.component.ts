@@ -3,9 +3,10 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 import { MAT_DATE_LOCALE } from '@angular/material/core'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
-import { ProfitDistributionMethod, Participation, snackBarConfig, User, Gender } from '../common/data'
+import { Participation, snackBarConfig } from '../common/data'
 import { startOfNextQuarter, startOfYear } from '../common/dates'
 import { Term } from '../common/term'
+import { Gender, ProfitDistributionMethod, User } from '../common/user'
 import { WinningTicket } from '../common/winning-ticket'
 import { ParticipationService } from '../service/participation.service'
 
@@ -99,7 +100,7 @@ export class AddParticipationComponent implements OnInit {
 
   private createUserFromFields(): User {
     console.debug('createUserFromFields')
-    return {
+    return new User({
       gender: this.gender.value,
       firstName: this.firstName.value,
       lastName: this.lastName.value,
@@ -114,7 +115,7 @@ export class AddParticipationComponent implements OnInit {
         distribution: this.distribution.value,
         iban: this.iban.value
       }
-    }
+    })
   }
 
   private onAdded<E extends Error>(addedId?: BSON.ObjectID, error?: E): void {

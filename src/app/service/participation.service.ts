@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core'
 import { QueryRef } from 'apollo-angular'
 import { BSON } from 'realm-web'
 import { map, Observable, zip } from 'rxjs'
-import { Participation, User } from '../common/data'
+import { Participation } from '../common/data'
 import { endOfQuarter, endOfToday, endOfYear } from '../common/dates'
 import { Term } from '../common/term'
+import { User } from '../common/user'
 import { WinningTicket } from '../common/winning-ticket'
 import { DatabaseService, ParticipationDocument, QueryParticipationsResult, QueryUsersResult } from './database.service'
 
@@ -44,7 +45,7 @@ export class ParticipationService {
         ps.data.participations
         .map(p => ({
           _id: p._id,
-          user: us.data.users.find(u => u._id === p.user),
+          user: new User(us.data.users.find(u => u._id === p.user)!),
           ticket: WinningTicket.fromObject(p.ticket),
           term: Term.fromObject(p.term)
         } as Participation))

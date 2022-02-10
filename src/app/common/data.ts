@@ -1,43 +1,8 @@
 import { MatSnackBarConfig } from "@angular/material/snack-bar";
 import { BSON } from "realm-web";
 import { Term } from "./term";
+import { User } from "./user";
 import { WinningTicket } from "./winning-ticket";
-
-export enum Gender {
-  Male = 'Herr',
-  Female = 'Frau',
-  Diverse = 'Divers'
-}
-
-export interface UserAddress {
-  street: string;
-  city: string;
-  postalCode: number;
-}
-
-export enum ProfitDistributionMethod {
-  BankTransfer = 'Überweisung',
-  PayPal = 'PayPal',
-  Cash = 'Bar',
-  Donation = 'Spende'
-}
-
-export interface UserPayment {
-  distribution: ProfitDistributionMethod;
-  iban: string;
-  paypal?: string;
-}
-
-export interface User {
-  _id?: BSON.ObjectID;
-  gender: Gender;
-  firstName: string;
-  lastName: string;
-  email?: string;
-  phone?: string;
-  address?: UserAddress;
-  payment: UserPayment;
-}
 
 export interface Participation {
   _id?: BSON.ObjectID;

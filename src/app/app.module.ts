@@ -21,6 +21,7 @@ import { DeletePariticipationDialog } from './participation/dialog/delete-partic
 import { PariticipationDetailsDialog } from './participation/dialog/participation-details.component';
 import { InformWinnerDialog } from './lottery/dialog/inform-winner';
 import { PayWinnerDialog } from './lottery/dialog/pay-winner';
+import { ResetProgressDialog } from './lottery/dialog/reset-progress';
 
 
 @NgModule({
@@ -38,7 +39,8 @@ import { PayWinnerDialog } from './lottery/dialog/pay-winner';
     EndPariticipationDialog,
     DeletePariticipationDialog,
     InformWinnerDialog,
-    PayWinnerDialog
+    PayWinnerDialog,
+    ResetProgressDialog
   ],
   imports: [
     AppRoutingModule,

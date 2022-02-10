@@ -1,6 +1,7 @@
-import { Component, Inject } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { LotteryWinner } from "src/app/common/lottery-winner";
+import { Component, Inject } from "@angular/core"
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog"
+import { Gender } from "src/app/common/user"
+import { LotteryWinner } from "src/app/common/lottery-winner"
 
 @Component({
     selector: 'inform-winner',
@@ -8,27 +9,36 @@ import { LotteryWinner } from "src/app/common/lottery-winner";
 })
 export class InformWinnerDialog {
 
-    firstName: string;
-    lastName: string;
-    date: Date;
+    Gender = Gender
+    
+    winner: LotteryWinner
+    noun: string
+    personalPronoun: string
+    possessivePronoun: string
 
     constructor(
         public dialogRef: MatDialogRef<InformWinnerDialog>,
         @Inject(MAT_DIALOG_DATA) public data: LotteryWinner) {
-        this.firstName = data.user.firstName;
-        this.lastName = data.user.lastName;
-        this.date = data.draw.date;
+        this.winner = data
+        this.noun = this.winner.user.getWinnerNoun()
+        this.personalPronoun = this.winner.user.getPersonalPronoun()
+        this.possessivePronoun = this.winner.user.getPossessivePronoun()
     }
 
     onNoClick(): void {
-        this.dialogRef.close();
+        this.dialogRef.close()
     }
 
     sendMail(): void {
-        this.dialogRef.close(true);
+        // TODO: send mail to winner
+        this.dialogRef.close(true)
+    }
+
+    doNotInform(): void {
+        this.dialogRef.close(false)
     }
 
     close(): void {
-        this.dialogRef.close();
+        this.dialogRef.close()
     }
 }

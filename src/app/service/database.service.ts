@@ -2,9 +2,10 @@ import { Injectable } from "@angular/core";
 import { Apollo, QueryRef, gql, MutationResult } from "apollo-angular";
 import { BSON } from "realm-web";
 import { Observable } from "rxjs";
-import { Participation, User } from "../common/data";
+import { Participation } from "../common/data";
 import { toGraphQL } from "../common/graphql";
 import { Term } from "../common/term";
+import { User } from "../common/user";
 import { WinningTicket } from "../common/winning-ticket";
 
 
@@ -77,6 +78,7 @@ export class DatabaseService {
         query: gql`{
           users {
             _id
+            gender
             firstName
             lastName
             email

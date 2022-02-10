@@ -1,6 +1,6 @@
 import { BSON } from "realm-web";
-import { User } from "./data";
 import { LotteryDraw } from "./lotterydraw";
+import { User } from "./user";
 import { WinningTicket } from "./winning-ticket";
 
 export class LotteryWinner {
