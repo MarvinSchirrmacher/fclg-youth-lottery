@@ -5,6 +5,7 @@ import { BSON } from 'realm-web'
 import { snackBarConfig } from '../common/data'
 import { LotteryWinner } from '../common/lottery-winner'
 import { LotteryDraw } from '../common/lotterydraw'
+import { DrawDay, LotteryService } from '../service/lottery.service'
 import { LotteryWinService } from '../service/lotterywin.service'
 import { InformWinnerDialog } from './dialog/inform-winner'
 import { PayWinnerDialog } from './dialog/pay-winner'
@@ -21,12 +22,16 @@ export class LotteryComponent implements OnInit {
   public drawsColumns: string[] = ['week', 'date', 'numbers']
 
   constructor(
+    private lottery: LotteryService,
     private lotteryWin: LotteryWinService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar) { }
 
   public ngOnInit(): void {
-    this.lotteryWin.observeDraws()
+    this.lottery
+      .year(new Date().getFullYear())
+      .day(DrawDay.Saturday)
+      .readDraws()
       .subscribe(draws => this.draws = draws)
     this.lotteryWin.observeWinners()
       .subscribe(winners => this.winners = winners)

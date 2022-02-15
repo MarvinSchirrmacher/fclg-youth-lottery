@@ -60,7 +60,12 @@
 
   <mat-card class="grow-1 basis-400 distant">
     <h2>Ziehungen</h2>
-    <mat-table [dataSource]="draws">
+
+    <div *ngIf="draws.length == 0">
+      <p>In dem gewählten Jahr gab es keine Ziehungen</p>
+    </div>
+    
+    <mat-table [dataSource]="draws" *ngIf="draws.length > 0">
       <ng-container matColumnDef="week">
         <mat-header-cell *matHeaderCellDef class="grow-1">Woche</mat-header-cell>
         <mat-cell *matCellDef="let draw" class="grow-1">{{ draw.date | date: 'w' }}</mat-cell>

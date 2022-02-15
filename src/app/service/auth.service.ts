@@ -9,12 +9,12 @@ import { REALM_APP_ID } from '../common/mongodb';
 export class AuthService {
 
   app: Realm.App = new Realm.App({ id: REALM_APP_ID });
-  aquireToken = new Promise<void>((r, j) => {});
 
   get user(): Realm.User | null { return this.app.currentUser; }
 
   get accessToken(): string | null {
     if (this.user) {
+      console.debug('refresh access token')
       this.user.refreshAccessToken();
       return this.user.accessToken;
     }

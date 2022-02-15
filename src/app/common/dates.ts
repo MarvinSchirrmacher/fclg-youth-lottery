@@ -1,3 +1,5 @@
+import { DrawDay } from "../service/lottery.service";
+
 export function endOfToday(): Date {
     var today: Date = new Date();
     return new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -41,6 +43,18 @@ export function endOfYear(): Date {
     var day = lastDayOf(year, month);
 
     return new Date(year, month, day);
+}
+
+export function dateFromString(date: string): Date {
+    var day = Number(date.substring(0, 2))
+    var month = Number(date.substring(3, 5))
+    var year = Number(date.substring(6, 10))
+    return new Date(year, month - 1, day)
+}
+
+export function isDay(date: Date, day: DrawDay): boolean {
+  if (day === DrawDay.All) return true
+  return day === date.getDay()
 }
 
 function lastMonthOfQuarter(month: number) {

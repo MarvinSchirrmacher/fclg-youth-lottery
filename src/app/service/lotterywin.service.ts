@@ -4,7 +4,7 @@ import { map, Observable, zip } from 'rxjs'
 import { Participation } from '../common/data'
 import { LotteryWinner } from '../common/lottery-winner'
 import { LotteryDraw } from '../common/lotterydraw'
-import { DrawDay, LotteryArchiveService } from './lotteryarchive.service'
+import { DrawDay, LotteryService } from './lottery.service'
 import { ParticipationService } from './participation.service'
 
 @Injectable({
@@ -12,22 +12,24 @@ import { ParticipationService } from './participation.service'
 })
 export class LotteryWinService {
 
-  public profitPerWin: number
+  public _profitPerWin: number
 
   constructor(
-      private lotteryArchive: LotteryArchiveService,
+      private lottery: LotteryService,
       private participation: ParticipationService) {
-    this.profitPerWin = 13
+    this._profitPerWin = 13
   }
 
-  public observeDraws(): Observable<LotteryDraw[]> {
-    return this.lotteryArchive
-      .getAllDrawsOfYear(new Date().getFullYear(), DrawDay.Saturday)
+  private profitPerWin(value: number): LotteryWinService {
+    this._profitPerWin = value
+    return this
   }
 
   public observeWinners(): Observable<LotteryWinner[]> {
-    var allDraws = this.lotteryArchive
-      .getAllDrawsOfYear(new Date().getFullYear(), DrawDay.Saturday)
+    var allDraws = this.lottery
+      .year(new Date().getFullYear())
+      .day(DrawDay.Saturday)
+      .readDraws()
     var allParticipations = this.participation.observeParticipations()
 
     return zip(allDraws, allParticipations)
@@ -42,7 +44,7 @@ export class LotteryWinService {
     return participations
       .filter(p => this.isInParticipationTerm(p, draw))
       .filter(p => p.ticket.number === draw.numbers[0])
-      .map(p => new LotteryWinner(draw, p.user, [p.ticket], this.profitPerWin))
+      .map(p => new LotteryWinner(draw, p.user, [p.ticket], this._profitPerWin))
       // .reduce((map, winner) => {
       //   const id = winner.user._id
       //   map[id] = map[id] ?? []
