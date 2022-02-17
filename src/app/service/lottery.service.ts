@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core'
-import { forkJoin, map, mergeMap, Observable } from 'rxjs'
+import { first, forkJoin, map, mergeMap, Observable, of, zip } from 'rxjs'
 import { HttpClient } from '@angular/common/http'
 import { dateFromString, isDay } from '../common/dates';
 import { LotteryDraw } from '../common/lotterydraw';
+import { DatabaseService } from './database.service';
+import { DatePipe } from '@angular/common';
 
 
 export enum DrawDay {
@@ -16,18 +18,21 @@ export enum DrawDay {
 })
 export class LotteryService {
 
-  private _westlottoArchiveUrl: string =
+  private _archiveUrl: string =
     'https://www.westlotto.com/wlinfo/WL_InfoService?client=wlincl&gruppe=ZahlenUndQuoten&spielart=LOTTO&historie=ja'
 
   private _dateSelectRegExp = /<select name=\"selDatum\"(.|\s)*?<\/select>/m
-  private _dateOptionRegExp = /<option value=\"(?<date>[\d\.]*)\".*?<\/option>/m
+  private _dateOptionRegExp = /<option value=\"(?<date>[\d\.]*)\".*?<\/option>/gm
   private _numbersRegExp = /Gezogene Reihenfolge(.|\s)*?<div class=\"right".*?>(?<numbers>(.|\s)*?)<\/div>/m
   private _numberRegExp = /<span class=\"number.*?>(?<number>\d+)<\/span>/gm
 
   private _year: number = new Date().getFullYear()
   private _day: DrawDay = DrawDay.All
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private database: DatabaseService,
+    private datePipe: DatePipe) { }
 
   public year(year: number): LotteryService {
     this._year = year
@@ -40,47 +45,71 @@ export class LotteryService {
   }
 
   public readDraws(): Observable<LotteryDraw[]> {
-    return this.http
-      .get(`${this._westlottoArchiveUrl}&jahr=${this._year}`, { responseType: 'text' })
-      .pipe(
-        map((html: string) => this.extractDates(html, this._day))
+    var archivedDates = this.http
+      .get(`${this._archiveUrl}&jahr=${this._year}`, { responseType: 'text' })
+      .pipe(  
+        map(html => this.extractDates(html, this._day))
       )
+    var savedDraws = this.database
+      .queryLotteryDraws().valueChanges
       .pipe(
-        mergeMap((dates: string[]) => forkJoin(dates.map(d => this.readDraw(d))))
+        first(),
+        map(result => result.data.draws.map(d => LotteryDraw.fromObject(d)))
+      )
+      
+    return zip(archivedDates, savedDraws)
+      .pipe(
+        mergeMap(([dates, draws]) =>
+          forkJoin(dates.map(d => this.maySaveDraw(d, draws))))
       )
   }
 
-  private readDraw(date: string): Observable<LotteryDraw> {
+  private maySaveDraw(date: Date, draws: LotteryDraw[]): Observable<LotteryDraw> {
+    var savedDraw = draws.find(d => d.date.getTime() == date.getTime())
+    if (savedDraw)
+      return of(savedDraw)
+
     return this.http
-      .get(`${this._westlottoArchiveUrl}&datum=${date}`, { responseType: 'text' })
+      .get(`${this._archiveUrl}&datum=${this.datePipe.transform(date, 'dd.MM.yyyy')}`, { responseType: 'text' })
       .pipe(
-        map((html: string) => this.extractLotteryDraw(html, date))
+        map(html => this.extractLotteryDraw(html, date)),
+        mergeMap(draw => this.saveDraw(draw))
       )
   }
 
-  private extractDates(html: string, day: DrawDay): string[] {
+  private saveDraw(draw: LotteryDraw): Observable<LotteryDraw> {
+    return this.database
+      .insertLotteryDraw(draw)
+      .pipe(map(result => {
+        draw._id = result.data?.insertOneDraw._id
+        return draw
+      }))
+  }
+
+  private extractDates(html: string, day: DrawDay): Date[] {
     var match = this._dateSelectRegExp.exec(html)
     if (!match) return []
-    
-    return match.toString()
-      .split('\n')
-      .map(line => {
-        let m = this._dateOptionRegExp.exec(line.trim())
-        return m && m.groups ? m.groups['date'] : ''
-      })
-      .filter(date => date != '' && isDay(dateFromString(date), day))
+
+    var dateSelect = match.toString()
+    var dates = [] as Date[]
+    while ((match = this._dateOptionRegExp.exec(dateSelect)) !== null) {
+      let date = dateFromString(match.groups!['date'])
+      if (isDay(date, day))
+        dates.push(date)
+    }
+    return dates
   }
 
-  private extractLotteryDraw(html: string, date: string): LotteryDraw {
+  private extractLotteryDraw(html: string, date: Date): LotteryDraw {
     var match = this._numbersRegExp.exec(html)
     if (!match || !match.groups)
       return {} as LotteryDraw
-    
+
     var numbersHtml = match.groups['numbers']
     var numbers = [] as number[]
     while ((match = this._numberRegExp.exec(numbersHtml)) !== null)
       numbers.push(parseInt(match.groups!['number']))
 
-    return new LotteryDraw(date, numbers)
+    return new LotteryDraw(date, numbers, false)
   }
 }

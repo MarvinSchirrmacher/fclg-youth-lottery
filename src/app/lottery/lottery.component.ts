@@ -29,12 +29,12 @@ export class LotteryComponent implements OnInit {
 
   public ngOnInit(): void {
     this.lottery
-      .year(new Date().getFullYear())
+      .year(new Date().getFullYear() - 1)
       .day(DrawDay.Saturday)
       .readDraws()
       .subscribe(draws => this.draws = draws)
-    this.lotteryWin.observeWinners()
-      .subscribe(winners => this.winners = winners)
+    // this.lotteryWin.observeWinners()
+    //   .subscribe(winners => this.winners = winners)
   }
 
   public onInform(id: BSON.ObjectID): void {

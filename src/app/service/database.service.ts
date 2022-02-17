@@ -4,6 +4,7 @@ import { BSON } from "realm-web";
 import { Observable } from "rxjs";
 import { Participation } from "../common/data";
 import { toGraphQL } from "../common/graphql";
+import { LotteryDraw } from "../common/lotterydraw";
 import { Term } from "../common/term";
 import { User } from "../common/user";
 import { WinningTicket } from "../common/winning-ticket";
@@ -24,6 +25,10 @@ export interface QueryUsersResult {
   users: User[];
 }
 
+export interface QueryLotteryDrawsResult {
+  draws: LotteryDraw[];
+}
+
 export interface InsertUserResult {
   insertOneUser: { _id: BSON.ObjectID }
 }
@@ -32,12 +37,20 @@ export interface InsertParticipationResult {
   insertOneParticipation: { _id: BSON.ObjectID }
 }
 
+export interface InsertLotteryDrawResult {
+  insertOneDraw: { _id: BSON.ObjectID }
+}
+
 export interface UpdateParticipationResult {
   updateOneParticipation: { _id: BSON.ObjectID }
 }
 
 export interface UpdateUserResult {
   updateOneUser: { _id: BSON.ObjectID }
+}
+
+export interface UpdateLotteryDrawResult {
+  updateOneDraw: { _id: BSON.ObjectID }
 }
 
 export interface DeleteParticipationResult {
@@ -97,6 +110,24 @@ export class DatabaseService {
       });
   }
 
+  public queryLotteryDraws(where?: Date): QueryRef<QueryLotteryDrawsResult> {
+
+    console.debug(`queryLotteryDraws`)
+    var query = where ? `(query: { date: "${where.toISOString()}" })` : ''
+
+    return this.apollo
+      .watchQuery<QueryLotteryDrawsResult>({
+        query: gql`{
+          draws${query} {
+            _id
+            date
+            numbers
+            evaluated
+          }}`,
+        fetchPolicy: 'cache-and-network'
+      });
+  }
+
   public insertParticipation(participation: Participation):
     Observable<MutationResult<InsertParticipationResult>> {
 
@@ -118,6 +149,16 @@ export class DatabaseService {
     return this.apollo.mutate<InsertUserResult>({
       mutation: gql`mutation {
         insertOneUser(data: ${toGraphQL(user)}) { _id }
+      }`});
+  }
+
+  public insertLotteryDraw(draw: LotteryDraw):
+    Observable<MutationResult<InsertLotteryDrawResult>> {
+
+    console.debug('insertLotteryDraw')
+    return this.apollo.mutate<InsertLotteryDrawResult>({
+      mutation: gql`mutation {
+        insertOneDraw(data: ${toGraphQL(draw)}) { _id }
       }`});
   }
 
@@ -143,6 +184,19 @@ export class DatabaseService {
         updateOneUser(
           query: { _id: "${id}" },
           set: ${toGraphQL(user)}
+        ) { _id } }`
+    })
+  }
+
+  public updateLotteryDraw(id: BSON.ObjectID, draw: LotteryDraw):
+    Observable<MutationResult<UpdateLotteryDrawResult>> {
+
+    console.debug('updateLotteryDraw')
+    return this.apollo.mutate<UpdateLotteryDrawResult>({
+      mutation: gql`mutation {
+        updateOneLotteryDraw(
+          query: { _id: "${id}" },
+          set: ${toGraphQL(draw)}
         ) { _id } }`
     })
   }
