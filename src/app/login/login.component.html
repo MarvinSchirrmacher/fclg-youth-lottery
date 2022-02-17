@@ -1,64 +1,64 @@
-<div class="login-form top-space">
-<div [formGroup]="formGroup">
-<mat-toolbar class="toolbar" color="primary">{{logonTitle}}</mat-toolbar>
-<mat-card>
-    <mat-form-field class="form-field">
-        <input type="text" matInput placeholder="User Email" formControlName="email">
+<section class="flex center h-100">
+<form [formGroup]="formGroup" class="login-form">
+<mat-toolbar class="toolbar" color="primary">Anmelden</mat-toolbar>
+<mat-card class="flex end">
+    <mat-form-field class="form-field w-100">
+        <input type="text" matInput placeholder="E-Mail-Adresse" formControlName="email">
     </mat-form-field>
     <br/>
     <div *ngIf="email.invalid && (email.dirty || email.touched)"
         class="alert">
         <div *ngIf="email.errors?.['required']" class="form-field error">
-            Email is required
+            E-Mail ist verpflichtend
         </div>
         <div *ngIf="email.errors?.['email']" class="form-field error">
-            Must be a valid email
+            Es muss eine valide E-Mail-Adresse sein
         </div>
     </div>
 
-    <mat-form-field class="form-field">
-    <input type="password" matInput placeholder="Password" formControlName="password">
+    <mat-form-field class="form-field w-100">
+    <input type="password" matInput placeholder="Passwort" formControlName="password">
     </mat-form-field>
     <br/>
     <div *ngIf="password.invalid && (password.dirty || password.touched)"
         class="alert">
         <div *ngIf="password.errors?.['required']" class="form-field error">
-            Password is required
+            Passwort ist verpflichtend
         </div>
     </div>
 
     <div *ngIf="showRetype">
         <mat-form-field class="form-field">
-            <input autofocus type="password" matInput placeholder="Retype password" formControlName="retypePassword">
+            <input autofocus type="password" matInput placeholder="Passwort wiederholen" formControlName="retypePassword">
         </mat-form-field>
         <br/>
     </div>
     <div *ngIf="showChangePassword">
         <mat-form-field class="form-field">
-            <input autofocus type="password" matInput placeholder="New password" formControlName="newPassword">
+            <input autofocus type="password" matInput placeholder="Neues Passwort" formControlName="newPassword">
         </mat-form-field>
         <br/>
         <mat-form-field class="form-field">
-            <input autofocus type="password" matInput placeholder="Retype new password" formControlName="retypeNewPassword">
+            <input autofocus type="password" matInput placeholder="Neues Passwort wiederholen" formControlName="retypeNewPassword">
         </mat-form-field>
         <br/>
     </div>
     <div class="center">
-        <button mat-raised-button color="primary" (click)="onLogin()">Submit</button>
+        <button mat-raised-button color="primary" (click)="onLogin()">Anmelden</button>
     </div>
     <div *ngIf="errorMessage != ''" class="form-field error">
         {{ errorMessage }}
     </div>
     <div class="right-just">
         <button mat-flat-button class="blue-text" (click)="onRegister()">
-            Don't have an account?
+            Noch keinen Account?
         </button>
     </div>
     <div class="right-just">
         <button mat-flat-button class="blue-text" (click)="onLoginAnonymously()">
-            Log in anonymously
+            Anonym anmelden
         </button>
     </div>
 </mat-card>
-</div>
-</div>  
+</form>
+</section>  

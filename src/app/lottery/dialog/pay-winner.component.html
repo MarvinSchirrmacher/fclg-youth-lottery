@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>Gewinn auszahlen</h2>
+<mat-dialog-content>
+  <section class="flex">
+    <p>Für die Gewinnausschüttung an <strong>{{ firstName }} {{ lastName }}</strong> per Banküberweisung den nebenstehenden <strong>Giro Pay Code</strong> mit deiner Bank-App scannen und die vorausgefüllte Überweisung tätigen. Anschließend bitte die Gewinnausschüttung hier mit <i>Ausgezahlt</i> bestätigen.</p>  
+    <qr-code class="qrcode" [value]="giroCode" [size]="160"></qr-code>
+  </section>
+</mat-dialog-content>
+<mat-dialog-actions class="flex end">
+  <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>
+  <button mat-raised-button color="primary" (click)="paid()">Ausgezahlt</button>
+</mat-dialog-actions>

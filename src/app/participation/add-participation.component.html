@@ -1,0 +1,148 @@
+<form novalidate (ngSubmit)="onAddParticipation()" [formGroup]="form">
+    <mat-form-field class="form-field w-100">
+        <mat-label>Auswählen oder neu registrieren</mat-label>
+        <mat-select formControlName="addMode">
+            <mat-option *ngFor="let addMode of addModes" [value]="addMode">
+                {{ addMode }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <section class="w-100" *ngIf="addMode.value == AddMode.RegisteredUser">
+
+        <mat-form-field class="form-field w-100">
+            <mat-label>Teilnehmer auswählen</mat-label>
+            <mat-select formControlName="user">
+                <mat-option *ngFor="let user of registeredUsers" [value]="user">
+                    {{ user.firstName }} {{ user.lastName }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+    </section>
+
+    <section class="w-100" *ngIf="addMode.value == AddMode.NewUser">
+
+        <mat-form-field class="form-field w-100">
+            <mat-label>Anrede</mat-label>
+            <mat-select formControlName="gender">
+                <mat-option *ngFor="let gender of genders" [value]="gender">
+                    {{ gender }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="form-field w-100">
+            <input type="text" matInput placeholder="Vorname" formControlName="firstName">
+            <mat-error *ngIf="firstName.dirty && firstName.invalid">
+                Kein valider Vorname
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="form-field w-100">
+            <input type="text" matInput placeholder="Nachname" formControlName="lastName">
+            <mat-error *ngIf="firstName.dirty && firstName.invalid">
+                Kein valider Nachname
+            </mat-error>
+        </mat-form-field>
+
+        <h4 class="w-100">Kontakt</h4>
+
+        <mat-form-field class="form-field w-100">
+            <input type="text" matInput placeholder="E-Mail" formControlName="email">
+            <mat-error *ngIf="email.dirty && email.invalid">
+                Keine valide E-Mail-Adresse
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="form-field w-100">
+            <input type="text" matInput placeholder="Telefon" formControlName="phone">
+            <mat-error *ngIf="phone.dirty && phone.invalid">
+                Kein valide Telefonnummer
+            </mat-error>
+        </mat-form-field>
+
+        <section formGroupName="address" class="w-100">
+
+            <h4 class="w-100">Adresse</h4>
+
+            <mat-form-field class="form-field w-100">
+                <input type="text" matInput placeholder="Straße" formControlName="street">
+                <mat-error *ngIf="street.dirty && street.invalid">
+                    Kein valide Straße und Hausnummer
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="form-field w-100">
+                <input type="text" matInput placeholder="PLZ" formControlName="postalCode">
+                <mat-error *ngIf="postalCode.dirty && postalCode.invalid">
+                    Keine valide Postleitzahl
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="form-field w-100">
+                <input type="text" matInput placeholder="Stadt" formControlName="city">
+                <mat-error *ngIf="city.dirty && city.invalid">
+                    Kein valider Stadtname
+                </mat-error>
+            </mat-form-field>
+
+        </section>
+
+        <h4 class="w-100">Zahlungsdaten</h4>
+
+        <section formGroupName="payment" class="w-100">
+
+            <mat-form-field class="form-field w-100">
+                <input type="text" matInput placeholder="IBAN" formControlName="iban">
+                <mat-error *ngIf="iban.dirty && iban.invalid">
+                    Keine valide IBAN
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="form-field w-100">
+                <mat-label>Gewinnausschüttung</mat-label>
+                <mat-select formControlName="distribution">
+                    <mat-option *ngFor="let distribution of profitDistributionMethods" [value]="distribution">
+                        {{ distribution }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+        </section>
+    </section>
+
+    <h4 class="w-100">Gewinnlos</h4>
+
+    <mat-form-field class="form-field w-100">
+        <mat-label>Gewinnlos</mat-label>
+        <mat-select formControlName="ticket">
+            <mat-option *ngFor="let ticket of freeTickets" [value]="ticket">
+                L{{ ticket.list }}N{{ ticket.number }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="form-field w-100">
+        <input matInput [matDatepicker]="startDatePicker" placeholder="Beginn" formControlName="start">
+        <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #startDatePicker></mat-datepicker>
+    </mat-form-field>
+
+    <div class="flex end">
+        <button class="mat-stroked-button mat-primary" type="button" (click)="onFromStartOfYear()">
+            Ab Jahresbeginn
+        </button>
+        <button class="mat-stroked-button mat-primary" type="button" (click)="onFromNextQuarter()">
+            Ab nächstem Quartal
+        </button>
+    </div>
+
+    <mat-form-field class="form-field w-100">
+        <input matInput [matDatepicker]="endDatePicker" placeholder="Ende" formControlName="end">
+        <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #endDatePicker></mat-datepicker>
+    </mat-form-field>
+
+    <button class="mat-raised-button mat-primary right" type="submit" [disabled]="form.invalid">Hinzufügen</button>
+</form>

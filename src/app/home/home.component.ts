@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../service/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -12,11 +12,7 @@ export class HomeComponent implements OnInit {
   constructor(private auth: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-    console.log('on init of home component');
-    if (this.auth.isLoggedIn())
-        this.router.navigate(['admin-component']);
-    else
-        this.router.navigate(['login-component']);
+    this.router.navigate([this.auth.isLoggedIn ? 'admin-component' : 'login-component']);
   }
 
 }

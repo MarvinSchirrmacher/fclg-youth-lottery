@@ -1,13 +1,12 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../service/auth.service';
 import { LoginBaseComponent } from '../common/login-base.component';
 
 @Component({
   selector: 'app-change-password',
-  templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.css']
+  templateUrl: './change-password.component.html'
 })
 export class ChangePasswordComponent extends LoginBaseComponent {
 

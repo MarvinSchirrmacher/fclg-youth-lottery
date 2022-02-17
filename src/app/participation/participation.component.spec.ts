@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LotterydataComponent } from './lotterydata.component';
+import { ParticipationComponent } from './participation.component';
 
-describe('LotterydataComponent', () => {
-  let component: LotterydataComponent;
-  let fixture: ComponentFixture<LotterydataComponent>;
+describe('ParticipationComponent', () => {
+  let component: ParticipationComponent;
+  let fixture: ComponentFixture<ParticipationComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LotterydataComponent ]
+      declarations: [ ParticipationComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LotterydataComponent);
+    fixture = TestBed.createComponent(ParticipationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

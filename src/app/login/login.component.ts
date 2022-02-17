@@ -1,17 +1,15 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../service/auth.service';
 import { LoginBaseComponent } from '../common/login-base.component';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  templateUrl: './login.component.html'
 })
 export class LoginComponent extends LoginBaseComponent {
               
-  logonTitle = "Logon";
   showRetype = false;
   showChangePassword = false;
 
@@ -23,11 +21,9 @@ export class LoginComponent extends LoginBaseComponent {
   getFormGroup(): FormGroup {
     return new FormGroup({
       email: new FormControl(this.userCredentials.email,
-        { validators: [ Validators.required, Validators.email ],
-          updateOn: 'blur' }),
+        { validators: [ Validators.required, Validators.email ] }),
       password: new FormControl(this.userCredentials.password,
-        { validators: [ Validators.required ],
-          updateOn: 'blur' })
+        { validators: [ Validators.required ] })
     });
   }
 
