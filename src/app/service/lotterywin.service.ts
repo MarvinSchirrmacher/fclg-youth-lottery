@@ -29,7 +29,7 @@ export class LotteryWinService {
     var allDraws = this.lottery
       .year(new Date().getFullYear())
       .day(DrawDay.Saturday)
-      .readDraws()
+      .updateDraws()
     var allParticipations = this.participation.observeParticipations()
 
     return zip(allDraws, allParticipations)

@@ -110,11 +110,13 @@ export class DatabaseService {
       });
   }
 
-  public queryLotteryDraws(where?: Date): QueryRef<QueryLotteryDrawsResult> {
-
-    console.debug(`queryLotteryDraws`)
-    var query = where ? `(query: { date: "${where.toISOString()}" })` : ''
-
+  public queryLotteryDraws(from: Date, to: Date): QueryRef<QueryLotteryDrawsResult> {
+    console.debug(`queryLotteryDraws(from: ${from.toISOString()}, to: ${to.toISOString()})`)
+    var query = `(query: {
+      date_gte: "${from.toISOString()}",
+      date_lte: "${to.toISOString()}"
+    })`
+    
     return this.apollo
       .watchQuery<QueryLotteryDrawsResult>({
         query: gql`{
@@ -124,7 +126,7 @@ export class DatabaseService {
             numbers
             evaluated
           }}`,
-        fetchPolicy: 'cache-and-network'
+        fetchPolicy: 'network-only' // the range may has new draws
       });
   }
 

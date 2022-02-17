@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core'
+import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
+import { switchMap } from 'rxjs'
 import { snackBarConfig } from '../common/data'
 import { LotteryWinner } from '../common/lottery-winner'
 import { LotteryDraw } from '../common/lotterydraw'
@@ -16,23 +18,39 @@ import { ResetProgressDialog } from './dialog/reset-progress'
   templateUrl: './lottery.component.html',
 })
 export class LotteryComponent implements OnInit {
+
+  public form = {} as FormGroup
   public winners = [] as LotteryWinner[]
+  public years = [] as number[]
   public draws = [] as LotteryDraw[]
   public winnersColumns: string[] = ['ticket', 'name', 'date', 'actions']
   public drawsColumns: string[] = ['week', 'date', 'numbers']
 
   constructor(
+    private formBuilder: FormBuilder,
     private lottery: LotteryService,
     private lotteryWin: LotteryWinService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar) { }
 
   public ngOnInit(): void {
+    this.form = this.formBuilder.group({
+      year: [new Date().getFullYear()]
+    })
+
     this.lottery
-      .year(new Date().getFullYear() - 1)
-      .day(DrawDay.Saturday)
-      .readDraws()
+      .readYears()
+      .subscribe(years => this.years = years)
+
+    this.year.valueChanges
+      .pipe(
+        switchMap((value: string) => this.lottery
+          .year(parseInt(value))
+          .day(DrawDay.Saturday)
+          .updateDraws())
+      )
       .subscribe(draws => this.draws = draws)
+    
     // this.lotteryWin.observeWinners()
     //   .subscribe(winners => this.winners = winners)
   }
@@ -94,4 +112,6 @@ export class LotteryComponent implements OnInit {
         }
       })
   }
+
+  get year() { return this.form.get('year')! }
 }

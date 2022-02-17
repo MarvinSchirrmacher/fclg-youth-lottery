@@ -1,16 +1,21 @@
-import { Injectable } from '@angular/core'
-import { first, forkJoin, map, mergeMap, Observable, of, zip } from 'rxjs'
-import { HttpClient } from '@angular/common/http'
+import { DatePipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { concatMap, first, forkJoin, map, mergeMap, Observable, of, switchMap } from 'rxjs';
 import { dateFromString, isDay } from '../common/dates';
 import { LotteryDraw } from '../common/lotterydraw';
 import { DatabaseService } from './database.service';
-import { DatePipe } from '@angular/common';
 
 
 export enum DrawDay {
   Wednesday = 3,
   Saturday = 6,
   All = 7
+}
+
+interface DatesAndDraws {
+  dates: Date[],
+  draws: LotteryDraw[]
 }
 
 @Injectable({
@@ -21,8 +26,12 @@ export class LotteryService {
   private _archiveUrl: string =
     'https://www.westlotto.com/wlinfo/WL_InfoService?client=wlincl&gruppe=ZahlenUndQuoten&spielart=LOTTO&historie=ja'
 
+  private _yearSelectRegExp = /<select name=\"selJahr\"(.|\s)*?<\/select>/m
+  private _yearOptionRegExp = /<option value=\"(?<year>[\d\.]*)\".*?<\/option>/gm
+
   private _dateSelectRegExp = /<select name=\"selDatum\"(.|\s)*?<\/select>/m
   private _dateOptionRegExp = /<option value=\"(?<date>[\d\.]*)\".*?<\/option>/gm
+  
   private _numbersRegExp = /Gezogene Reihenfolge(.|\s)*?<div class=\"right".*?>(?<numbers>(.|\s)*?)<\/div>/m
   private _numberRegExp = /<span class=\"number.*?>(?<number>\d+)<\/span>/gm
 
@@ -44,23 +53,36 @@ export class LotteryService {
     return this
   }
 
-  public readDraws(): Observable<LotteryDraw[]> {
-    var archivedDates = this.http
+  public readYears(): Observable<number[]> {
+    return this.http
+      .get(this._archiveUrl, { responseType: 'text' })
+      .pipe(
+        map(html => this.extractYears(html))
+      )
+  }
+
+  public updateDraws(): Observable<LotteryDraw[]> {
+    return this.http
       .get(`${this._archiveUrl}&jahr=${this._year}`, { responseType: 'text' })
       .pipe(  
-        map(html => this.extractDates(html, this._day))
+        map(html => this.extractDates(html, this._day)),
+        switchMap(dates => this.readDraws(dates)),
+        concatMap(result =>
+          forkJoin(result.dates.map(d => this.maySaveDraw(d, result.draws))))
       )
-    var savedDraws = this.database
-      .queryLotteryDraws().valueChanges
+  }
+
+  private readDraws(dates: Date[]): Observable<DatesAndDraws> {
+    var firstDate = dates[dates.length - 1]
+    var lastDate = dates[0]
+    return this.database
+      .queryLotteryDraws(firstDate, lastDate).valueChanges
       .pipe(
         first(),
-        map(result => result.data.draws.map(d => LotteryDraw.fromObject(d)))
-      )
-      
-    return zip(archivedDates, savedDraws)
-      .pipe(
-        mergeMap(([dates, draws]) =>
-          forkJoin(dates.map(d => this.maySaveDraw(d, draws))))
+        map(result => ({
+          dates: dates,
+          draws: result.data.draws.map(d => LotteryDraw.fromObject(d))
+        }))
       )
   }
 
@@ -69,6 +91,7 @@ export class LotteryService {
     if (savedDraw)
       return of(savedDraw)
 
+    console.debug(`backup: ${date.toISOString()}`)
     return this.http
       .get(`${this._archiveUrl}&datum=${this.datePipe.transform(date, 'dd.MM.yyyy')}`, { responseType: 'text' })
       .pipe(
@@ -84,6 +107,18 @@ export class LotteryService {
         draw._id = result.data?.insertOneDraw._id
         return draw
       }))
+  }
+
+  private extractYears(html: string): number[] {
+    var match = this._yearSelectRegExp.exec(html)
+    if (!match) return []
+
+    var yearSelect = match.toString()
+    var years = [] as number[]
+    while ((match = this._yearOptionRegExp.exec(yearSelect)) !== null)
+      years.push(parseInt(match.groups!['year']))
+    
+    return years
   }
 
   private extractDates(html: string, day: DrawDay): Date[] {

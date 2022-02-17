@@ -29,7 +29,7 @@
           <button class="mat-icon-button mat-primary"
                   *ngIf="winner.user.email"
                   title="{{ winner.informed ? 'Gewinner wurde benachrichtigt' : 'Gewinner benachrichtigen' }}"
-                  (click)="onInform(winner._id)" [disabled]="winner.informed">
+            (click)="onInform(winner._id)" [disabled]="winner.informed">
             <span class="mat-button-wrapper">
               <mat-icon>mail_outline</mat-icon>
             </span>
@@ -61,10 +61,19 @@
   <mat-card class="grow-1 basis-400 distant">
     <h2>Ziehungen</h2>
 
+    <form [formGroup]="form">
+      <mat-form-field class="form-field w-100">
+        <mat-label>Jahr</mat-label>
+        <mat-select formControlName="year">
+          <mat-option *ngFor="let year of years" [value]="year">{{ year }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+
     <div *ngIf="draws.length == 0">
       <p>In dem gewählten Jahr gab es keine Ziehungen</p>
     </div>
-    
+
     <mat-table [dataSource]="draws" *ngIf="draws.length > 0">
       <ng-container matColumnDef="week">
         <mat-header-cell *matHeaderCellDef class="grow-1">Woche</mat-header-cell>

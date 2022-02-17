@@ -25,20 +25,20 @@ export function startOfNextQuarter(): Date {
     return new Date(year, month, day);
 }
 
-export function startOfYear(): Date {
-    var today: Date = new Date();
+export function startOfYear(date?: Date): Date {
+    var ref: Date = date ? date : new Date();
 
-    var year = today.getFullYear();
+    var year = ref.getFullYear();
     var month = 0;
     var day = 1;
 
     return new Date(year, month, day);
 }
 
-export function endOfYear(): Date {
-    var today: Date = new Date();
+export function endOfYear(date?: Date): Date {
+    var ref: Date = date ? date : new Date();
 
-    var year = today.getFullYear();
+    var year = ref.getFullYear();
     var month = 11;
     var day = lastDayOf(year, month);
 
