@@ -19,6 +19,6 @@ export class AppComponent {
   onLogout() {
     this.auth
       .logout()
-      .then(r => this.router.navigate(['login-component']));
+      .then(() => this.router.navigate(['login-component']));
   }
 }

@@ -13,13 +13,16 @@ export class AuthService {
   get user(): Realm.User | null { return this.app.currentUser; }
 
   get accessToken(): string | null {
-    if (this.user) {
-      console.debug('refresh access token')
-      this.user.refreshAccessToken();
-      return this.user.accessToken;
+    if (!this.user)
+      return null
+
+    if (this.user.accessToken) {
+      return this.user.accessToken
     }
 
-    return null;
+    this.user.refreshAccessToken()
+        .then(() => console.debug(`refreshed access token`));
+    return null
   }
 
   get isLoggedIn(): boolean { return this.user ? this.user.isLoggedIn : false; }

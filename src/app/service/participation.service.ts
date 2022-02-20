@@ -23,12 +23,16 @@ export enum ParticipationEnd {
 export class ParticipationService {
   participationsQuery = {} as QueryRef<QueryParticipationsResult>
   usersQuery = {} as QueryRef<QueryUsersResult>
-  allTickets = [] as WinningTicket[]
+  tickets = [] as WinningTicket[]
 
   constructor(private database: DatabaseService) {
+    this.tickets = this.establishTickets()
+  }
+
+  public init(): ParticipationService {
     this.participationsQuery = this.database.queryParticipations()
     this.usersQuery = this.database.queryUsers()
-    this.allTickets = this.establishTickets()
+    return this
   }
 
   public refetch(): void {
@@ -215,7 +219,7 @@ export class ParticipationService {
 
   /* Winning Ticket Service */
 
-  public establishTickets(): WinningTicket[] {
+  private establishTickets(): WinningTicket[] {
     console.debug('establishTickets')
     var numbers = Array.from(Array(49).keys()).map(n => n + 1)
     var lists = Array.from(Array(2).keys()).map(l => l + 1)
@@ -241,7 +245,7 @@ export class ParticipationService {
   public observeFreeTickets(): Observable<WinningTicket[]> {
     console.debug('observeFreeTickets')
     return this.observeUsedTickets()
-      .pipe(map(usedTickets => this.allTickets
+      .pipe(map(usedTickets => this.tickets
         .filter(t => !usedTickets.find(u => t.equals(u)))))
   }
 

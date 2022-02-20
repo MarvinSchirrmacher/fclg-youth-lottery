@@ -66,6 +66,7 @@ export class AddParticipationComponent implements OnInit {
         paypal: ['', [Validators.email]]
       })
     })
+
     this.addMode.valueChanges
       .subscribe(mode => this.resetRequiredFields(mode))
     this.participationService.observeUsers()

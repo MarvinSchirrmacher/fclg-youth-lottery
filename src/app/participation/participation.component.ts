@@ -31,7 +31,10 @@ export class ParticipationComponent implements OnInit {
     private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    this.participationService.observeParticipations()
+    console.debug('on init participation compo')
+
+    this.participationService
+      .observeParticipations()
       .subscribe({
         next: ps => this.participations = ps,
         error: (error: ApolloError) => {

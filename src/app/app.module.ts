@@ -1,4 +1,4 @@
-import { DatePipe, registerLocaleData } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { LOCALE_ID, NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';

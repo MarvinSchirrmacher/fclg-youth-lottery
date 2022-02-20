@@ -1,8 +1,8 @@
 <mat-tab-group>
     <mat-tab label="Ziehungen">
-        <app-lottery></app-lottery>
+        <app-lottery *ngIf="ready"></app-lottery>
     </mat-tab>
     <mat-tab label="Teilnahmen">
-        <app-participation></app-participation>
+        <app-participation *ngIf="ready"></app-participation>
     </mat-tab>
 </mat-tab-group>

@@ -34,25 +34,33 @@ export class LotteryComponent implements OnInit {
     private snackBar: MatSnackBar) { }
 
   public ngOnInit(): void {
+    console.debug('on init lottery component')
+
     this.form = this.formBuilder.group({
       year: [new Date().getFullYear()]
     })
 
     this.lottery
       .readYears()
-      .subscribe(years => this.years = years)
+      .subscribe(years => {
+        this.years = years
+        this.year.updateValueAndValidity({ emitEvent: true })
+      })
 
     this.year.valueChanges
       .pipe(
         switchMap((value: string) => this.lottery
           .year(parseInt(value))
           .day(DrawDay.Saturday)
-          .updateDraws())
+          .updateDraws()),
+        switchMap((draws: LotteryDraw[]) => this.lotteryWin
+          .draws(draws)
+          .updateWinners())
       )
-      .subscribe(draws => this.draws = draws)
-    
-    // this.lotteryWin.observeWinners()
-    //   .subscribe(winners => this.winners = winners)
+      .subscribe(result => {
+        this.draws = result.draws
+        this.winners = result.winners
+      })
   }
 
   public onInform(id: BSON.ObjectID): void {

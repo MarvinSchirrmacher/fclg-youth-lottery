@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core'
 import { BSON } from 'realm-web'
-import { map, Observable, zip } from 'rxjs'
+import { map, Observable } from 'rxjs'
 import { Participation } from '../common/data'
 import { LotteryWinner } from '../common/lottery-winner'
 import { LotteryDraw } from '../common/lotterydraw'
-import { DrawDay, LotteryService } from './lottery.service'
 import { ParticipationService } from './participation.service'
+
+export interface DrawsAndWinners {
+  draws: LotteryDraw[]
+  winners: LotteryWinner[]
+}
 
 @Injectable({
   providedIn: 'root'
@@ -13,31 +17,31 @@ import { ParticipationService } from './participation.service'
 export class LotteryWinService {
 
   public _profitPerWin: number
+  private _draws: LotteryDraw[] = []
 
-  constructor(
-      private lottery: LotteryService,
-      private participation: ParticipationService) {
+  constructor(private participation: ParticipationService) {
     this._profitPerWin = 13
   }
 
-  private profitPerWin(value: number): LotteryWinService {
+  public profitPerWin(value: number): LotteryWinService {
     this._profitPerWin = value
     return this
   }
 
-  public observeWinners(): Observable<LotteryWinner[]> {
-    var allDraws = this.lottery
-      .year(new Date().getFullYear())
-      .day(DrawDay.Saturday)
-      .updateDraws()
-    var allParticipations = this.participation.observeParticipations()
+  public draws(draws: LotteryDraw[]): LotteryWinService {
+    this._draws = draws
+    return this
+  }
 
-    return zip(allDraws, allParticipations)
-      .pipe(map(([draws, participations]) =>
-        draws
+  public updateWinners(): Observable<DrawsAndWinners> {
+    return this.participation
+      .observeParticipations()
+      .pipe(map(participations => ({
+        draws: this._draws,
+        winners: this._draws
           .map(d => this.determineWinners(d, participations))
           .reduce((a, b) => a.concat(b))
-        ))
+      }) ))
   }
 
   private determineWinners(draw: LotteryDraw, participations: Participation[]): LotteryWinner[] {
