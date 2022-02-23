@@ -2,9 +2,9 @@ import { Injectable } from "@angular/core";
 import { Apollo, QueryRef, gql, MutationResult } from "apollo-angular";
 import { BSON } from "realm-web";
 import { Observable } from "rxjs";
-import { Participation } from "../common/data";
 import { toGraphQL } from "../common/graphql";
 import { LotteryDraw } from "../common/lotterydraw";
+import { Participation } from "../common/participation";
 import { Term } from "../common/term";
 import { User } from "../common/user";
 import { WinningTicket } from "../common/winning-ticket";
@@ -55,6 +55,10 @@ export interface UpdateLotteryDrawResult {
 
 export interface DeleteParticipationResult {
   deleteOneParticipation: { _id: BSON.ObjectID }
+}
+
+export interface DeleteUserResult {
+  deleteOneUser: { _id: BSON.ObjectID }
 }
 
 @Injectable({
@@ -203,13 +207,25 @@ export class DatabaseService {
     })
   }
 
-  public delete(id: BSON.ObjectID):
+  public deleteParticipation(id: BSON.ObjectID):
     Observable<MutationResult<DeleteParticipationResult>> {
 
     console.debug('delete')
     return this.apollo.mutate<DeleteParticipationResult>({
       mutation: gql`mutation {
         deleteOneParticipation(
+          query: { _id:"${id}" }
+        ) { _id } }`
+    });
+  }
+
+  public deleteUser(id: BSON.ObjectID):
+    Observable<MutationResult<DeleteUserResult>> {
+
+    console.debug('delete')
+    return this.apollo.mutate<DeleteUserResult>({
+      mutation: gql`mutation {
+        deleteOneUser(
           query: { _id:"${id}" }
         ) { _id } }`
     });

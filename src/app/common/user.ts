@@ -1,10 +1,6 @@
 import { BSON } from "realm-web";
+import { Gender, personalPronoun, possessivePronoun, winnerNoun } from "./gendering";
 
-export enum Gender {
-  Male = 'Herr',
-  Female = 'Frau',
-  Diverse = 'Divers'
-}
 
 export interface UserAddress {
   street: string;
@@ -50,33 +46,26 @@ export class User {
     return new User(user)
   }
 
+  public static unkown() {
+    return new User({
+      firstName: '',
+      lastName: 'Unbekannt',
+      payment: {
+        distribution: ProfitDistributionMethod.Cash,
+        iban: ''
+      }
+    })
+  }
+
   public getWinnerNoun(): string {
-    return this.nouns[this.gender]
+    return winnerNoun.get(this.gender)!
   }
 
   public getPersonalPronoun(): string {
-    return this.personalPronouns[this.gender]
+    return personalPronoun.get(this.gender)!
   }
 
   public getPossessivePronoun(): string {
-    return this.possessivePronouns[this.gender]
-  }
-
-  private nouns = {
-    'Herr': 'Gewinner',
-    'Frau': 'Gewinnerin',
-    'Divers': 'Gewinner'
-  }
-
-  private personalPronouns = {
-    'Herr': 'er',
-    'Frau': 'sie',
-    'Divers': 'es'
-  }
-
-  private possessivePronouns = {
-    'Herr': 'sein',
-    'Frau': 'ihr',
-    'Divers': 'sein'
+    return possessivePronoun.get(this.gender)!
   }
 }

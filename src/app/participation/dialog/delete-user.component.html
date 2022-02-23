@@ -1,0 +1,8 @@
+<h2 mat-dialog-title>{{ noun }} löschen</h2>
+<mat-dialog-content>
+  <p>Soll {{ the }} {{ noun }} <strong>{{ firstName }} {{ lastName }}</strong> wirklich gelöscht werden?</p>
+</mat-dialog-content>
+<mat-dialog-actions class="flex end">
+  <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>
+  <button mat-raised-button color="warn" (click)="yes()">Ja</button>
+</mat-dialog-actions>

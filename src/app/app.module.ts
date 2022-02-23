@@ -19,6 +19,7 @@ import { LotteryComponent } from './lottery/lottery.component';
 import { MaterialModule } from './material.module';
 import { AddParticipationComponent } from './participation/add-participation.component';
 import { DeletePariticipationDialog } from './participation/dialog/delete-participation.component';
+import { DeleteUserDialog } from './participation/dialog/delete-user.component';
 import { EndPariticipationDialog } from './participation/dialog/end-participation.component';
 import { PariticipationDetailsDialog } from './participation/dialog/participation-details.component';
 import { ParticipationComponent } from './participation/participation.component';
@@ -38,6 +39,7 @@ import { RegisterComponent } from './register/register.component';
     PariticipationDetailsDialog,
     EndPariticipationDialog,
     DeletePariticipationDialog,
+    DeleteUserDialog,
     InformWinnerDialog,
     PayWinnerDialog,
     ResetProgressDialog

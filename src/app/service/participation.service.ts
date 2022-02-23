@@ -2,13 +2,18 @@ import { Injectable } from '@angular/core'
 import { QueryRef } from 'apollo-angular'
 import { BSON } from 'realm-web'
 import { map, Observable, zip } from 'rxjs'
-import { Participation } from '../common/data'
 import { endOfQuarter, endOfToday, endOfYear } from '../common/dates'
+import { Participation } from '../common/participation'
 import { Term } from '../common/term'
 import { User } from '../common/user'
 import { WinningTicket } from '../common/winning-ticket'
 import { DatabaseService, ParticipationDocument, QueryParticipationsResult, QueryUsersResult } from './database.service'
 
+
+export interface Done {
+  next?: (id?: BSON.ObjectID) => void,
+  error?: <E extends Error> (error?: E) => void
+}
 
 export enum ParticipationEnd {
   Today,
@@ -47,12 +52,11 @@ export class ParticipationService {
       this.usersQuery.valueChanges])
       .pipe(map(([ps, us]) =>
         ps.data.participations
-        .map(p => ({
-          _id: p._id,
-          user: new User(us.data.users.find(u => u._id === p.user)!),
-          ticket: WinningTicket.fromObject(p.ticket),
-          term: Term.fromObject(p.term)
-        } as Participation))
+        .map(p => {
+          let o = us.data.users.find(u => u._id === p.user)
+          let u = o ? User.fromObject(o) : User.unkown()
+          return Participation.fromDocument(p, u)
+        })
         .sort((a, b) => a.ticket.compareTo(b.ticket))
       ))
   }
@@ -87,13 +91,12 @@ export class ParticipationService {
   }
 
   public addParticipation(
-    participation: Participation,
-    onAdded?: <E extends Error> (addedId?: BSON.ObjectID, error?: E) => void): void {
+    participation: Participation, done?: Done): void {
 
     console.debug('addParticipation')
     var error = this.hasError(participation)
-    if (error) {
-      if (onAdded) onAdded(undefined, error)
+    if (error && done?.error) {
+      done.error(error)
       return
     }
     this.database.insertParticipation(participation)
@@ -101,15 +104,14 @@ export class ParticipationService {
         next: result => {
           let id = result.data?.insertOneParticipation._id
           this.refetch()
-          if (onAdded) onAdded(id)
+          if (done && done.next) done.next(id)
         },
-        error: error => { if (onAdded) onAdded(undefined, error) }
+        error: error => { if (done?.error) done.error(error) }
       })
   }
 
   public addParticipationWithNewUser(
-    participation: Participation, user: User,
-    onAdded?: <E extends Error> (addedId?: BSON.ObjectID, error?: E) => void): void {
+    participation: Participation, user: User, done?: Done): void {
 
     console.debug('addParticipationWithNewUser')
     this.database.insertParticipation(participation)
@@ -117,15 +119,14 @@ export class ParticipationService {
         next: result => {
           let id = result.data?.insertOneParticipation._id
           this.refetch()
-          this.addUser(user, id, onAdded)
+          this.addUser(user, id, done)
         },
-        error: error => { if (onAdded) onAdded(undefined, error) }
+        error: error => { if (done?.error) done.error(error) }
       })
   }
 
   public addUser(
-    user: User, participationId?: BSON.ObjectID,
-    onAdded?: <E extends Error> (id?: BSON.ObjectID, error?: E) => void): void {
+    user: User, participationId?: BSON.ObjectID, done?: Done): void {
 
     console.debug('addUser')
     this.database.insertUser(user)
@@ -137,36 +138,33 @@ export class ParticipationService {
             let update = { user: userId } as ParticipationDocument
             this.database.updateParticipation(participationId, update)
               .subscribe({
-                next: result => { if (onAdded) onAdded(userId) },
-                error: error => { if (onAdded) onAdded(undefined, error) }
+                next: result => { if (done?.next) done.next(userId) },
+                error: error => { if (done?.error) done.error(error) }
               })
           } else {
-            if (onAdded) onAdded(userId)
+            if (done?.next) done.next(userId)
           }
         },
         error: error => console.error(error)
       })
   }
 
-  public deleteParticipation(
-    id: BSON.ObjectID,
-    onDeleted?: <E extends Error> (id?: BSON.ObjectID, error?: E) => void): void {
+  public deleteParticipation(id: BSON.ObjectID, done?: Done): void {
 
     console.debug('deleteParticipation')
-    this.database.delete(id)
+    this.database.deleteParticipation(id)
       .subscribe({
         next: result => {
           let id = result.data?.deleteOneParticipation._id
           this.refetch()
-          if (onDeleted) onDeleted(id)
+          if (done?.next) done.next(id)
         },
-        error: error => { if (onDeleted) onDeleted(undefined, error) }
+        error: error => { if (done?.error) done.error(error) }
       })
   }
 
   public endParticipation(
-    id: BSON.ObjectID, end: ParticipationEnd,
-    onEnded?: <E extends Error> (id?: BSON.ObjectID, error?: E) => void): void {
+    id: BSON.ObjectID, end: ParticipationEnd, done?: Done): void {
 
     console.debug('endParticipation')
     var current = this.getCurrentParticipation(id)
@@ -185,9 +183,23 @@ export class ParticipationService {
         next: result => {
           let id = result.data?.updateOneParticipation._id
           this.refetch()
-          if (onEnded) onEnded(id)
+          if (done?.next) done.next(id)
         },
-        error: error => { if (onEnded) onEnded(undefined, error) }
+        error: error => { if (done?.error) done.error(error) }
+      })
+  }
+
+  public deleteUser(id: BSON.ObjectID, done?: Done) {
+
+    console.debug('deleteUser')
+    this.database.deleteUser(id)
+      .subscribe({
+        next: result => {
+          let id = result.data?.deleteOneUser._id
+          this.refetch()
+          if (done?.next) done?.next(id)
+        },
+        error: error => { if (done?.error) done.error(error) }
       })
   }
 

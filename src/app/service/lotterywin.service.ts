@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core'
 import { BSON } from 'realm-web'
 import { map, Observable } from 'rxjs'
-import { Participation } from '../common/data'
 import { LotteryWinner } from '../common/lottery-winner'
 import { LotteryDraw } from '../common/lotterydraw'
+import { Participation } from '../common/participation'
 import { ParticipationService } from './participation.service'
 
 export interface DrawsAndWinners {
@@ -36,12 +36,14 @@ export class LotteryWinService {
   public updateWinners(): Observable<DrawsAndWinners> {
     return this.participation
       .observeParticipations()
-      .pipe(map(participations => ({
-        draws: this._draws,
-        winners: this._draws
-          .map(d => this.determineWinners(d, participations))
-          .reduce((a, b) => a.concat(b))
-      }) ))
+      .pipe(
+        map(participations => ({
+          draws: this._draws,
+          winners: this._draws
+            .map(d => this.determineWinners(d, participations))
+            .reduce((a, b) => a.concat(b))
+        }))
+      )
   }
 
   private determineWinners(draw: LotteryDraw, participations: Participation[]): LotteryWinner[] {

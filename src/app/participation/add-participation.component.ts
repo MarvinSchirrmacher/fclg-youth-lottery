@@ -3,12 +3,14 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 import { MAT_DATE_LOCALE } from '@angular/material/core'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
-import { Participation, snackBarConfig } from '../common/data'
+import { snackBarConfig } from '../common/data'
 import { startOfNextQuarter, startOfYear } from '../common/dates'
+import { Participation } from '../common/participation'
 import { Term } from '../common/term'
-import { Gender, ProfitDistributionMethod, User } from '../common/user'
+import { ProfitDistributionMethod, User } from '../common/user'
 import { WinningTicket } from '../common/winning-ticket'
 import { ParticipationService } from '../service/participation.service'
+import { Gender } from '../common/gendering'
 
 
 export enum AddMode {
@@ -84,10 +86,10 @@ export class AddParticipationComponent implements OnInit {
 
     if (this.addMode.value == AddMode.NewUser) {
       var user = this.createUserFromFields()
-      this.participationService.addParticipationWithNewUser(participation, user, (i, e) => this.onAdded(i, e))
+      this.participationService.addParticipationWithNewUser(participation, user, this.onAdded)
     } else if (this.addMode.value == AddMode.RegisteredUser) {
       participation.user = this.registeredUser.value
-      this.participationService.addParticipation(participation, (i, e) => this.onAdded(i, e))
+      this.participationService.addParticipation(participation, this.onAdded)
     }
   }
 
@@ -119,14 +121,13 @@ export class AddParticipationComponent implements OnInit {
     })
   }
 
-  private onAdded<E extends Error>(addedId?: BSON.ObjectID, error?: E): void {
-    console.debug('onAdded')
-    if (addedId) {
+  private onAdded = {
+    next: (id: any) => {
       this.participationService.refetch()
       this.resetAllFieldsButAddMode();
       this.snackBar.open(`Teilnahme wurde registriert`, 'Schließen', snackBarConfig)
-    }
-    if (error) {
+    },
+    error: (error: any) => {
       this.snackBar.open(`Teilname konnte nicht registriert werden: ${error}`, 'Schließen', snackBarConfig)
     }
   }

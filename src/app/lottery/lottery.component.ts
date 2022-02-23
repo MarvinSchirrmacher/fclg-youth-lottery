@@ -3,12 +3,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
-import { switchMap } from 'rxjs'
+import { concatMap, filter, Observable, of, switchMap } from 'rxjs'
 import { snackBarConfig } from '../common/data'
 import { LotteryWinner } from '../common/lottery-winner'
 import { LotteryDraw } from '../common/lotterydraw'
 import { DrawDay, LotteryService } from '../service/lottery.service'
 import { LotteryWinService } from '../service/lotterywin.service'
+import { MailService } from '../service/mail.service'
 import { InformWinnerDialog } from './dialog/inform-winner'
 import { PayWinnerDialog } from './dialog/pay-winner'
 import { ResetProgressDialog } from './dialog/reset-progress'
@@ -30,6 +31,7 @@ export class LotteryComponent implements OnInit {
     private formBuilder: FormBuilder,
     private lottery: LotteryService,
     private lotteryWin: LotteryWinService,
+    private mail: MailService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar) { }
 
@@ -65,22 +67,22 @@ export class LotteryComponent implements OnInit {
 
   public onInform(id: BSON.ObjectID): void {
     var winner = this.winners.find(w => w._id == id)
-    if (winner === undefined) {
+    if (!winner) {
       this.snackBar.open(`Für die ID ${id} gibt es keinen Gewinner`, 'Ok', snackBarConfig)
       return
     }
 
     this.dialog
       .open(InformWinnerDialog, { data: winner, panelClass: 'w-600p' })
-      .afterClosed().subscribe((informed: boolean) => {
-        if (informed == undefined) return
+      .afterClosed()
+      .pipe(
+        filter(inform => inform),
+        concatMap(() => this.informWinner(winner!))
+      )
+      .subscribe(informed => {
+        if (!informed) return
         this.lotteryWin.setWinnerInformed(id)
-        this.winners.find(w => w._id == id)!.informed = true
-        if (informed) {
-          this.snackBar.open(`Der Gewinner wurde informiert`, 'Ok', snackBarConfig)
-        } else {
-          this.snackBar.open('Der Gewinner wird nicht informiert', 'Ok', snackBarConfig)
-        }
+        this.snackBar.open(`Der Gewinner wurde${informed ? '' : ' nicht'} informiert`, 'Ok', snackBarConfig)
       })
   }
 
@@ -119,6 +121,26 @@ export class LotteryComponent implements OnInit {
           this.snackBar.open(`Der Bearbeitungsstatus wurde zurückgesetzt`, 'Ok', snackBarConfig)
         }
       })
+  }
+
+  private informWinner(winner: LotteryWinner): Observable<any> {
+    if (!winner.user.email)
+      return of(true)
+
+    return this.mail
+      .address(winner.user.email)
+      .reference(`Dein Gewinn beim FCLG-Jugendlotto`)
+      .content(this.buildMailContent(winner))
+      .send()
+  }
+
+  private buildMailContent(winner: LotteryWinner): string {
+    return `Hallo ${winner.user.firstName} ${winner.user.lastName},
+    
+    am ${winner.draw.date.toLocaleDateString()} hat dein Gewinnlos ${winner.tickets[0]} gewonnen - Glückwunsch!
+    
+    Mit sportlichen Grüßen
+    FC Löhne-Gohfeld`
   }
 
   get year() { return this.form.get('year')! }
