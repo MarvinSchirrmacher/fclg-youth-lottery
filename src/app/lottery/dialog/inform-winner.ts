@@ -1,7 +1,7 @@
 import { Component, Inject } from "@angular/core"
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog"
 import { Gender } from "src/app/common/gendering"
-import { LotteryWinner } from "src/app/common/lottery-winner"
+import { Winner } from "src/app/common/winner"
 
 @Component({
     selector: 'inform-winner',
@@ -11,14 +11,14 @@ export class InformWinnerDialog {
 
     Gender = Gender
     
-    winner: LotteryWinner
+    winner: Winner
     noun: string
     personalPronoun: string
     possessivePronoun: string
 
     constructor(
         public dialogRef: MatDialogRef<InformWinnerDialog>,
-        @Inject(MAT_DIALOG_DATA) public data: LotteryWinner) {
+        @Inject(MAT_DIALOG_DATA) public data: Winner) {
         this.winner = data
         this.noun = this.winner.user.getWinnerNoun()
         this.personalPronoun = this.winner.user.getPersonalPronoun()

@@ -46,7 +46,7 @@ export class User {
     return new User(user)
   }
 
-  public static unkown() {
+  public static unknown() {
     return new User({
       firstName: '',
       lastName: 'Unbekannt',

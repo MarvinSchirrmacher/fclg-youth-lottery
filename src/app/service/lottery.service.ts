@@ -1,10 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MutationResult } from 'apollo-angular';
+import { BSON } from 'realm-web';
 import { concatMap, first, forkJoin, map, mergeMap, Observable, of, switchMap } from 'rxjs';
 import { dateFromString, isDay } from '../common/dates';
-import { LotteryDraw } from '../common/lotterydraw';
-import { DatabaseService } from './database.service';
+import { Draw } from '../common/draw';
+import { DatabaseService, UpdateManyPayload } from './database.service';
 
 
 export enum DrawDay {
@@ -15,7 +17,7 @@ export enum DrawDay {
 
 interface DatesAndDraws {
   dates: Date[],
-  draws: LotteryDraw[]
+  draws: Draw[]
 }
 
 @Injectable({
@@ -43,16 +45,6 @@ export class LotteryService {
     private database: DatabaseService,
     private datePipe: DatePipe) { }
 
-  public year(year: number): LotteryService {
-    this._year = year
-    return this
-  }
-
-  public day(day: DrawDay): LotteryService {
-    this._day = day
-    return this
-  }
-
   public readYears(): Observable<number[]> {
     return this.http
       .get(this._archiveUrl, { responseType: 'text' })
@@ -61,48 +53,64 @@ export class LotteryService {
       )
   }
 
-  public updateDraws(): Observable<LotteryDraw[]> {
+  public saveNewDraws(year: number, day: DrawDay): Observable<Draw[]> {
+    console.debug('saveNewDraws')
     return this.http
-      .get(`${this._archiveUrl}&jahr=${this._year}`, { responseType: 'text' })
-      .pipe(  
-        map(html => this.extractDates(html, this._day)),
+      .get(`${this._archiveUrl}&jahr=${year}`, { responseType: 'text' })
+      .pipe(
+        map(html => this.extractDates(html, day)),
         switchMap(dates => this.readDraws(dates)),
-        concatMap(result =>
-          forkJoin(result.dates.map(d => this.maySaveDraw(d, result.draws))))
+        concatMap(result => forkJoin(result.dates.map(d => this.maySaveDraw(d, result.draws))))
       )
   }
 
+  public markDraws(ids: BSON.ObjectID[], evaluated: boolean):
+      Observable<MutationResult<UpdateManyPayload>> {
+    console.debug('markDraws')
+    var partial = {
+      evaluated: evaluated
+    }
+    return this.database.updateDraws(ids, partial)
+  }
+
+  public queryDraws(from: Date, to: Date): Observable<Draw[]> {
+    return this.database.queryDraws(from, to).valueChanges
+      .pipe(map(result => result.data.draws))
+  }
+
   private readDraws(dates: Date[]): Observable<DatesAndDraws> {
+    console.debug('readDraws')
     var firstDate = dates[dates.length - 1]
     var lastDate = dates[0]
     return this.database
-      .queryLotteryDraws(firstDate, lastDate).valueChanges
+      .queryDraws(firstDate, lastDate).valueChanges
       .pipe(
         first(),
         map(result => ({
           dates: dates,
-          draws: result.data.draws.map(d => LotteryDraw.fromObject(d))
+          draws: result.data.draws.map(d => Draw.fromObject(d))
         }))
       )
   }
 
-  private maySaveDraw(date: Date, draws: LotteryDraw[]): Observable<LotteryDraw> {
+  private maySaveDraw(date: Date, draws: Draw[]): Observable<Draw> {
+    console.debug(`maySaveDraw(date: ${date.toISOString()})`)
     var savedDraw = draws.find(d => d.date.getTime() == date.getTime())
     if (savedDraw)
       return of(savedDraw)
 
-    console.debug(`backup: ${date.toISOString()}`)
+    console.debug('save draw')
     return this.http
       .get(`${this._archiveUrl}&datum=${this.datePipe.transform(date, 'dd.MM.yyyy')}`, { responseType: 'text' })
       .pipe(
-        map(html => this.extractLotteryDraw(html, date)),
+        map(html => this.extractDraw(html, date)),
         mergeMap(draw => this.saveDraw(draw))
       )
   }
 
-  private saveDraw(draw: LotteryDraw): Observable<LotteryDraw> {
+  private saveDraw(draw: Draw): Observable<Draw> {
     return this.database
-      .insertLotteryDraw(draw)
+      .insertDraw(draw)
       .pipe(map(result => {
         draw._id = result.data?.insertOneDraw._id
         return draw
@@ -135,16 +143,16 @@ export class LotteryService {
     return dates
   }
 
-  private extractLotteryDraw(html: string, date: Date): LotteryDraw {
+  private extractDraw(html: string, date: Date): Draw {
     var match = this._numbersRegExp.exec(html)
     if (!match || !match.groups)
-      return {} as LotteryDraw
+      return {} as Draw
 
     var numbersHtml = match.groups['numbers']
     var numbers = [] as number[]
     while ((match = this._numberRegExp.exec(numbersHtml)) !== null)
       numbers.push(parseInt(match.groups!['number']))
 
-    return new LotteryDraw(date, numbers, false)
+    return new Draw(date, numbers, false)
   }
 }

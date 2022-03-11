@@ -1,32 +1,34 @@
-import { Injectable } from "@angular/core";
-import { Apollo, QueryRef, gql, MutationResult } from "apollo-angular";
-import { BSON } from "realm-web";
-import { Observable } from "rxjs";
-import { toGraphQL } from "../common/graphql";
-import { LotteryDraw } from "../common/lotterydraw";
-import { Participation } from "../common/participation";
-import { Term } from "../common/term";
-import { User } from "../common/user";
-import { WinningTicket } from "../common/winning-ticket";
+import { Injectable } from "@angular/core"
+import { Apollo, QueryRef, gql, MutationResult } from "apollo-angular"
+import { BSON } from "realm-web"
+import { Observable, of } from "rxjs"
+import { toGraphQL } from "../common/graphql"
+import { Winner } from "../common/winner"
+import { Draw } from "../common/draw"
+import { Participation } from "../common/participation"
+import { User } from "../common/user"
+import { ParticipationDocument, toWinnerDocument, WinnerDocument } from "./database-documents"
 
 
-export interface ParticipationDocument {
-  _id?: BSON.ObjectID;
-  user: BSON.ObjectID;
-  ticket: WinningTicket;
-  term: Term;
+export interface Done {
+  next?: (id?: BSON.ObjectID) => void,
+  error?: <E extends Error> (error?: E) => void
 }
 
 export interface QueryParticipationsResult {
-  participations: ParticipationDocument[];
+  participations: ParticipationDocument[]
 }
 
 export interface QueryUsersResult {
-  users: User[];
+  users: User[]
 }
 
-export interface QueryLotteryDrawsResult {
-  draws: LotteryDraw[];
+export interface QueryDrawsResult {
+  draws: Draw[]
+}
+
+export interface QueryWinnersResult {
+  winners: WinnerDocument[]
 }
 
 export interface InsertUserResult {
@@ -37,8 +39,12 @@ export interface InsertParticipationResult {
   insertOneParticipation: { _id: BSON.ObjectID }
 }
 
-export interface InsertLotteryDrawResult {
+export interface InsertDrawResult {
   insertOneDraw: { _id: BSON.ObjectID }
+}
+
+export interface InsertWinnersResult {
+  insertManyWinners: { insertedIds: BSON.ObjectID[] }
 }
 
 export interface UpdateParticipationResult {
@@ -49,8 +55,13 @@ export interface UpdateUserResult {
   updateOneUser: { _id: BSON.ObjectID }
 }
 
-export interface UpdateLotteryDrawResult {
+export interface UpdateDrawResult {
   updateOneDraw: { _id: BSON.ObjectID }
+}
+
+export interface UpdateManyPayload {
+  matchedCount: number
+  modifiedCount: number
 }
 
 export interface DeleteParticipationResult {
@@ -61,173 +72,230 @@ export interface DeleteUserResult {
   deleteOneUser: { _id: BSON.ObjectID }
 }
 
+export interface DeleteWinnerResult {
+  deleteOneWinner: { _id: BSON.ObjectID }
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
 export class DatabaseService {
+
   constructor(private apollo: Apollo) { }
 
   public queryParticipations(): QueryRef<QueryParticipationsResult> {
-    console.debug('queryParticipations')
-    return this.apollo
-      .watchQuery<QueryParticipationsResult>({
-        query: gql`{
-          participations {
-            _id
-            user
-            ticket {
-              list
-              number
-            }
-            term {
-              start
-              end
-            }
-          }}`,
-        fetchPolicy: 'cache-and-network'
-      });
+    var sortBy = createSortBy('user', SortOrder.Ascending)
+    return this.query<QueryParticipationsResult>('participations', undefined, sortBy, `{
+      _id
+      user
+      ticket {
+        list
+        number
+      }
+      term {
+        start
+        end
+      }
+    }`)
   }
 
-  public queryUsers(): QueryRef<QueryUsersResult> {
-    console.debug('queryUsers')
-    return this.apollo
-      .watchQuery<QueryUsersResult>({
-        query: gql`{
-          users {
-            _id
-            gender
-            firstName
-            lastName
-            email
-            phone
-            address {
-              street
-              postalCode
-              city
-            }
-            payment {
-              distribution
-              iban
-            }
-          }}`,
-        fetchPolicy: 'cache-and-network'
-      });
+  public queryUsers(ids?: BSON.ObjectID[]): QueryRef<QueryUsersResult> {
+    var query = ids ? createIdInQuery('_id', ids) : undefined
+    var sortBy = createSortBy('lastname', SortOrder.Ascending)
+    return this.query<QueryUsersResult>('users', query, sortBy, `{
+      _id
+      gender
+      firstName
+      lastName
+      email
+      phone
+      address {
+        street
+        postalCode
+        city
+      }
+      payment {
+        distribution
+        iban
+      }
+    }`)
   }
 
-  public queryLotteryDraws(from: Date, to: Date): QueryRef<QueryLotteryDrawsResult> {
-    console.debug(`queryLotteryDraws(from: ${from.toISOString()}, to: ${to.toISOString()})`)
-    var query = `(query: {
-      date_gte: "${from.toISOString()}",
-      date_lte: "${to.toISOString()}"
-    })`
-    
-    return this.apollo
-      .watchQuery<QueryLotteryDrawsResult>({
-        query: gql`{
-          draws${query} {
-            _id
-            date
-            numbers
-            evaluated
-          }}`,
-        fetchPolicy: 'network-only' // the range may has new draws
-      });
+  public queryDraws(from: Date, to: Date): QueryRef<QueryDrawsResult> {
+    var query = createDateRangeQuery(from, to)
+    var sortBy = createSortBy('date', SortOrder.Descending)
+    return this.query<QueryDrawsResult>('draws', query, sortBy, `{
+      _id
+      date
+      numbers
+      evaluated
+    }`)
   }
 
-  public insertParticipation(participation: Participation):
-    Observable<MutationResult<InsertParticipationResult>> {
+  public queryWinners(drawIds: BSON.ObjectID[]): QueryRef<QueryWinnersResult> {
+    var query = createIdInQuery('draw', drawIds)
+    var sortBy = createSortBy('_id', SortOrder.Descending)
+    return this.query<QueryWinnersResult>('winners', query, sortBy, `{
+      _id
+      draw
+      user
+      tickets {
+        list
+        number
+      }
+      profit
+      informed
+      paid
+    }`)
+  }
 
-    console.debug('insertParticipation')
-    return this.apollo.mutate<InsertParticipationResult>({
+  public insertParticipation(participation: Participation): Observable<MutationResult<InsertParticipationResult>> {
+    return this.insert<InsertParticipationResult>('insertOneParticipation', participation);
+  }
+
+  public insertUser(user: User): Observable<MutationResult<InsertUserResult>> {
+    return this.insert<InsertUserResult>('insertOneUser', user);
+  }
+
+  public insertDraw(draw: Draw): Observable<MutationResult<InsertDrawResult>> {
+    return this.insert<InsertDrawResult>('insertOneDraw', draw);
+  }
+
+  public insertWinners(winners: Winner[]):
+    Observable<MutationResult<InsertWinnersResult>> {
+
+    console.debug('insertWinners')
+
+    if (winners.length == 0)
+      return ofEmptyResult()
+
+    var documents = winners.map(w => toWinnerDocument(w))
+    return this.apollo.mutate<InsertWinnersResult>({
       mutation: gql`mutation {
-        insertOneParticipation(data: ${toGraphQL({
-        user: participation.user?._id,
-        ticket: participation.ticket,
-          term: participation.term
-      })} ) { _id } }`
-    });
-  }
-
-  public insertUser(user: User):
-    Observable<MutationResult<InsertUserResult>> {
-
-    console.debug('insertUser')
-    return this.apollo.mutate<InsertUserResult>({
-      mutation: gql`mutation {
-        insertOneUser(data: ${toGraphQL(user)}) { _id }
-      }`});
-  }
-
-  public insertLotteryDraw(draw: LotteryDraw):
-    Observable<MutationResult<InsertLotteryDrawResult>> {
-
-    console.debug('insertLotteryDraw')
-    return this.apollo.mutate<InsertLotteryDrawResult>({
-      mutation: gql`mutation {
-        insertOneDraw(data: ${toGraphQL(draw)}) { _id }
-      }`});
+        insertManyWinners(data: ${toGraphQL(documents, new Map([['profit', '%s']]))}) { insertedIds }
+      }`})
   }
 
   public updateParticipation(id: BSON.ObjectID, participation: ParticipationDocument):
-    Observable<MutationResult<UpdateParticipationResult>> {
-
-    console.debug('updateParticipation')
-    return this.apollo.mutate<UpdateParticipationResult>({
-      mutation: gql`mutation {
-        updateOneParticipation(
-          query: { _id:"${id}" },
-          set: ${toGraphQL(participation)}
-        ) { _id } }`
-    });
+      Observable<MutationResult<UpdateParticipationResult>> {
+    return this.update<UpdateParticipationResult>('updateOneParticipation', id, participation);
   }
 
-  public updateUser(id: BSON.ObjectID, user: User):
-    Observable<MutationResult<UpdateUserResult>> {
-
-    console.debug('updateUser')
-    return this.apollo.mutate<UpdateUserResult>({
-      mutation: gql`mutation {
-        updateOneUser(
-          query: { _id: "${id}" },
-          set: ${toGraphQL(user)}
-        ) { _id } }`
-    })
+  public updateUser(id: BSON.ObjectID, user: User): Observable<MutationResult<UpdateUserResult>> {
+    return this.update<UpdateUserResult>('updateOneUser', id, user);
   }
 
-  public updateLotteryDraw(id: BSON.ObjectID, draw: LotteryDraw):
-    Observable<MutationResult<UpdateLotteryDrawResult>> {
+  public updateDraw(id: BSON.ObjectID, draw: Draw): Observable<MutationResult<UpdateDrawResult>> {
+    return this.update<UpdateDrawResult>('updateOneDraw', id, draw);
+  }
 
-    console.debug('updateLotteryDraw')
-    return this.apollo.mutate<UpdateLotteryDrawResult>({
+  public updateDraws(ids: BSON.ObjectID[], draw: Partial<Draw>):
+      Observable<MutationResult<UpdateManyPayload>> {
+    console.debug(`updateDraws(${JSON.stringify(ids)}, ${JSON.stringify(draw)})`)
+
+    if (ids.length == 0)
+      return ofEmptyResult()
+
+    var query = createIdInQuery('_id', ids)
+    return this.apollo.mutate<UpdateManyPayload>({
       mutation: gql`mutation {
-        updateOneLotteryDraw(
-          query: { _id: "${id}" },
+        updateManyDraws(
+          query: ${query},
           set: ${toGraphQL(draw)}
+        ) {
+          matchedCount
+          modifiedCount
+        }
+      }`
+    })
+  }
+
+  public deleteParticipation(id: BSON.ObjectID): Observable<MutationResult<DeleteParticipationResult>> {
+    return this.delete<DeleteParticipationResult>('deleteOneParticipation', id);
+  }
+
+  public deleteUser(id: BSON.ObjectID): Observable<MutationResult<DeleteUserResult>> {
+    return this.delete<DeleteUserResult>('deleteOneUser', id);
+  }
+
+  public deleteWinner(id: BSON.ObjectID): Observable<MutationResult<DeleteWinnerResult>> {
+    return this.delete<DeleteWinnerResult>('deleteOneWinner', id);
+  }
+
+  public query<ResultType>(
+    collection: string, query: string | undefined, sortBy: string | undefined, fields: string):
+      QueryRef<ResultType> {
+    console.debug(`query ${collection}`)
+    
+    if (query == undefined) query = '{}'
+    if (sortBy == undefined) sortBy = '_ID_ASC'
+
+    return this.apollo
+      .watchQuery<ResultType>({
+        query: gql`{ ${collection}(query: ${query}, sortBy: ${sortBy}) ${fields} }`,
+        fetchPolicy: 'network-only' // any range may has new documents
+      })
+  }
+
+  public insert<ResultType>(mutation: string, document: any):
+      Observable<MutationResult<ResultType>> {
+    console.debug(mutation)
+    return this.apollo.mutate<ResultType>({
+      mutation: gql`mutation {
+        ${mutation}(data: ${toGraphQL(document)}) { _id }
+      }`
+    })
+  }
+
+  private update<ResultType>(mutation: string, id: BSON.ObjectID, document: any):
+      Observable<MutationResult<ResultType>> {
+    console.debug(mutation)
+    return this.apollo.mutate<ResultType>({
+      mutation: gql`mutation {
+        ${mutation}(
+          query: { _id: "${id}" },
+          set: ${toGraphQL(document)}
         ) { _id } }`
     })
   }
 
-  public deleteParticipation(id: BSON.ObjectID):
-    Observable<MutationResult<DeleteParticipationResult>> {
-
-    console.debug('delete')
-    return this.apollo.mutate<DeleteParticipationResult>({
+  private delete<ResultType>(mutation: string, id: BSON.ObjectID):
+    Observable<MutationResult<ResultType>> {
+    console.debug(mutation)
+    return this.apollo.mutate<ResultType>({
       mutation: gql`mutation {
-        deleteOneParticipation(
+        ${mutation}(
           query: { _id:"${id}" }
         ) { _id } }`
-    });
+    })
   }
+}
 
-  public deleteUser(id: BSON.ObjectID):
-    Observable<MutationResult<DeleteUserResult>> {
+function ofEmptyResult(): Observable<MutationResult<any>> {
+  return of({
+    loading: false
+  } as MutationResult)
+}
 
-    console.debug('delete')
-    return this.apollo.mutate<DeleteUserResult>({
-      mutation: gql`mutation {
-        deleteOneUser(
-          query: { _id:"${id}" }
-        ) { _id } }`
-    });
-  }
+function createDateRangeQuery(from: Date, to: Date): string {
+  return `{
+    date_gte: "${from.toISOString()}",
+    date_lte: "${to.toISOString()}"
+  }`
+}
+
+function createIdInQuery(key: string, ids: BSON.ObjectID[]): string {
+  return `{
+    ${key}_in: ${toGraphQL(ids)}
+  }`
+}
+
+enum SortOrder {
+  Ascending = 'ASC',
+  Descending = 'DESC'
+}
+
+function createSortBy(field: string, order: SortOrder): string {
+  return `${field.toUpperCase()}_${order}`
 }

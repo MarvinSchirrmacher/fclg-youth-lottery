@@ -153,3 +153,7 @@ p {
 .text + .text:before {
     content: ", ";
 }
+
+span + span.separated:before {
+    content: ", ";
+}

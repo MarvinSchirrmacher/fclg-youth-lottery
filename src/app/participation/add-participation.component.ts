@@ -71,7 +71,7 @@ export class AddParticipationComponent implements OnInit {
 
     this.addMode.valueChanges
       .subscribe(mode => this.resetRequiredFields(mode))
-    this.participationService.observeUsers()
+    this.participationService.queryUsers()
       .subscribe(users => this.registeredUsers = users)
     this.participationService.observeFreeTickets()
       .subscribe(tickets => this.freeTickets = tickets)

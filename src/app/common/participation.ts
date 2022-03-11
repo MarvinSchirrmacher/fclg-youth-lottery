@@ -1,5 +1,4 @@
 import { BSON } from "realm-web"
-import { ParticipationDocument } from "../service/database.service"
 import { Term } from "./term"
 import { User } from "./user"
 import { WinningTicket } from "./winning-ticket"
@@ -21,14 +20,6 @@ export class Participation {
   public static fromObject(participation: Participation): Participation {
     return new Participation(
       User.fromObject(participation.user),
-      WinningTicket.fromObject(participation.ticket),
-      Term.fromObject(participation.term),
-      participation._id)
-  }
-
-  public static fromDocument(participation: ParticipationDocument, user?: User): Participation {
-    return new Participation(
-      user ? User.fromObject(user) : User.unkown(),
       WinningTicket.fromObject(participation.ticket),
       Term.fromObject(participation.term),
       participation._id)

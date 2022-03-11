@@ -5,3 +5,9 @@ export var snackBarConfig = {
   verticalPosition: 'bottom',
   panelClass: ['mat-primary'],
 } as MatSnackBarConfig; 
+
+export function addUniqueOnly<Type>(types: Type[], type: Type): Type[] {
+  if (!types.includes(type))
+    types.push(type)
+  return types
+}

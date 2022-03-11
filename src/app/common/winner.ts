@@ -1,18 +1,19 @@
 import { BSON } from "realm-web";
-import { LotteryDraw } from "./lotterydraw";
+import { Draw } from "./draw";
 import { User } from "./user";
 import { WinningTicket } from "./winning-ticket";
 
-export class LotteryWinner {
+export class Winner {
   public _id?: BSON.ObjectID
-  public draw: LotteryDraw
+  public draw: Draw
   public user: User
   public tickets: WinningTicket[]
   public profit: number
   public informed: boolean
   public paid: boolean
 
-  constructor(draw: LotteryDraw, user: User, tickets: WinningTicket[], profit: number) {
+  constructor(draw: Draw, user: User, tickets: WinningTicket[], profit: number, id?: BSON.ObjectID) {
+    this._id = id
     this.draw = draw
     this.user = user
     this.tickets = tickets

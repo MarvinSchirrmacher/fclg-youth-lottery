@@ -32,7 +32,7 @@ export class ParticipationComponent implements OnInit {
     console.debug('on init participation compo')
 
     this.participationService
-      .observeParticipations()
+      .queryParticipations()
       .subscribe({
         next: participations => this.participations = participations,
         error: (error: ApolloError) => {
@@ -41,7 +41,7 @@ export class ParticipationComponent implements OnInit {
       })
 
     this.participationService
-      .observeUsers()
+      .queryUsers()
       .subscribe({
         next: users => this.users = users,
         error: (error: ApolloError) => {

@@ -1,6 +1,6 @@
 import { Component, Inject } from "@angular/core"
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog"
-import { LotteryWinner } from "src/app/common/lottery-winner"
+import { Winner } from "src/app/common/winner"
 
 @Component({
     selector: 'reset-progress',
@@ -8,11 +8,11 @@ import { LotteryWinner } from "src/app/common/lottery-winner"
 })
 export class ResetProgressDialog {
     
-    winner: LotteryWinner
+    winner: Winner
 
     constructor(
         public dialogRef: MatDialogRef<ResetProgressDialog>,
-        @Inject(MAT_DIALOG_DATA) public data: LotteryWinner) {
+        @Inject(MAT_DIALOG_DATA) public data: Winner) {
         this.winner = data
     }
 

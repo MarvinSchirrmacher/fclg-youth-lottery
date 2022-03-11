@@ -1,6 +1,6 @@
 import { Component, Inject } from "@angular/core"
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog"
-import { LotteryWinner } from "src/app/common/lottery-winner"
+import { Winner } from "src/app/common/winner"
 import { GiroCodeService } from "src/app/service/girocode.service"
 
 @Component({
@@ -16,9 +16,9 @@ export class PayWinnerDialog {
   giroCode: string
 
   constructor(
-    public dialogRef: MatDialogRef<PayWinnerDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: LotteryWinner,
-    private giroCodeService: GiroCodeService) {
+      public dialogRef: MatDialogRef<PayWinnerDialog>,
+      @Inject(MAT_DIALOG_DATA) public data: Winner,
+      private giroCodeService: GiroCodeService) {
     this.firstName = data.user.firstName
     this.lastName = data.user.lastName
     this.tickets = data.tickets.map(t => t.toString).join(', ')

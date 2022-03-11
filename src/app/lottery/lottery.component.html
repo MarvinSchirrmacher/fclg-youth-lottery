@@ -8,9 +8,9 @@
     <mat-table [dataSource]="winners" *ngIf="winners.length > 0">
 
       <ng-container matColumnDef="ticket">
-        <mat-header-cell *matHeaderCellDef class="grow-1">Gewinnlos</mat-header-cell>
+        <mat-header-cell *matHeaderCellDef class="grow-1">Gewinnlose</mat-header-cell>
         <mat-cell *matCellDef="let winner" class="grow-1">
-          <span *ngFor="let ticket of winner.tickets">L{{ ticket.list }}N{{ ticket.number }}</span>
+          <span *ngFor="let ticket of winner.tickets" class="separated">L{{ ticket.list }}N{{ ticket.number }}</span>
         </mat-cell>
       </ng-container>
 
@@ -22,6 +22,11 @@
       <ng-container matColumnDef="date">
         <mat-header-cell *matHeaderCellDef class="grow-2">Datum</mat-header-cell>
         <mat-cell *matCellDef="let winner" class="grow-2">{{ winner.draw.date | date: 'dd.MM.yyyy' }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="profit">
+        <mat-header-cell *matHeaderCellDef class="grow-1">Gewinn</mat-header-cell>
+        <mat-cell *matCellDef="let winner" class="grow-1">{{ winner.profit }} €</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="actions">
@@ -46,9 +51,14 @@
           <button class="mat-icon-button mat-primary"
                   *ngIf="winner.informed && winner.paid"
                   title="Bearbeitet"
-                  (click)="onReset(winner._id)">
+                  (click)="onResetWinner(winner._id)">
             <span class="mat-button-wrapper">
               <mat-icon>check_circle_outline</mat-icon>
+            </span>
+          </button>
+          <button class="mat-icon-button mat-primary" (click)="onDeleteWinner(winner._id)">
+            <span class="mat-button-wrapper">
+              <mat-icon>delete_outline</mat-icon>
             </span>
           </button>
         </mat-cell>
@@ -71,11 +81,15 @@
       </mat-form-field>
     </form>
 
-    <div *ngIf="draws.length == 0">
+    <div class="flex center" *ngIf="drawsLoading">
+      <mat-spinner></mat-spinner>
+    </div>
+
+    <div *ngIf="draws.length == 0 && !drawsLoading">
       <p>In dem gewählten Jahr gab es keine Ziehungen</p>
     </div>
 
-    <mat-table [dataSource]="draws" *ngIf="draws.length > 0">
+    <mat-table [dataSource]="draws" *ngIf="draws.length > 0 && !drawsLoading">
       <ng-container matColumnDef="week">
         <mat-header-cell *matHeaderCellDef class="grow-1">Woche</mat-header-cell>
         <mat-cell *matCellDef="let draw" class="grow-1">{{ draw.date | date: 'w' }}</mat-cell>

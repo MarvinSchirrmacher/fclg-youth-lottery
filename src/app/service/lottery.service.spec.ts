@@ -11,7 +11,7 @@ describe('LotteryDrawService', () => {
   });
 
   it('should get all saturday draws of current year', () => {
-    var html = service.year(2022).day(DrawDay.Saturday).updateDraws();
+    var html = service.year(2022).day(DrawDay.Saturday).saveNewDraws();
     expect(html).toBeTruthy();
   });
 });

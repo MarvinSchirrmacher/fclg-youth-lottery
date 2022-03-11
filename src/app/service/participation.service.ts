@@ -7,13 +7,9 @@ import { Participation } from '../common/participation'
 import { Term } from '../common/term'
 import { User } from '../common/user'
 import { WinningTicket } from '../common/winning-ticket'
-import { DatabaseService, ParticipationDocument, QueryParticipationsResult, QueryUsersResult } from './database.service'
+import { toParticipationInstance, ParticipationDocument } from './database-documents'
+import { DatabaseService, Done, QueryParticipationsResult, QueryUsersResult } from './database.service'
 
-
-export interface Done {
-  next?: (id?: BSON.ObjectID) => void,
-  error?: <E extends Error> (error?: E) => void
-}
 
 export enum ParticipationEnd {
   Today,
@@ -26,27 +22,35 @@ export enum ParticipationEnd {
   providedIn: 'root'
 })
 export class ParticipationService {
-  participationsQuery = {} as QueryRef<QueryParticipationsResult>
-  usersQuery = {} as QueryRef<QueryUsersResult>
-  tickets = [] as WinningTicket[]
+
+  private _participationsQuery: QueryRef<QueryParticipationsResult> | undefined
+  private _usersQuery: QueryRef<QueryUsersResult> | undefined
+  private tickets = [] as WinningTicket[]
+
+  get participationsQuery(): QueryRef<QueryParticipationsResult> {
+    if (this._participationsQuery == undefined)
+      this._participationsQuery = this.database.queryParticipations()
+    return this._participationsQuery
+  }
+
+  get usersQuery(): QueryRef<QueryUsersResult> {
+    if (this._usersQuery == undefined)
+      this._usersQuery = this.database.queryUsers()
+    return this._usersQuery
+  }
 
   constructor(private database: DatabaseService) {
     this.tickets = this.establishTickets()
   }
 
-  public init(): ParticipationService {
-    this.participationsQuery = this.database.queryParticipations()
-    this.usersQuery = this.database.queryUsers()
-    return this
-  }
-
   public refetch(): void {
-    this.participationsQuery.refetch()
-    this.usersQuery.refetch()
+    console.debug('refetch participatoins and users')
+    this._participationsQuery?.refetch()
+    this._usersQuery?.refetch()
   }
 
-  public observeParticipations(): Observable<Participation[]> {
-    console.debug('observeParticipations')
+  public queryParticipations(): Observable<Participation[]> {
+    console.debug('queryParticipations')
     return zip([
       this.participationsQuery.valueChanges,
       this.usersQuery.valueChanges])
@@ -54,15 +58,15 @@ export class ParticipationService {
         ps.data.participations
         .map(p => {
           let o = us.data.users.find(u => u._id === p.user)
-          let u = o ? User.fromObject(o) : User.unkown()
-          return Participation.fromDocument(p, u)
+          let u = o ? User.fromObject(o) : User.unknown()
+          return toParticipationInstance(p, u)
         })
         .sort((a, b) => a.ticket.compareTo(b.ticket))
       ))
   }
 
-  public observeUsers(): Observable<User[]> {
-    console.debug('observeUsers')
+  public queryUsers(): Observable<User[]> {
+    console.debug('queryUsers')
     return this.usersQuery.valueChanges
       .pipe(map(result => result.data.users))
   }
@@ -257,8 +261,9 @@ export class ParticipationService {
   public observeFreeTickets(): Observable<WinningTicket[]> {
     console.debug('observeFreeTickets')
     return this.observeUsedTickets()
-      .pipe(map(usedTickets => this.tickets
-        .filter(t => !usedTickets.find(u => t.equals(u)))))
+      .pipe(
+        map(usedTickets => this.tickets
+          .filter(t => !usedTickets.find(u => t.equals(u)))))
   }
 
   private calculateEndDate(participation: Participation, end: ParticipationEnd): Date {

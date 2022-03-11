@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../service/auth.service';
-import { ParticipationService } from '../service/participation.service';
 
 @Component({
   selector: 'app-admin',
@@ -14,12 +13,10 @@ export class AdminComponent implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private router: Router,
-    private participationService: ParticipationService) { }
+    private router: Router) { }
 
   ngOnInit(): void {
     if (this.auth.isLoggedIn) {
-      this.participationService.init()
       this.ready = true
     } else {
       console.debug('not logged in, route to login page')

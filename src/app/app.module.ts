@@ -8,10 +8,11 @@ import { QRCodeModule } from 'angular2-qrcode';
 import { AdminComponent } from './admin/admin.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ChangePasswordComponent } from './change-password/change-password.component';
+import { ChangePasswordComponent } from './account/change-password/change-password.component';
 import { GraphQLModule } from './graphql.module';
 import { HomeComponent } from './home/home.component';
-import { LoginComponent } from './login/login.component';
+import { LoginComponent } from './account/login/login.component';
+import { DeleteWinnerDialog } from './lottery/dialog/delete-winner.component';
 import { InformWinnerDialog } from './lottery/dialog/inform-winner';
 import { PayWinnerDialog } from './lottery/dialog/pay-winner';
 import { ResetProgressDialog } from './lottery/dialog/reset-progress';
@@ -23,7 +24,7 @@ import { DeleteUserDialog } from './participation/dialog/delete-user.component';
 import { EndPariticipationDialog } from './participation/dialog/end-participation.component';
 import { PariticipationDetailsDialog } from './participation/dialog/participation-details.component';
 import { ParticipationComponent } from './participation/participation.component';
-import { RegisterComponent } from './register/register.component';
+import { RegisterComponent } from './account/register/register.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { RegisterComponent } from './register/register.component';
     DeleteUserDialog,
     InformWinnerDialog,
     PayWinnerDialog,
+    DeleteWinnerDialog,
     ResetProgressDialog
   ],
   imports: [
