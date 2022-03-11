@@ -1,60 +1,50 @@
 <section class="flex center h-100">
-    <form [formGroup]="formGroup">
-        <mat-toolbar class="toolbar" color="primary">Registrieren</mat-toolbar>
-        <mat-card>
-        <mat-form-field class="form-field">
-            <input type="text" matInput placeholder="E-Mail-Adresse" formControlName="email">
-        </mat-form-field>
-        <br/>
+  <form [formGroup]="formGroup" class="w-300px">
+  <mat-toolbar class="toolbar" color="primary">Registrieren</mat-toolbar>
+  <mat-card class="flex between wrap">
+    <mat-form-field class="form-field w-100">
+      <input type="text" matInput placeholder="E-Mail-Adresse" formControlName="email">
+    </mat-form-field>
 
-        <div *ngIf="email.invalid && (email.dirty || email.touched)"
-                class="alert">
-            <div *ngIf="email.errors?.['required']" class="form-field error">
-            Email ist verpflichtend
-            </div>
-            <div *ngIf="email.errors?.['email']" class="form-field error">
-            Es muss eine gültige E-Mail-Adresse sein
-            </div>
-        </div>
+    <div *ngIf="email.invalid && (email.dirty || email.touched)"
+        class="alert">
+      <div *ngIf="email.errors?.['required']" class="form-field w-100 error">
+        Email ist verpflichtend
+      </div>
+      <div *ngIf="email.errors?.['email']" class="form-field w-100 error">
+        Es muss eine gültige E-Mail-Adresse sein
+      </div>
+    </div>
 
-        <mat-form-field class="form-field">
-            <input type="password" matInput placeholder="Passwort" formControlName="password">
-        </mat-form-field>
-        <br/>
-        <div *ngIf="password.invalid && (password.dirty || password.touched)"
-                class="alert">
-            <div *ngIf="password.errors?.['required']" class="form-field error">
-            Passwort ist verpflichtend
-            </div>
-        </div>
+    <mat-form-field class="form-field w-100">
+      <input type="password" matInput placeholder="Passwort" formControlName="password">
+    </mat-form-field>
+    <div *ngIf="password.invalid && (password.dirty || password.touched)"
+        class="alert">
+      <div *ngIf="password.errors?.['required']" class="form-field w-100 error">
+      Passwort ist verpflichtend
+      </div>
+    </div>
 
-        <mat-form-field class="form-field">
-            <input type="password" matInput placeholder="Passwort wiederholen" formControlName="retype">
-        </mat-form-field>
-        <br/>
-        <div *ngIf="(password.dirty || password.touched) && (retype.dirty || retype.touched) && (password.value != retype.value)"
-                class="form-field error">
-            Passwörter sind nicht gleich
-        </div>
-        <div *ngIf="isVerifying">
-            Ein Verifizierungs-Code wurde an Deine E-Mail-Adresse gesendet
-        </div>
-        <mat-form-field *ngIf="isVerifying" class="form-field">
-            <input type="text" matInput placeholder="Verifizierungs-Code" formControlName="verify">
-        </mat-form-field>
-        <br/>
+    <mat-form-field class="form-field w-100">
+      <input type="password" matInput placeholder="Passwort wiederholen" formControlName="retype">
+    </mat-form-field>
+    <div *ngIf="(password.dirty || password.touched) && (retype.dirty || retype.touched) && (password.value != retype.value)"
+        class="form-field w-100 error">
+      Passwörter sind nicht gleich
+    </div>
+    <div *ngIf="isVerifying">
+      Ein Verifizierungs-Code wurde an Deine E-Mail-Adresse gesendet
+    </div>
+    <mat-form-field *ngIf="isVerifying" class="form-field w-100">
+      <input type="text" matInput placeholder="Verifizierungs-Code" formControlName="verify">
+    </mat-form-field>
 
-        <div class="center">
-            <button mat-raised-button color="primary" (click)="onSubmit()">Submit</button>
-        </div>
-        <div *ngIf="errorMessage != ''" class="form-field error">
-            {{ errorMessage }}
-        </div>
-        <div class="right-just">
-            <button mat-flat-button class="blue-text" (click)="onAlreadyRegistered()">
-                Bereits einen Account?
-            </button>
-        </div>
-        </mat-card>
-    </form>
+    <button mat-flat-button (click)="onAlreadyRegistered()">Bereits einen Account?</button>
+    <button mat-raised-button color="primary" (click)="onSubmit()">Submit</button>
+    <div *ngIf="errorMessage != ''" class="form-field w-100 error">
+      {{ errorMessage }}
+    </div>
+  </mat-card>
+  </form>
 </section>

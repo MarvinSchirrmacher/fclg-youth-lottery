@@ -15,7 +15,7 @@ p {
 }
 
 .flex {
-    display: flex;
+    display: flex !important;
     align-items: flex-start;
 }
 
@@ -31,6 +31,11 @@ p {
 .flex.end {
     align-items: center;
     justify-content: flex-end;
+}
+
+.flex.between {
+    align-items: center;
+    justify-content: space-between;
 }
 
 .grow-1 { flex-grow: 1 }
@@ -73,16 +78,16 @@ p {
 .w-90 { width: 90%; }
 .w-100 { width: 100%; }
 
-.w-100p { width: 100px; }
-.w-200p { width: 200px; }
-.w-300p { width: 300px; }
-.w-400p { width: 400px; }
-.w-500p { width: 500px; }
-.w-600p { width: 600px; }
-.w-700p { width: 700px; }
-.w-800p { width: 800px; }
-.w-900p { width: 900px; }
-.w-100p { width: 100px; }
+.w-100px { width: 100px; }
+.w-200px { width: 200px; }
+.w-300px { width: 300px; }
+.w-400px { width: 400px; }
+.w-500px { width: 500px; }
+.w-600px { width: 600px; }
+.w-700px { width: 700px; }
+.w-800px { width: 800px; }
+.w-900px { width: 900px; }
+.w-1000px { width: 1000px; }
 
 .distant {
     margin: 16px;
@@ -90,10 +95,6 @@ p {
 
 .h-100 {
     min-height: calc(100% - 64px);
-}
-
-.login-form {
-    width: 300px;
 }
 
 .mat-table {

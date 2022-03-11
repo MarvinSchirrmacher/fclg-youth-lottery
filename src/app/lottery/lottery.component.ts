@@ -68,7 +68,7 @@ export class LotteryComponent implements OnInit {
     var winner = this.getWinner(id)
 
     this.dialog
-      .open(InformWinnerDialog, { data: winner, panelClass: 'w-600p' })
+      .open(InformWinnerDialog, { data: winner, panelClass: 'w-600px' })
       .afterClosed()
       .pipe(
         filter(inform => inform),
@@ -85,7 +85,7 @@ export class LotteryComponent implements OnInit {
     var winner = this.getWinner(id)
 
     this.dialog
-      .open(PayWinnerDialog, { data: winner, panelClass: 'w-600p' })
+      .open(PayWinnerDialog, { data: winner, panelClass: 'w-600px' })
       .afterClosed().subscribe((paid: boolean) => {
         if (paid) {
           this.lotteryWin.setWinnerPaid(id)
@@ -99,7 +99,7 @@ export class LotteryComponent implements OnInit {
     var winner = this.getWinner(id)
 
     this.dialog
-      .open(ResetProgressDialog, { data: winner, panelClass: 'w-600p' })
+      .open(ResetProgressDialog, { data: winner, panelClass: 'w-600px' })
       .afterClosed().subscribe((reset: boolean) => {
         if (reset) {
           let winner = this.winners.find(w => w._id == id)!
@@ -114,7 +114,7 @@ export class LotteryComponent implements OnInit {
     var winner = this.getWinner(id)
 
     this.dialog
-      .open(DeleteWinnerDialog, { data: winner, panelClass: 'w-600p' })
+      .open(DeleteWinnerDialog, { data: winner, panelClass: 'w-600px' })
       .afterClosed()
       .subscribe(del => this.deleteWinner(winner._id!, del))
   }

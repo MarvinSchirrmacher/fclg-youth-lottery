@@ -60,7 +60,7 @@ export class ParticipationComponent implements OnInit {
     var participation = this.getParticipation(id)
 
     this.dialog
-      .open(EndParticipationDialog, { data: participation, panelClass: 'w-600p' })
+      .open(EndParticipationDialog, { data: participation, panelClass: 'w-600px' })
       .afterClosed()
       .subscribe(when => this.endParticipation(participation._id!, when))
   }
@@ -69,7 +69,7 @@ export class ParticipationComponent implements OnInit {
     var participation = this.getParticipation(id)
 
     this.dialog
-      .open(RemoveParticipationDialog, { data: participation, panelClass: 'w-600p' })
+      .open(RemoveParticipationDialog, { data: participation, panelClass: 'w-600px' })
       .afterClosed()
       .subscribe(del => this.deleteParticipation(participation._id!, del))
   }
@@ -82,7 +82,7 @@ export class ParticipationComponent implements OnInit {
     var user = this.getUser(id)
 
     this.dialog
-      .open(DeleteUserDialog, { data: user, panelClass: 'w-600p' })
+      .open(DeleteUserDialog, { data: user, panelClass: 'w-600px' })
       .afterClosed()
       .subscribe(del => this.deleteUser(user._id!, del))
   }
