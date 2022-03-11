@@ -7,7 +7,7 @@ import { Winner } from "../common/winner"
 import { Draw } from "../common/draw"
 import { Participation } from "../common/participation"
 import { User } from "../common/user"
-import { ParticipationDocument, toWinnerDocument, WinnerDocument } from "./database-documents"
+import { ParticipationDocument, toParticipationDocument, toWinnerDocument, WinnerDocument } from "./database-documents"
 
 
 export interface Done {
@@ -151,7 +151,8 @@ export class DatabaseService {
   }
 
   public insertParticipation(participation: Participation): Observable<MutationResult<InsertParticipationResult>> {
-    return this.insert<InsertParticipationResult>('insertOneParticipation', participation);
+    var document = toParticipationDocument(participation)
+    return this.insert<InsertParticipationResult>('insertOneParticipation', document);
   }
 
   public insertUser(user: User): Observable<MutationResult<InsertUserResult>> {
