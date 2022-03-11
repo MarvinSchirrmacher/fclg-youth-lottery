@@ -10,7 +10,9 @@
       <ng-container matColumnDef="ticket">
         <mat-header-cell *matHeaderCellDef class="grow-1">Gewinnlose</mat-header-cell>
         <mat-cell *matCellDef="let winner" class="grow-1">
-          <span *ngFor="let ticket of winner.tickets" class="separated">L{{ ticket.list }}N{{ ticket.number }}</span>
+          <div class="flex wrap">
+            <span *ngFor="let ticket of winner.tickets">L{{ ticket.list }}N{{ ticket.number }}</span>
+          </div>
         </mat-cell>
       </ng-container>
 

@@ -129,14 +129,14 @@
         <mat-datepicker #startDatePicker></mat-datepicker>
     </mat-form-field>
 
-    <div class="flex end">
-        <button class="mat-stroked-button mat-primary" type="button" (click)="onFromStartOfYear()">
+    <mat-dialog-actions class="flex end">
+        <button class="mat-stroked-button mat-button-base mat-primary" type="button" (click)="onFromStartOfYear()">
             Ab Jahresbeginn
         </button>
-        <button class="mat-stroked-button mat-primary" type="button" (click)="onFromNextQuarter()">
+        <button class="mat-stroked-button mat-button-base mat-primary" type="button" (click)="onFromNextQuarter()">
             Ab nächstem Quartal
         </button>
-    </div>
+    </mat-dialog-actions>
 
     <mat-form-field class="form-field w-100">
         <input matInput [matDatepicker]="endDatePicker" placeholder="Ende" formControlName="end">
