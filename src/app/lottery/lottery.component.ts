@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
-import { concatMap, filter, Observable, of, switchMap } from 'rxjs'
+import { concatMap, filter, Observable, of, switchMap, zip } from 'rxjs'
 import { snackBarConfig } from '../common/data'
 import { Winner } from '../common/winner'
 import { Draw } from '../common/draw'
@@ -15,6 +15,7 @@ import { PayWinnerDialog } from './dialog/pay-winner'
 import { ResetProgressDialog } from './dialog/reset-progress'
 import { DeleteWinnerDialog } from './dialog/delete-winner.component'
 import { Observer } from '@apollo/client/core'
+import { article, winnerNoun } from '../common/gendering'
 
 @Component({
   selector: 'app-lottery',
@@ -74,11 +75,21 @@ export class LotteryComponent implements OnInit {
         filter(inform => inform),
         concatMap(() => this.informWinner(winner!))
       )
-      .subscribe(informed => {
-        if (!informed) return
-        this.lotteryWin.setWinnerInformed(id)
-        this.snackBar.open(`Der Gewinner wurde${informed ? '' : ' nicht'} informiert`, 'Ok', snackBarConfig)
-      })
+      .subscribe((informedOn: Date) => {
+        if (!informedOn) return
+
+        let g = winner.user.gender
+        this.lotteryWin.saveWinnerInformedOn(id, informedOn)
+          .subscribe({
+            next: result => {
+              this.snackBar.open(`${article(g).capitalize()} ${winnerNoun(g)} wurde informiert`, 'Ok', snackBarConfig)
+              this.lotteryWin.refetchWinners()
+            },
+            error: error => {
+              this.snackBar.open(`${article(g).capitalize()} ${winnerNoun(g)} wurde nicht informiert\n${error}`, 'Ok', snackBarConfig)
+            }
+          })
+        })
   }
 
   public onPay(id: BSON.ObjectID): void {
@@ -86,13 +97,21 @@ export class LotteryComponent implements OnInit {
 
     this.dialog
       .open(PayWinnerDialog, { data: winner, panelClass: 'w-600px' })
-      .afterClosed().subscribe((paid: boolean) => {
-        if (paid) {
-          this.lotteryWin.setWinnerPaid(id)
-          this.winners.find(w => w._id == id)!.paid = true
-          this.snackBar.open(`Der Gewinner wurde bezahlt`, 'Ok', snackBarConfig)
-        }
-      })
+      .afterClosed().subscribe((paidOn: Date) => {
+        if (!paidOn) return
+
+        let g = winner.user.gender
+        this.lotteryWin.saveWinnerPaidOn(id, paidOn)
+          .subscribe({
+            next: result => {
+              this.snackBar.open(`${article(g).capitalize()} ${winnerNoun(g)} wurde ausgezahlt`, 'Ok', snackBarConfig)
+              this.lotteryWin.refetchWinners()
+            },
+            error: error => {
+              this.snackBar.open(`${article(g).capitalize()} ${winnerNoun(g)} wurde nicht ausgezahlt\n${error}`, 'Ok', snackBarConfig)
+            }
+          })
+        })
   }
 
   public onResetWinner(id: BSON.ObjectID): void {
@@ -101,12 +120,18 @@ export class LotteryComponent implements OnInit {
     this.dialog
       .open(ResetProgressDialog, { data: winner, panelClass: 'w-600px' })
       .afterClosed().subscribe((reset: boolean) => {
-        if (reset) {
-          let winner = this.winners.find(w => w._id == id)!
-          winner.informed = false
-          winner.paid = false
-          this.snackBar.open(`Der Bearbeitungsstatus wurde zurückgesetzt`, 'Ok', snackBarConfig)
-        }
+        if (!reset) return
+
+        this.lotteryWin.resetWinner(id)
+          .subscribe({
+            next: result => {
+              this.snackBar.open(`Der Bearbeitungsstatus wurde zurückgesetzt`, 'Ok', snackBarConfig)
+              this.lotteryWin.refetchWinners()
+            },
+            error: error => {
+              this.snackBar.open(`Der Bearbeitungsstatus konnte nicht zurückgesetzt werden\n${error}`, 'Ok', snackBarConfig)
+            }
+          })
       })
   }
 
@@ -144,9 +169,9 @@ export class LotteryComponent implements OnInit {
       'Ok', snackBarConfig)
   }
 
-  private informWinner(winner: Winner): Observable<any> {
+  private informWinner(winner: Winner): Observable<Date> {
     if (!winner.user.email)
-      return of(true)
+      return of(new Date())
 
     return this.mail
       .address(winner.user.email)

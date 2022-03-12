@@ -19,11 +19,11 @@ export interface WinnerDocument {
   user: BSON.ObjectID
   tickets: WinningTicket[]
   profit: number
-  informed: boolean
-  paid: boolean
+  informedOn: Date | undefined
+  paidOn: Date | undefined
 }
 
-export function toParticipationDocument(object: Participation): ParticipationDocument {
+export function toParticipationDocument(object: Partial<Participation>): ParticipationDocument {
   return {
     user: object.user?._id,
     ticket: object.ticket,
@@ -31,14 +31,14 @@ export function toParticipationDocument(object: Participation): ParticipationDoc
   } as ParticipationDocument
 }
 
-export function toWinnerDocument(object: Winner): WinnerDocument {
+export function toWinnerDocument(object: Partial<Winner>): WinnerDocument {
   return {
-    draw: object.draw._id,
-    user: object.user._id,
+    draw: object.draw?._id,
+    user: object.user?._id,
     tickets: object.tickets,
     profit: object.profit,
-    informed: object.informed,
-    paid: object.paid
+    informedOn: object.informedOn,
+    paidOn: object.paidOn
   } as WinnerDocument
 }
 
@@ -58,5 +58,7 @@ export function toWinnerInstance(
     user ? User.fromObject(user) : User.unknown(),
     document.tickets.map(t => WinningTicket.fromObject(t)),
     document.profit,
+    document.informedOn,
+    document.paidOn,
     document._id)
 }

@@ -25,7 +25,7 @@ export class MailService {
     return this
   }
 
-  public send(): Observable<any> {
-    return of(`sent mail to ${this._address}`)
+  public send(): Observable<Date> {
+    return of(new Date())
   }
 }

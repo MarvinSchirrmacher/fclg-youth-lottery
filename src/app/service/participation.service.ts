@@ -139,7 +139,7 @@ export class ParticipationService {
           let userId = result.data!.insertOneUser._id
           this.refetch()
           if (participationId) {
-            let update = { user: userId } as ParticipationDocument
+            let update = { user: { _id: userId } } as Partial<Participation>
             this.database.updateParticipation(participationId, update)
               .subscribe({
                 next: result => { if (done?.next) done.next(userId) },
@@ -180,7 +180,7 @@ export class ParticipationService {
         start: current.term.start,
         end: this.calculateEndDate(current, end)
       }
-    } as ParticipationDocument
+    } as Participation
 
     this.database.updateParticipation(id, update)
       .subscribe({

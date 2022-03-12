@@ -25,6 +25,7 @@ import { EndPariticipationDialog } from './participation/dialog/end-participatio
 import { PariticipationDetailsDialog } from './participation/dialog/participation-details.component';
 import { ParticipationComponent } from './participation/participation.component';
 import { RegisterComponent } from './account/register/register.component';
+import './common/strings'
 
 @NgModule({
   declarations: [

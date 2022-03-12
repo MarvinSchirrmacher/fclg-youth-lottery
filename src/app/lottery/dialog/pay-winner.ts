@@ -1,4 +1,5 @@
 import { Component, Inject } from "@angular/core"
+import { FormBuilder, FormGroup, Validators } from "@angular/forms"
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog"
 import { Winner } from "src/app/common/winner"
 import { GiroCodeService } from "src/app/service/girocode.service"
@@ -8,6 +9,7 @@ import { GiroCodeService } from "src/app/service/girocode.service"
   templateUrl: './pay-winner.component.html',
 })
 export class PayWinnerDialog {
+  form = {} as FormGroup
   firstName: string
   lastName: string
   tickets: string
@@ -15,10 +17,14 @@ export class PayWinnerDialog {
   profit: number
   giroCode: string
 
+  get paidOn() { return this.form.get('paidOn')! }
+
   constructor(
       public dialogRef: MatDialogRef<PayWinnerDialog>,
       @Inject(MAT_DIALOG_DATA) public data: Winner,
-      private giroCodeService: GiroCodeService) {
+      private giroCodeService: GiroCodeService,
+      private formBuilder: FormBuilder) {
+
     this.firstName = data.user.firstName
     this.lastName = data.user.lastName
     this.tickets = data.tickets.map(t => t.toString).join(', ')
@@ -30,6 +36,10 @@ export class PayWinnerDialog {
       amount: data.profit,
       purpose: 'FCLG Jugendlotto Gewinn'
     })
+
+    this.form = this.formBuilder.group({
+      paidOn: [new Date(), Validators.required]
+    })
   }
 
   onNoClick(): void {
@@ -37,7 +47,8 @@ export class PayWinnerDialog {
   }
 
   paid(): void {
-    this.dialogRef.close(true)
+    if (this.form.valid)
+      this.dialogRef.close(this.paidOn.value)
   }
 
   close(): void {

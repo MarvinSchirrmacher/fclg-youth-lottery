@@ -98,12 +98,18 @@ export class LotteryWinService {
       )
   }
 
-  public setWinnerInformed(id: BSON.ObjectID): void {
-    
+  public saveWinnerInformedOn(id: BSON.ObjectID, date: Date) {
+    return this.database.updateWinner(id, { informedOn: date })
   }
 
-  public setWinnerPaid(id: BSON.ObjectID): void {
-    
+  public saveWinnerPaidOn(id: BSON.ObjectID, date: Date) {
+    return this.database.updateWinner(id, { paidOn: date })
+  }
+
+  public resetWinner(id: BSON.ObjectID) {
+    return this.database
+      .includeEmpty(['informedOn', 'paidOn'])
+      .updateWinner(id, { informedOn: undefined, paidOn: undefined })
   }
 
   public deleteWinner(id: BSON.ObjectID, done?: Done) {

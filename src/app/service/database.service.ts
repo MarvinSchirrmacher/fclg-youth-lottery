@@ -2,12 +2,12 @@ import { Injectable } from "@angular/core"
 import { Apollo, QueryRef, gql, MutationResult } from "apollo-angular"
 import { BSON } from "realm-web"
 import { Observable, of } from "rxjs"
-import { toGraphQL } from "../common/graphql"
 import { Winner } from "../common/winner"
 import { Draw } from "../common/draw"
 import { Participation } from "../common/participation"
 import { User } from "../common/user"
 import { ParticipationDocument, toParticipationDocument, toWinnerDocument, WinnerDocument } from "./database-documents"
+import { toGraphQL } from "../common/graphql"
 
 
 export interface Done {
@@ -59,6 +59,10 @@ export interface UpdateDrawResult {
   updateOneDraw: { _id: BSON.ObjectID }
 }
 
+export interface UpdateWinnerResult {
+  updateOneWinner: { _id: BSON.ObjectID }
+}
+
 export interface UpdateManyPayload {
   matchedCount: number
   modifiedCount: number
@@ -82,7 +86,14 @@ export interface DeleteWinnerResult {
 })
 export class DatabaseService {
 
+  private emptyFieldsToInclude: string[] = []
+
   constructor(private apollo: Apollo) { }
+
+  public includeEmpty(fields: string[]): DatabaseService {
+    this.emptyFieldsToInclude = fields
+    return this
+  }
 
   public queryParticipations(): QueryRef<QueryParticipationsResult> {
     var sortBy = createSortBy('user', SortOrder.Ascending)
@@ -145,22 +156,22 @@ export class DatabaseService {
         number
       }
       profit
-      informed
-      paid
+      informedOn
+      paidOn
     }`)
   }
 
   public insertParticipation(participation: Participation): Observable<MutationResult<InsertParticipationResult>> {
     var document = toParticipationDocument(participation)
-    return this.insert<InsertParticipationResult>('insertOneParticipation', document);
+    return this.insert<InsertParticipationResult>('insertOneParticipation', document)
   }
 
   public insertUser(user: User): Observable<MutationResult<InsertUserResult>> {
-    return this.insert<InsertUserResult>('insertOneUser', user);
+    return this.insert<InsertUserResult>('insertOneUser', user)
   }
 
   public insertDraw(draw: Draw): Observable<MutationResult<InsertDrawResult>> {
-    return this.insert<InsertDrawResult>('insertOneDraw', draw);
+    return this.insert<InsertDrawResult>('insertOneDraw', draw)
   }
 
   public insertWinners(winners: Winner[]):
@@ -174,21 +185,31 @@ export class DatabaseService {
     var documents = winners.map(w => toWinnerDocument(w))
     return this.apollo.mutate<InsertWinnersResult>({
       mutation: gql`mutation {
-        insertManyWinners(data: ${toGraphQL(documents, new Map([['profit', '%s']]))}) { insertedIds }
+        insertManyWinners(data: ${this.toGraphQL(documents, new Map([['profit', '%s']]))}) { insertedIds }
       }`})
   }
 
-  public updateParticipation(id: BSON.ObjectID, participation: ParticipationDocument):
+  public updateParticipation(id: BSON.ObjectID, participation: Partial<Participation>):
       Observable<MutationResult<UpdateParticipationResult>> {
-    return this.update<UpdateParticipationResult>('updateOneParticipation', id, participation);
+    var document = toParticipationDocument(participation)
+    return this.update<UpdateParticipationResult>('updateOneParticipation', id, document)
   }
 
-  public updateUser(id: BSON.ObjectID, user: User): Observable<MutationResult<UpdateUserResult>> {
-    return this.update<UpdateUserResult>('updateOneUser', id, user);
+  public updateUser(id: BSON.ObjectID, user: Partial<User>): Observable<MutationResult<UpdateUserResult>> {
+    return this.update<UpdateUserResult>('updateOneUser', id, user)
   }
 
-  public updateDraw(id: BSON.ObjectID, draw: Draw): Observable<MutationResult<UpdateDrawResult>> {
-    return this.update<UpdateDrawResult>('updateOneDraw', id, draw);
+  public updateDraw(id: BSON.ObjectID, draw: Partial<Draw>): Observable<MutationResult<UpdateDrawResult>> {
+    return this.update<UpdateDrawResult>('updateOneDraw', id, draw)
+  }
+
+  public updateWinner(id: BSON.ObjectID, winner: Partial<Winner>): Observable<MutationResult<UpdateWinnerResult>> {
+    var document = toWinnerDocument(winner)
+    return this.update<UpdateWinnerResult>('updateOneWinner', id, document)
+  }
+
+  public updateWinnerDocument(id: BSON.ObjectID, document: Partial<Document>): Observable<MutationResult<UpdateWinnerResult>> {
+    return this.update<UpdateWinnerResult>('updateOneWinner', id, document)
   }
 
   public updateDraws(ids: BSON.ObjectID[], draw: Partial<Draw>):
@@ -203,7 +224,7 @@ export class DatabaseService {
       mutation: gql`mutation {
         updateManyDraws(
           query: ${query},
-          set: ${toGraphQL(draw)}
+          set: ${this.toGraphQL(draw)}
         ) {
           matchedCount
           modifiedCount
@@ -213,15 +234,15 @@ export class DatabaseService {
   }
 
   public deleteParticipation(id: BSON.ObjectID): Observable<MutationResult<DeleteParticipationResult>> {
-    return this.delete<DeleteParticipationResult>('deleteOneParticipation', id);
+    return this.delete<DeleteParticipationResult>('deleteOneParticipation', id)
   }
 
   public deleteUser(id: BSON.ObjectID): Observable<MutationResult<DeleteUserResult>> {
-    return this.delete<DeleteUserResult>('deleteOneUser', id);
+    return this.delete<DeleteUserResult>('deleteOneUser', id)
   }
 
   public deleteWinner(id: BSON.ObjectID): Observable<MutationResult<DeleteWinnerResult>> {
-    return this.delete<DeleteWinnerResult>('deleteOneWinner', id);
+    return this.delete<DeleteWinnerResult>('deleteOneWinner', id)
   }
 
   public query<ResultType>(
@@ -244,7 +265,7 @@ export class DatabaseService {
     console.debug(mutation)
     return this.apollo.mutate<ResultType>({
       mutation: gql`mutation {
-        ${mutation}(data: ${toGraphQL(document)}) { _id }
+        ${mutation}(data: ${this.toGraphQL(document)}) { _id }
       }`
     })
   }
@@ -256,7 +277,7 @@ export class DatabaseService {
       mutation: gql`mutation {
         ${mutation}(
           query: { _id: "${id}" },
-          set: ${toGraphQL(document)}
+          set: ${this.toGraphQL(document)}
         ) { _id } }`
     })
   }
@@ -270,6 +291,18 @@ export class DatabaseService {
           query: { _id:"${id}" }
         ) { _id } }`
     })
+  }
+
+  private toGraphQL(object: any, formats?: Map<string, string>): string {
+    if (!formats)
+      formats = new Map()
+    
+    if (this.emptyFieldsToInclude.length > 0)
+      this.emptyFieldsToInclude.forEach(f => formats?.set(f, ''))
+
+    var document = toGraphQL(object, formats)
+    this.emptyFieldsToInclude = []
+    return document
   }
 }
 

@@ -56,16 +56,4 @@ export class User {
       }
     })
   }
-
-  public getWinnerNoun(): string {
-    return winnerNoun.get(this.gender)!
-  }
-
-  public getPersonalPronoun(): string {
-    return personalPronoun.get(this.gender)!
-  }
-
-  public getPossessivePronoun(): string {
-    return possessivePronoun.get(this.gender)!
-  }
 }

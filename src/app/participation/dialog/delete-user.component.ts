@@ -20,8 +20,8 @@ export class DeleteUserDialog {
         @Inject(MAT_DIALOG_DATA) public data: User) {
         this.firstName = data.firstName
         this.lastName = data.lastName
-        this.the = article.get(data.gender)!
-        this.noun = participantNoun.get(data.gender)!
+        this.the = article(data.gender)
+        this.noun = participantNoun(data.gender)
     }
 
     onNoClick(): void {

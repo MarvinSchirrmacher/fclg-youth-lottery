@@ -36,31 +36,31 @@
         <mat-cell *matCellDef="let winner" class="grow-2">
           <button class="mat-icon-button mat-primary"
                   *ngIf="winner.user.email"
-                  title="{{ winner.informed ? 'Gewinner wurde benachrichtigt' : 'Gewinner benachrichtigen' }}"
-            (click)="onInform(winner._id)" [disabled]="winner.informed">
+                  title="{{ winner.informedOn ? 'Gewinner wurde am ' + winner.informedOn + ' benachrichtigt' : 'Gewinner benachrichtigen' }}"
+            (click)="onInform(winner._id)" [disabled]="winner.informedOn">
             <span class="mat-button-wrapper">
               <mat-icon>mail_outline</mat-icon>
             </span>
           </button>
           <button class="mat-icon-button mat-primary"
                   *ngIf="winner.user.payment.iban"
-                  title="{{ winner.paid ? 'Gewinn wurde ausgezahlt' : 'Gewinn auszahlen' }}"
-                  (click)="onPay(winner._id)" [disabled]="winner.paid">
+                  title="{{ winner.paidOn ? 'Gewinn wurde am ' + winner.paidOn + ' ausgezahlt' : 'Gewinn auszahlen' }}"
+                  (click)="onPay(winner._id)" [disabled]="winner.paidOn">
             <span class="mat-button-wrapper">
               <mat-icon>payment</mat-icon>
             </span>
           </button>
+          <button class="mat-icon-button mat-primary" (click)="onDeleteWinner(winner._id)">
+            <span class="mat-button-wrapper">
+              <mat-icon color="warn">delete_outline</mat-icon>
+            </span>
+          </button>
           <button class="mat-icon-button mat-primary"
-                  *ngIf="winner.informed && winner.paid"
-                  title="Bearbeitet"
+                  *ngIf="winner.informedOn && winner.paidOn"
+                  title="Bearbeitung zurücksetzen"
                   (click)="onResetWinner(winner._id)">
             <span class="mat-button-wrapper">
               <mat-icon>check_circle_outline</mat-icon>
-            </span>
-          </button>
-          <button class="mat-icon-button mat-primary" (click)="onDeleteWinner(winner._id)">
-            <span class="mat-button-wrapper">
-              <mat-icon>delete_outline</mat-icon>
             </span>
           </button>
         </mat-cell>
@@ -83,8 +83,8 @@
       </mat-form-field>
     </form>
 
-    <div class="flex center" *ngIf="drawsLoading">
-      <mat-spinner></mat-spinner>
+    <div class="flex center padded" *ngIf="drawsLoading">
+      <mat-spinner diameter="50"></mat-spinner>
     </div>
 
     <div *ngIf="draws.length == 0 && !drawsLoading">
