@@ -20,7 +20,7 @@ export class ParticipationComponent implements OnInit {
 
   participations = [] as Participation[]
   users = [] as User[]
-  participationColumns = [ 'ticket', 'name', 'start', 'end', 'actions' ]
+  participationColumns = [ 'ticket', 'name', 'term', 'actions' ]
   userColumns = [ 'name', 'actions' ]
 
   constructor(

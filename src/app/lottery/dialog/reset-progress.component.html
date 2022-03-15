@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>Bearbeitung zurücksetzen</h2>
 <mat-dialog-content>
-  <p>Soll der Bearbeitungsstatus für <strong>{{ winner.user.firstName }} {{ winner.user.lastName }}</strong> zurückgesetzt werden?</p>
+  <p>Soll der Bearbeitungsstatus für den Gewinn von <strong>{{ winner.user.firstName }} {{ winner.user.lastName }}</strong> vom <strong>{{ winner.draw.date | date: 'dd.MM.yyyy' }}</strong> zurückgesetzt werden?</p>
 </mat-dialog-content>
 <mat-dialog-actions class="flex end">
   <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>

@@ -64,15 +64,6 @@ export class LotteryService {
       )
   }
 
-  public markDraws(ids: BSON.ObjectID[], evaluated: boolean):
-      Observable<MutationResult<UpdateManyPayload>> {
-    console.debug('markDraws')
-    var partial = {
-      evaluated: evaluated
-    }
-    return this.database.updateDraws(ids, partial)
-  }
-
   public queryDraws(from: Date, to: Date): Observable<Draw[]> {
     return this.database.queryDraws(from, to).valueChanges
       .pipe(map(result => result.data.draws))

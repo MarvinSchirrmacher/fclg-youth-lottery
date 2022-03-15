@@ -2,40 +2,40 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 *, *:before, *:after {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 p {
-    line-height: 1.5;
-    hyphens: auto;
+  line-height: 1.5;
+  hyphens: auto;
 }
 
 .right {
-    float: right;
+  float: right;
 }
 
 .flex {
-    display: flex !important;
-    align-items: flex-start;
+  display: flex !important;
+  align-items: flex-start;
 }
 
 .flex.wrap {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .flex.center {
-    align-items: center;
-    justify-content: center;
+  align-items: center;
+  justify-content: center;
 }
 
 .flex.end {
-    align-items: center;
-    justify-content: flex-end;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .flex.between {
-    align-items: center;
-    justify-content: space-between;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .grow-1 { flex-grow: 1 }
@@ -90,67 +90,82 @@ p {
 .w-1000px { width: 1000px; }
 
 .distant {
-    margin: 16px;
+  margin: 16px;
 }
 
 .padded {
-    padding: 16px;
+  padding: 16px;
 }
 
 .h-100 {
-    min-height: calc(100% - 64px);
+  min-height: calc(100% - 64px);
 }
 
 .mat-table {
-    width: 100%;
+  width: 100%;
 }
 
 .mat-button,
 .mat-icon-button,
 .mat-stroked-button,
 .mat-flat-button {
-    overflow: hidden !important;
-    text-overflow: ellipsis;
-    &.mat-primary[disabled] {
-        color: grey;
-        cursor: default;
-    }
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  &.mat-primary[disabled] {
+    color: grey;
+    cursor: default;
+  }
 }
 
 .mat-dialog-container {
-    min-width: 400px;
+  min-width: 400px;
 }
 
 .mat-toolbar.mat-primary {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .mat-row {
-    align-items: flex-start;
+  align-items: flex-start;
 }
 
 .tile {
-    background: #f2f3f4;
-    padding: 5px;
-    text-align: center;
-    width: 27px;
+  background: #f2f3f4;
+  padding: 5px;
+  text-align: center;
+  width: 27px;
 }
 
 .tile + .tile {
-    margin-left: 5px;
+  margin-left: 5px;
 }
 
 .tile:first-of-type {
-    background-color: #25ac00;
-    color: white;
-    font-weight: bold;
+  background-color: #25ac00;
+  color: white;
+  font-weight: bold;
 }
 
 .text + .text:before {
-    content: ", ";
+  content: ", ";
 }
 
 span + span.separated:before {
-    content: ", ";
+  content: ", ";
+}
+
+@media (hover: hover) {
+
+.mat-row {
+  .show-on-hover {
+    opacity: 0;
+  }
+  &:hover {
+    .show-on-hover  {
+    opacity: 1;
+    }
+  }
+}
+
 }

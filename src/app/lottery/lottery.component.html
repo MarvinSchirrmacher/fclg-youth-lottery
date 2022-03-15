@@ -32,37 +32,40 @@
       </ng-container>
 
       <ng-container matColumnDef="actions">
-        <mat-header-cell *matHeaderCellDef class="grow-2">Aktionen</mat-header-cell>
+        <mat-header-cell *matHeaderCellDef class="grow-2"></mat-header-cell>
         <mat-cell *matCellDef="let winner" class="grow-2">
-          <button class="mat-icon-button mat-primary"
-                  *ngIf="winner.user.email"
-                  title="{{ winner.informedOn ? 'Gewinner wurde am ' + winner.informedOn + ' benachrichtigt' : 'Gewinner benachrichtigen' }}"
-            (click)="onInform(winner._id)" [disabled]="winner.informedOn">
-            <span class="mat-button-wrapper">
-              <mat-icon>mail_outline</mat-icon>
-            </span>
-          </button>
-          <button class="mat-icon-button mat-primary"
-                  *ngIf="winner.user.payment.iban"
-                  title="{{ winner.paidOn ? 'Gewinn wurde am ' + winner.paidOn + ' ausgezahlt' : 'Gewinn auszahlen' }}"
-                  (click)="onPay(winner._id)" [disabled]="winner.paidOn">
-            <span class="mat-button-wrapper">
-              <mat-icon>payment</mat-icon>
-            </span>
-          </button>
-          <button class="mat-icon-button mat-primary" (click)="onDeleteWinner(winner._id)">
-            <span class="mat-button-wrapper">
-              <mat-icon color="warn">delete_outline</mat-icon>
-            </span>
-          </button>
-          <button class="mat-icon-button mat-primary"
-                  *ngIf="winner.informedOn && winner.paidOn"
-                  title="Bearbeitung zurücksetzen"
-                  (click)="onResetWinner(winner._id)">
-            <span class="mat-button-wrapper">
-              <mat-icon>check_circle_outline</mat-icon>
-            </span>
-          </button>
+          <div class="flex end w-100">
+            <button class="mat-icon-button mat-primary"
+                    *ngIf="winner.informedOn && winner.paidOn"
+                    title="Bearbeitung zurücksetzen"
+                    (click)="onResetWinner(winner._id)">
+              <span class="mat-button-wrapper">
+                <mat-icon>check_circle_outline</mat-icon>
+              </span>
+            </button>
+            <button class="mat-icon-button mat-primary show-on-hover"
+                    *ngIf="winner.user.email"
+                    title="{{ winner.informedOn ? 'Gewinner wurde am ' + winner.informedOn + ' benachrichtigt' : 'Gewinner benachrichtigen' }}"
+              (click)="onInform(winner._id)" [disabled]="winner.informedOn">
+              <span class="mat-button-wrapper">
+                <mat-icon>mail_outline</mat-icon>
+              </span>
+            </button>
+            <button class="mat-icon-button mat-primary show-on-hover"
+                    *ngIf="winner.user.payment.iban"
+                    title="{{ winner.paidOn ? 'Gewinn wurde am ' + winner.paidOn + ' ausgezahlt' : 'Gewinn auszahlen' }}"
+                    (click)="onPay(winner._id)" [disabled]="winner.paidOn">
+              <span class="mat-button-wrapper">
+                <mat-icon>payment</mat-icon>
+              </span>
+            </button>
+            <button class="mat-icon-button mat-primary show-on-hover"
+                    title="Gewinn löschen" (click)="onDeleteWinner(winner._id)">
+              <span class="mat-button-wrapper">
+                <mat-icon color="warn">delete_outline</mat-icon>
+              </span>
+            </button>
+          </div>
         </mat-cell>
       </ng-container>
 
@@ -96,10 +99,12 @@
         <mat-header-cell *matHeaderCellDef class="grow-1">Woche</mat-header-cell>
         <mat-cell *matCellDef="let draw" class="grow-1">{{ draw.date | date: 'w' }}</mat-cell>
       </ng-container>
+
       <ng-container matColumnDef="date">
         <mat-header-cell *matHeaderCellDef class="grow-2">Datum</mat-header-cell>
         <mat-cell *matCellDef="let draw" class="grow-2">{{ draw.date | date: 'dd.MM.yyyy' }}</mat-cell>
       </ng-container>
+
       <ng-container matColumnDef="numbers">
         <mat-header-cell *matHeaderCellDef class="grow-3">Gewinnzahlen</mat-header-cell>
         <mat-cell *matCellDef="let draw" class="grow-3">
@@ -107,8 +112,22 @@
         </mat-cell>
       </ng-container>
 
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef class="grow-1"></mat-header-cell>
+        <mat-cell *matCellDef="let draw" class="grow-1">
+          <button class="mat-icon-button mat-primary show-on-hover"
+                  title="Gewinner erneut ermitteln"
+                  (click)="onReEvaluateDraw(draw._id)">
+            <span class="mat-button-wrapper">
+              <mat-icon>autorenew</mat-icon>
+            </span>
+          </button>
+        </mat-cell>
+      </ng-container>
+
       <mat-header-row *matHeaderRowDef="drawsColumns"></mat-header-row>
       <mat-row *matRowDef="let draw; columns: drawsColumns"></mat-row>
+
     </mat-table>
   </mat-card>
 

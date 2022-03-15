@@ -34,13 +34,15 @@ export class LotteryWinService {
     return this
   }
 
-  public updateWinners(draws: Draw[]): Observable<Draw[]> {
-    var newDraws = draws.filter(d => !d.evaluated)
+  public updateWinners(draws: Draw[], force: boolean = false): Observable<Draw[]> {
+    var newDraws = force ? draws : draws.filter(d => !d.evaluated)
+    var newDrawsIds = newDraws.map(d => d._id!)
     console.debug(`updateWinners ${JSON.stringify(newDraws)}`)
     return this.participation.queryParticipations()
       .pipe(
         map(participations => this.determineWinners(newDraws, participations)),
         exhaustMap(newWinners => this.database.insertWinners(newWinners)),
+        exhaustMap(result => this.database.updateDraws(newDrawsIds, { evaluated: true })),
         map(result => draws)
       )
   }
@@ -58,6 +60,8 @@ export class LotteryWinService {
   }
 
   private determineWinners(draws: Draw[], participations: Participation[]): Winner[] {
+    if (draws.length == 0) return []
+
     return draws
       .map(draw => this.determineWinnersForDraw(draw, participations))
       .reduce((winners, winnersForDraw) => winners.concat(winnersForDraw))

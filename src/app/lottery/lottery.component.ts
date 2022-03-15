@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
-import { concatMap, filter, Observable, of, switchMap, zip } from 'rxjs'
+import { concatMap, filter, Observable, of, Subscription, switchMap } from 'rxjs'
 import { snackBarConfig } from '../common/data'
 import { Winner } from '../common/winner'
 import { Draw } from '../common/draw'
@@ -28,9 +28,10 @@ export class LotteryComponent implements OnInit {
   public years = [] as number[]
   public draws = [] as Draw[]
   public winnersColumns: string[] = ['ticket', 'name', 'date', 'profit', 'actions']
-  public drawsColumns: string[] = ['week', 'date', 'numbers']
+  public drawsColumns: string[] = ['week', 'date', 'numbers', 'actions']
   public winnersLoading: boolean = true
   public drawsLoading: boolean = true
+  private winnersSubscription: Subscription | undefined
 
   constructor(
     private formBuilder: FormBuilder,
@@ -144,12 +145,21 @@ export class LotteryComponent implements OnInit {
       .subscribe(del => this.deleteWinner(winner._id!, del))
   }
 
+  public onReEvaluateDraw(id: BSON.ObjectID): void {
+    var draws = [this.getDraw(id)]
+    this.winnersSubscription?.unsubscribe()
+    this.winnersSubscription = this.lotteryWin.updateWinners(draws, true)
+      .pipe(switchMap(draws => this.lotteryWin.queryWinners(this.draws)))
+      .subscribe(this.updateWinners)
+  }
+
   private updateDraws: Observer<Draw[]> = {
     next: draws => {
       console.debug(`new draws received ${JSON.stringify(draws)}`)
       this.draws = draws
       this.drawsLoading = false
-      this.lotteryWin.updateWinners(draws)
+      this.winnersSubscription?.unsubscribe()
+      this.winnersSubscription = this.lotteryWin.updateWinners(draws)
         .pipe(switchMap(draws => this.lotteryWin.queryWinners(draws)))
         .subscribe(this.updateWinners)
     },
@@ -194,6 +204,13 @@ export class LotteryComponent implements OnInit {
     if (w === undefined)
       this.snackBar.open(`Für die ID ${id} gibt es keinen Gewinner`, 'Ok', snackBarConfig)
     return w!
+  }
+
+  private getDraw(id: BSON.ObjectID): Draw {
+    var d = this.draws.find(d => d._id === id)
+    if (d === undefined)
+      this.snackBar.open(`Für die ID ${id} gibt es keine Ziehung`, 'Ok', snackBarConfig)
+    return d!
   }
 
   private deleteWinner(id: BSON.ObjectID, del: boolean | undefined): void {
