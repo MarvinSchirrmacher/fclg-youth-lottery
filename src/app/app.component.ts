@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { ActivationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from './service/auth.service';
-import { QuerySubscriptionService } from './service/subscription.service';
 
 @Component({
   selector: 'app-root',
@@ -14,14 +13,8 @@ export class AppComponent {
 
   constructor(
     public auth: AuthService,
-    private router: Router,
-    private subscription: QuerySubscriptionService) {
-      this.router.events.subscribe(event => {
-        if (event instanceof ActivationEnd) {
-          this.subscription.unsubscribeAll()
-        }
-      })
-  }
+    private router: Router
+  ) { }
 
   onLogout() {
     this.auth

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
@@ -17,14 +17,12 @@ import { DeleteWinnerDialog } from './dialog/delete-winner.component'
 import { Observer } from '@apollo/client/core'
 import { posPronounAccMas } from '../common/gendering'
 import { SettingsService } from '../service/settings.service'
-import { QuerySubscriptionService } from '../service/subscription.service'
-import { IQuerySubscriber } from '../common/subscriber'
 
 @Component({
   selector: 'app-lottery',
   templateUrl: './lottery.component.html',
 })
-export class LotteryComponent implements OnInit, IQuerySubscriber {
+export class LotteryComponent implements OnInit, OnDestroy {
 
   form = {} as FormGroup
   winners = [] as Winner[]
@@ -42,13 +40,11 @@ export class LotteryComponent implements OnInit, IQuerySubscriber {
     private settings: SettingsService,
     private lottery: LotteryService,
     private lotteryWin: LotteryWinService,
-    private subscription: QuerySubscriptionService,
     private mail: MailService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    this.subscription.register(this)
     this.drawsSubscription = this.lottery.saveNewDraws(this.settings.year, DrawDay.Saturday)
       .pipe(
         switchMap(draws => {
@@ -57,6 +53,11 @@ export class LotteryComponent implements OnInit, IQuerySubscriber {
           return this.lottery.queryDraws(firstDate, lastDate)
         }))
       .subscribe(this.updateDraws)
+  }
+
+  ngOnDestroy(): void {
+    this.drawsSubscription?.unsubscribe()
+    this.winnersSubscription?.unsubscribe()
   }
 
   onInform(id: BSON.ObjectID): void {
@@ -148,10 +149,6 @@ export class LotteryComponent implements OnInit, IQuerySubscriber {
     this.winnersSubscription = this.lotteryWin.updateWinners([draw])
       .pipe(switchMap(draws => this.lotteryWin.queryWinners(this.draws)))
       .subscribe(this.updateWinners)
-  }
-
-  getSubscriptions(): (Subscription | undefined)[] {
-    return [this.drawsSubscription, this.winnersSubscription]
   }
 
   private updateDraws: Observer<Draw[]> = {

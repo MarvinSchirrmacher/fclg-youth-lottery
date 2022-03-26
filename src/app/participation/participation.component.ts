@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
@@ -13,15 +13,13 @@ import { Participation } from '../common/participation'
 import { DeleteUserDialog } from './dialog/delete-user.component'
 import { article, participantNoun } from '../common/gendering'
 import { EditUserDialog } from './dialog/edit-user.component'
-import { QuerySubscriptionService } from '../service/subscription.service'
-import { IQuerySubscriber } from '../common/subscriber'
 import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-participation',
   templateUrl: './participation.component.html'
 })
-export class ParticipationComponent implements OnInit, IQuerySubscriber {
+export class ParticipationComponent implements OnInit, OnDestroy {
 
   participations = [] as Participation[]
   users = [] as User[]
@@ -33,12 +31,10 @@ export class ParticipationComponent implements OnInit, IQuerySubscriber {
 
   constructor(
     private participationService: ParticipationService,
-    private subscription: QuerySubscriptionService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    this.subscription.register(this)
     this.participationsSubscription = this.participationService
       .queryParticipations()
       .subscribe({
@@ -56,6 +52,11 @@ export class ParticipationComponent implements OnInit, IQuerySubscriber {
           this.snackBar.open(`Teilnehmerliste konnte nicht bezogen werden: ${error}`, 'Ok', snackBarConfig)
         }
       })
+  }
+
+  ngOnDestroy(): void {
+    this.participationsSubscription?.unsubscribe()
+    this.usersSubscription?.unsubscribe()
   }
 
   onInfo(id: BSON.ObjectID): void {
@@ -98,10 +99,6 @@ export class ParticipationComponent implements OnInit, IQuerySubscriber {
       .open(DeleteUserDialog, { data: user, panelClass: 'w-600px' })
       .afterClosed()
       .subscribe(del => this.deleteUser(user._id!, del))
-  }
-
-  getSubscriptions(): (Subscription | undefined)[] {
-    return [this.participationsSubscription, this.usersSubscription]
   }
 
   private endParticipation(id: BSON.ObjectID, when: ParticipationEnd): void {
