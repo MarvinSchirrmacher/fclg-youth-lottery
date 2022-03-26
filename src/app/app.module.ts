@@ -28,6 +28,7 @@ import { RegisterComponent } from './account/register/register.component';
 import './common/strings'
 import { UserFormComponent } from './participation/form/user-form.component';
 import { SettingsComponent } from './settings/settings.component';
+import { UnsavedChangesDialog } from './settings/dialog/unsaved-changes.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { SettingsComponent } from './settings/settings.component';
     InformWinnerDialog,
     PayWinnerDialog,
     DeleteWinnerDialog,
-    ResetProgressDialog
+    ResetProgressDialog,
+    UnsavedChangesDialog
   ],
   imports: [
     AppRoutingModule,

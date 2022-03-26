@@ -17,8 +17,9 @@ export class AppComponent {
     private router: Router,
     private subscription: QuerySubscriptionService) {
       this.router.events.subscribe(event => {
-        if (event instanceof ActivationEnd)
+        if (event instanceof ActivationEnd) {
           this.subscription.unsubscribeAll()
+        }
       })
   }
 

@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { descending, snackBarConfig } from '../common/common';
 import { LotteryService } from '../service/lottery.service';
 import { SettingsService } from '../service/settings.service';
+import { UnsavedChangesDialog } from './dialog/unsaved-changes.component';
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html'
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent implements OnInit, OnDestroy {
 
   years: number[] = []
   form = {} as FormGroup
@@ -19,6 +21,7 @@ export class SettingsComponent implements OnInit {
     private settings: SettingsService,
     private lottery: LotteryService,
     private formBuilder: FormBuilder,
+    private dialog: MatDialog,
     private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
@@ -29,6 +32,18 @@ export class SettingsComponent implements OnInit {
       .subscribe(years => {
         this.years = years.sort(descending)
         this.year.setValue(years.includes(this.settings.year) ? this.settings.year : years[0])
+      })
+  }
+
+  ngOnDestroy(): void {
+    if (!this.form.dirty)
+      return
+
+    this.dialog
+      .open(UnsavedChangesDialog, { data: undefined, panelClass: 'w-600px' })
+      .afterClosed()
+      .subscribe(save => {
+        if (save) this.save()
       })
   }
 
