@@ -97,6 +97,16 @@ p {
   padding: 16px;
 }
 
+.fixed {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  > * {
+    min-height: 68px; // single row to fit buttons
+  }
+}
+
 .h-100 {
   min-height: calc(100% - 64px);
 }

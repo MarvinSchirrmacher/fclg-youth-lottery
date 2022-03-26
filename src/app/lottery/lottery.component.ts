@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core'
-import { FormBuilder, FormGroup } from '@angular/forms'
+import { FormGroup } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
 import { concatMap, filter, Observable, of, Subscription, switchMap } from 'rxjs'
-import { snackBarConfig } from '../common/data'
+import { snackBarConfig } from '../common/common'
 import { Winner } from '../common/winner'
 import { Draw } from '../common/draw'
 import { DrawDay, LotteryService } from '../service/lottery.service'
@@ -15,7 +15,8 @@ import { PayWinnerDialog } from './dialog/pay-winner'
 import { ResetProgressDialog } from './dialog/reset-progress'
 import { DeleteWinnerDialog } from './dialog/delete-winner.component'
 import { Observer } from '@apollo/client/core'
-import { article, winnerNoun } from '../common/gendering'
+import { posPronounAccMas } from '../common/gendering'
+import { SettingsService } from '../service/settings.service'
 
 @Component({
   selector: 'app-lottery',
@@ -34,7 +35,7 @@ export class LotteryComponent implements OnInit {
   private winnersSubscription: Subscription | undefined
 
   constructor(
-    private formBuilder: FormBuilder,
+    private settings: SettingsService,
     private lottery: LotteryService,
     private lotteryWin: LotteryWinService,
     private mail: MailService,
@@ -42,22 +43,9 @@ export class LotteryComponent implements OnInit {
     private snackBar: MatSnackBar) { }
 
   public ngOnInit(): void {
-    console.debug('on init lottery component')
-
-    this.form = this.formBuilder.group({
-      year: [new Date().getFullYear()]
-    })
-
-    this.lottery
-      .readYears()
-      .subscribe(years => {
-        this.years = years
-        this.year.updateValueAndValidity({ emitEvent: true })
-      })
-
-    this.year.valueChanges
+    console.debug('on init lottery')
+    this.lottery.saveNewDraws(this.settings.year, DrawDay.Saturday)
       .pipe(
-        switchMap(year => this.lottery.saveNewDraws(parseInt(year), DrawDay.Saturday)),
         switchMap(draws => {
           var firstDate = draws[draws.length - 1].date
           var lastDate = draws[0].date
@@ -79,15 +67,16 @@ export class LotteryComponent implements OnInit {
       .subscribe((informedOn: Date) => {
         if (!informedOn) return
 
+        let name = winner.user.name
         let g = winner.user.gender
         this.lotteryWin.saveWinnerInformedOn(id, informedOn)
           .subscribe({
             next: result => {
-              this.snackBar.open(`${article(g).capitalize()} ${winnerNoun(g)} wurde informiert`, 'Ok', snackBarConfig)
+              this.snackBar.open(`${name} wurde über ${posPronounAccMas(g)} Gewinn informiert`, 'Ok', snackBarConfig)
               this.lotteryWin.refetchWinners()
             },
             error: error => {
-              this.snackBar.open(`${article(g).capitalize()} ${winnerNoun(g)} wurde nicht informiert\n${error}`, 'Ok', snackBarConfig)
+              this.snackBar.open(`${name} wurde nicht über ${posPronounAccMas(g)} Gewinn informiert\n${error}`, 'Ok', snackBarConfig)
             }
           })
         })
@@ -101,15 +90,16 @@ export class LotteryComponent implements OnInit {
       .afterClosed().subscribe((paidOn: Date) => {
         if (!paidOn) return
 
+        let name = winner.user.name
         let g = winner.user.gender
         this.lotteryWin.saveWinnerPaidOn(id, paidOn)
           .subscribe({
             next: result => {
-              this.snackBar.open(`${article(g).capitalize()} ${winnerNoun(g)} wurde ausgezahlt`, 'Ok', snackBarConfig)
+              this.snackBar.open(`Der Gewinn wurde an ${name} ausgezahlt`, 'Ok', snackBarConfig)
               this.lotteryWin.refetchWinners()
             },
             error: error => {
-              this.snackBar.open(`${article(g).capitalize()} ${winnerNoun(g)} wurde nicht ausgezahlt\n${error}`, 'Ok', snackBarConfig)
+              this.snackBar.open(`Der Gewinn wurde nicht an ${name} ausgezahlt\n${error}`, 'Ok', snackBarConfig)
             }
           })
         })
@@ -123,14 +113,15 @@ export class LotteryComponent implements OnInit {
       .afterClosed().subscribe((reset: boolean) => {
         if (!reset) return
 
+        let name = winner.user.name
         this.lotteryWin.resetWinner(id)
           .subscribe({
             next: result => {
-              this.snackBar.open(`Der Bearbeitungsstatus wurde zurückgesetzt`, 'Ok', snackBarConfig)
+              this.snackBar.open(`Der Bearbeitungsstatus des Gewinns von ${name} wurde zurückgesetzt`, 'Ok', snackBarConfig)
               this.lotteryWin.refetchWinners()
             },
             error: error => {
-              this.snackBar.open(`Der Bearbeitungsstatus konnte nicht zurückgesetzt werden\n${error}`, 'Ok', snackBarConfig)
+              this.snackBar.open(`Der Bearbeitungsstatus des Gewinns von ${name} konnte nicht zurückgesetzt werden\n${error}`, 'Ok', snackBarConfig)
             }
           })
       })
@@ -146,16 +137,16 @@ export class LotteryComponent implements OnInit {
   }
 
   public onReEvaluateDraw(id: BSON.ObjectID): void {
-    var draws = [this.getDraw(id)]
+    var draw = this.getDraw(id)
+    draw.reset()
     this.winnersSubscription?.unsubscribe()
-    this.winnersSubscription = this.lotteryWin.updateWinners(draws, true)
+    this.winnersSubscription = this.lotteryWin.updateWinners([draw])
       .pipe(switchMap(draws => this.lotteryWin.queryWinners(this.draws)))
       .subscribe(this.updateWinners)
   }
 
   private updateDraws: Observer<Draw[]> = {
     next: draws => {
-      console.debug(`new draws received ${JSON.stringify(draws)}`)
       this.draws = draws
       this.drawsLoading = false
       this.winnersSubscription?.unsubscribe()
@@ -170,7 +161,6 @@ export class LotteryComponent implements OnInit {
 
   private updateWinners: Observer<Winner[]> = {
     next: winners => {
-      console.debug(`new winners received ${JSON.stringify(winners)}`)
       this.winners = winners
       this.winnersLoading = false
     },
@@ -225,6 +215,4 @@ export class LotteryComponent implements OnInit {
       error: error => this.snackBar.open(`Gewinner mit der ID ${id} konnte nicht entfernt werden: ${error}`, 'Ok', snackBarConfig)
     })
   }
-
-  get year() { return this.form.get('year')! }
 }

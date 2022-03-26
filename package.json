@@ -26,6 +26,7 @@
     "@apollo/client": "^3.0.0",
     "angular2-qrcode": "^2.0.3",
     "apollo-angular": "^3.0.0-alpha.2",
+    "file-saver": "^2.0.5",
     "graphql": "^15.8.0",
     "immutable": "^4.0.0",
     "realm-web": "^1.5.1",

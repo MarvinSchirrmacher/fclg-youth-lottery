@@ -38,26 +38,24 @@
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef class="grow-2"></mat-header-cell>
         <mat-cell *matCellDef="let row" class="grow-2">
-          <div class="flex end w-100">
-            <button class="mat-icon-button mat-primary show-on-hover"
-                    title="Informationen anzeigen" (click)="onInfo(row._id)">
-              <span class="mat-button-wrapper">
-                <mat-icon>info_outline</mat-icon>
-              </span>
-            </button>
-            <button class="mat-icon-button mat-primary show-on-hover"
-                    title="Teilnahme beenden" (click)="onEnd(row._id)">
-              <span class="mat-button-wrapper">
-                <mat-icon>exit_to_app</mat-icon>
-              </span>
-            </button>
-            <button class="mat-icon-button mat-primary show-on-hover"
-                    title="Teilnahme löschen" (click)="onDelete(row._id)">
-              <span class="mat-button-wrapper">
-                <mat-icon color="warn">delete_outline</mat-icon>
-              </span>
-            </button>
-          </div>
+          <button class="mat-icon-button mat-primary show-on-hover"
+                  title="Informationen anzeigen" (click)="onInfo(row._id)">
+            <span class="mat-button-wrapper">
+              <mat-icon>info_outline</mat-icon>
+            </span>
+          </button>
+          <button class="mat-icon-button mat-primary show-on-hover"
+                  title="Teilnahme beenden" (click)="onEnd(row._id)">
+            <span class="mat-button-wrapper">
+              <mat-icon>exit_to_app</mat-icon>
+            </span>
+          </button>
+          <button class="mat-icon-button mat-primary show-on-hover"
+                  title="Teilnahme löschen" (click)="onDelete(row._id)">
+            <span class="mat-button-wrapper">
+              <mat-icon color="warn">delete_outline</mat-icon>
+            </span>
+          </button>
         </mat-cell>
       </ng-container>
 
@@ -90,18 +88,16 @@
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef class="grow-2"></mat-header-cell>
         <mat-cell *matCellDef="let user" class="grow-2">
-          <div class="flex end w-100">
-            <button class="mat-icon-button mat-primary show-on-hover" title="Informationen anzeigen" (click)="onUserInfo(user._id)">
-              <span class="mat-button-wrapper">
-                <mat-icon>info_outline</mat-icon>
-              </span>
-            </button>
-            <button class="mat-icon-button mat-primary show-on-hover" title="Teilnehmer löschen" (click)="onDeleteUser(user._id)">
-              <span class="mat-button-wrapper">
-                <mat-icon color="warn">delete_outline</mat-icon>
-              </span>
-            </button>
-          </div>
+          <button class="mat-icon-button mat-primary show-on-hover" title="Teilnehmer bearbeiten" (click)="onEditUser(user._id)">
+            <span class="mat-button-wrapper">
+              <mat-icon>edit</mat-icon>
+            </span>
+          </button>
+          <button class="mat-icon-button mat-primary show-on-hover" title="Teilnehmer löschen" (click)="onDeleteUser(user._id)">
+            <span class="mat-button-wrapper">
+              <mat-icon color="warn">delete_outline</mat-icon>
+            </span>
+          </button>
         </mat-cell>
       </ng-container>
 

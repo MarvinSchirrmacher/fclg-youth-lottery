@@ -11,3 +11,11 @@ export function addUniqueOnly<Type>(types: Type[], type: Type): Type[] {
     types.push(type)
   return types
 }
+
+export function ascending(a: number, b: number): number {
+  return a - b
+}
+
+export function descending(a: number, b: number): number {
+  return b - a
+}

@@ -16,7 +16,7 @@ export function toGraphQL(object: any, formats?: Map<string, string>): string {
 }
 
 function isEmpty(value: any): boolean {
-  return Number.isNaN(value) || value === ''
+  return Number.isNaN(value) || value === '' || value === null
 }
 
 function isDate(value: any): boolean {

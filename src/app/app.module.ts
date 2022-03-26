@@ -5,7 +5,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { QRCodeModule } from 'angular2-qrcode';
-import { AdminComponent } from './admin/admin.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ChangePasswordComponent } from './account/change-password/change-password.component';
@@ -21,20 +20,24 @@ import { MaterialModule } from './material.module';
 import { AddParticipationComponent } from './participation/add-participation.component';
 import { DeletePariticipationDialog } from './participation/dialog/delete-participation.component';
 import { DeleteUserDialog } from './participation/dialog/delete-user.component';
+import { EditUserDialog } from './participation/dialog/edit-user.component';
 import { EndPariticipationDialog } from './participation/dialog/end-participation.component';
 import { PariticipationDetailsDialog } from './participation/dialog/participation-details.component';
 import { ParticipationComponent } from './participation/participation.component';
 import { RegisterComponent } from './account/register/register.component';
 import './common/strings'
+import { UserFormComponent } from './participation/form/user-form.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    AdminComponent,
     HomeComponent,
     LoginComponent,
     RegisterComponent,
     ChangePasswordComponent,
+    SettingsComponent,
+    UserFormComponent,
     LotteryComponent,
     ParticipationComponent,
     AddParticipationComponent,
@@ -42,6 +45,7 @@ import './common/strings'
     EndPariticipationDialog,
     DeletePariticipationDialog,
     DeleteUserDialog,
+    EditUserDialog,
     InformWinnerDialog,
     PayWinnerDialog,
     DeleteWinnerDialog,

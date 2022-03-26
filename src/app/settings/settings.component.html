@@ -1,0 +1,22 @@
+<section class="flex wrap">
+    <form novalidate (ngSubmit)="save()" [formGroup]="form">
+        <mat-card class="basis-300 w-300px distant">
+            <h2>Allgemein</h2>
+            <mat-form-field class="form-field w-100">
+                <mat-label>Jahr</mat-label>
+                <mat-select formControlName="year">
+                    <mat-option *ngFor="let y of years" [value]="y">
+                        {{ y }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </mat-card>
+        <section class="fixed bottom">
+            <mat-card>
+                <button class="mat-raised-button mat-primary right" type="submit" [disabled]="form.invalid">
+                    Speichern
+                </button>
+            </mat-card>
+        </section>
+    </form>
+</section>

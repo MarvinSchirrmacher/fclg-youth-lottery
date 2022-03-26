@@ -31,6 +31,10 @@ export interface QueryWinnersResult {
   winners: WinnerDocument[]
 }
 
+export interface QueryYearsResult {
+  draws: Partial<Draw>[]
+}
+
 export interface InsertUserResult {
   insertOneUser: { _id: BSON.ObjectID }
 }
@@ -161,6 +165,13 @@ export class DatabaseService {
     }`)
   }
 
+  public queryYears(): QueryRef<QueryYearsResult> {
+    var sortBy = createSortBy('_id', SortOrder.Descending)
+    return this.query<QueryYearsResult>('draws', undefined, sortBy, `{
+      date
+    }`)
+  }
+
   public insertParticipation(participation: Participation): Observable<MutationResult<InsertParticipationResult>> {
     var document = toParticipationDocument(participation)
     return this.insert<InsertParticipationResult>('insertOneParticipation', document)
@@ -176,8 +187,6 @@ export class DatabaseService {
 
   public insertWinners(winners: Winner[]):
     Observable<MutationResult<InsertWinnersResult>> {
-
-    console.debug('insertWinners')
 
     if (winners.length == 0)
       return ofEmptyResult()
@@ -214,7 +223,6 @@ export class DatabaseService {
 
   public updateDraws(ids: BSON.ObjectID[], draw: Partial<Draw>):
       Observable<MutationResult<UpdateManyPayload>> {
-    console.debug(`updateDraws(${JSON.stringify(ids)}, ${JSON.stringify(draw)})`)
 
     if (ids.length == 0)
       return ofEmptyResult()
@@ -248,7 +256,6 @@ export class DatabaseService {
   public query<ResultType>(
     collection: string, query: string | undefined, sortBy: string | undefined, fields: string):
       QueryRef<ResultType> {
-    console.debug(`query ${collection}`)
     
     if (query == undefined) query = '{}'
     if (sortBy == undefined) sortBy = '_ID_ASC'
@@ -262,7 +269,6 @@ export class DatabaseService {
 
   public insert<ResultType>(mutation: string, document: any):
       Observable<MutationResult<ResultType>> {
-    console.debug(mutation)
     return this.apollo.mutate<ResultType>({
       mutation: gql`mutation {
         ${mutation}(data: ${this.toGraphQL(document)}) { _id }
@@ -272,7 +278,6 @@ export class DatabaseService {
 
   private update<ResultType>(mutation: string, id: BSON.ObjectID, document: any):
       Observable<MutationResult<ResultType>> {
-    console.debug(mutation)
     return this.apollo.mutate<ResultType>({
       mutation: gql`mutation {
         ${mutation}(
@@ -284,7 +289,6 @@ export class DatabaseService {
 
   private delete<ResultType>(mutation: string, id: BSON.ObjectID):
     Observable<MutationResult<ResultType>> {
-    console.debug(mutation)
     return this.apollo.mutate<ResultType>({
       mutation: gql`mutation {
         ${mutation}(

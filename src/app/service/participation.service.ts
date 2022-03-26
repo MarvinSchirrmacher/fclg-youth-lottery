@@ -7,7 +7,7 @@ import { Participation } from '../common/participation'
 import { Term } from '../common/term'
 import { User } from '../common/user'
 import { WinningTicket } from '../common/winning-ticket'
-import { toParticipationInstance, ParticipationDocument } from './database-documents'
+import { toParticipationInstance } from './database-documents'
 import { DatabaseService, Done, QueryParticipationsResult, QueryUsersResult } from './database.service'
 
 
@@ -44,13 +44,11 @@ export class ParticipationService {
   }
 
   public refetch(): void {
-    console.debug('refetch participatoins and users')
     this._participationsQuery?.refetch()
     this._usersQuery?.refetch()
   }
 
   public queryParticipations(): Observable<Participation[]> {
-    console.debug('queryParticipations')
     return zip([
       this.participationsQuery.valueChanges,
       this.usersQuery.valueChanges])
@@ -66,23 +64,19 @@ export class ParticipationService {
   }
 
   public queryUsers(): Observable<User[]> {
-    console.debug('queryUsers')
     return this.usersQuery.valueChanges
       .pipe(map(result => result.data.users))
   }
 
   public getCurrentUser(id: BSON.ObjectID): User | undefined {
-    console.debug('getCurrentUser')
     return this.usersQuery.getCurrentResult().data.users.find(u => u._id === id)
   }
 
   public getCurrentParticipation(id: BSON.ObjectID): Participation | undefined {
-    console.debug('getCurrentParticipation')
     return this.getCurrentParticipations().find(p => p._id === id)
   }
 
   public getCurrentParticipations(): Participation[] {
-    console.debug('getCurrentParticipations')
     var participations = this.participationsQuery.getCurrentResult().data.participations
     var users = this.usersQuery.getCurrentResult().data.users
     return participations
@@ -94,10 +88,7 @@ export class ParticipationService {
       } as Participation))
   }
 
-  public addParticipation(
-    participation: Participation, done?: Done): void {
-
-    console.debug('addParticipation')
+  public addParticipation(participation: Participation, done?: Done): void {
     var error = this.hasError(participation)
     if (error && done?.error) {
       done.error(error)
@@ -114,10 +105,7 @@ export class ParticipationService {
       })
   }
 
-  public addParticipationWithNewUser(
-    participation: Participation, user: User, done?: Done): void {
-
-    console.debug('addParticipationWithNewUser')
+  public addParticipationWithNewUser(participation: Participation, user: User, done?: Done): void {
     this.database.insertParticipation(participation)
       .subscribe({
         next: result => {
@@ -129,10 +117,7 @@ export class ParticipationService {
       })
   }
 
-  public addUser(
-    user: User, participationId?: BSON.ObjectID, done?: Done): void {
-
-    console.debug('addUser')
+  public addUser(user: User, participationId?: BSON.ObjectID, done?: Done): void {
     this.database.insertUser(user)
       .subscribe({
         next: result => {
@@ -149,13 +134,11 @@ export class ParticipationService {
             if (done?.next) done.next(userId)
           }
         },
-        error: error => console.error(error)
+        error: error => { if (done?.error) done.error(error) }
       })
   }
 
   public deleteParticipation(id: BSON.ObjectID, done?: Done): void {
-
-    console.debug('deleteParticipation')
     this.database.deleteParticipation(id)
       .subscribe({
         next: result => {
@@ -167,10 +150,7 @@ export class ParticipationService {
       })
   }
 
-  public endParticipation(
-    id: BSON.ObjectID, end: ParticipationEnd, done?: Done): void {
-
-    console.debug('endParticipation')
+  public endParticipation(id: BSON.ObjectID, end: ParticipationEnd, done?: Done): void {
     var current = this.getCurrentParticipation(id)
     if (current === undefined)
       return
@@ -193,9 +173,19 @@ export class ParticipationService {
       })
   }
 
-  public deleteUser(id: BSON.ObjectID, done?: Done) {
+  public updateUser(id: BSON.ObjectID, user: User, done?: Done): void {
+    this.database.updateUser(id, user)
+      .subscribe({
+        next: result => {
+          let id = result.data?.updateOneUser._id
+          this.refetch()
+          if (done?.next) done?.next(id)
+        },
+        error: error => { if (done?.error) done.error(error) }
+      })
+  }
 
-    console.debug('deleteUser')
+  public deleteUser(id: BSON.ObjectID, done?: Done): void {
     this.database.deleteUser(id)
       .subscribe({
         next: result => {
@@ -236,7 +226,6 @@ export class ParticipationService {
   /* Winning Ticket Service */
 
   private establishTickets(): WinningTicket[] {
-    console.debug('establishTickets')
     var numbers = Array.from(Array(49).keys()).map(n => n + 1)
     var lists = Array.from(Array(2).keys()).map(l => l + 1)
     var tickets = lists.map(l => numbers
@@ -246,7 +235,6 @@ export class ParticipationService {
   }
 
   public observeUsedTickets(): Observable<WinningTicket[]> {
-    console.debug('observeUsedTickets')
     var today = endOfToday()
     return this.participationsQuery.valueChanges
       .pipe(map(result => result.data.participations
@@ -259,7 +247,6 @@ export class ParticipationService {
   }
 
   public observeFreeTickets(): Observable<WinningTicket[]> {
-    console.debug('observeFreeTickets')
     return this.observeUsedTickets()
       .pipe(
         map(usedTickets => this.tickets
@@ -267,7 +254,6 @@ export class ParticipationService {
   }
 
   private calculateEndDate(participation: Participation, end: ParticipationEnd): Date {
-    console.debug('calculateEndDate')
     if (end === ParticipationEnd.Today)
       return endOfToday()
     else if (end === ParticipationEnd.EndOfQuarter)

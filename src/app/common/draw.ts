@@ -14,6 +14,10 @@ export class Draw {
     this.evaluated = evaluated
   }
 
+  public reset(): void {
+    this.evaluated = false
+  }
+
   public static fromObject(object: Draw): Draw {
     return new Draw(new Date(object.date), object.numbers, object.evaluated, object._id)
   }

@@ -1,12 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { MutationResult } from 'apollo-angular';
-import { BSON } from 'realm-web';
+import { QueryRef } from 'apollo-angular';
 import { concatMap, first, forkJoin, map, mergeMap, Observable, of, switchMap } from 'rxjs';
 import { dateFromString, isDay } from '../common/dates';
 import { Draw } from '../common/draw';
-import { DatabaseService, UpdateManyPayload } from './database.service';
+import { DatabaseService, QueryDrawsResult } from './database.service';
 
 
 export enum DrawDay {
@@ -37,15 +36,12 @@ export class LotteryService {
   private _numbersRegExp = /Gezogene Reihenfolge(.|\s)*?<div class=\"right".*?>(?<numbers>(.|\s)*?)<\/div>/m
   private _numberRegExp = /<span class=\"number.*?>(?<number>\d+)<\/span>/gm
 
-  private _year: number = new Date().getFullYear()
-  private _day: DrawDay = DrawDay.All
-
   constructor(
     private http: HttpClient,
     private database: DatabaseService,
     private datePipe: DatePipe) { }
 
-  public readYears(): Observable<number[]> {
+  readYears(): Observable<number[]> {
     return this.http
       .get(this._archiveUrl, { responseType: 'text' })
       .pipe(
@@ -53,8 +49,7 @@ export class LotteryService {
       )
   }
 
-  public saveNewDraws(year: number, day: DrawDay): Observable<Draw[]> {
-    console.debug('saveNewDraws')
+  saveNewDraws(year: number, day: DrawDay): Observable<Draw[]> {
     return this.http
       .get(`${this._archiveUrl}&jahr=${year}`, { responseType: 'text' })
       .pipe(
@@ -64,13 +59,29 @@ export class LotteryService {
       )
   }
 
-  public queryDraws(from: Date, to: Date): Observable<Draw[]> {
+  queryDraws(from: Date, to: Date): Observable<Draw[]> {
     return this.database.queryDraws(from, to).valueChanges
-      .pipe(map(result => result.data.draws))
+      .pipe(map(result => result.data.draws.map(d => Draw.fromObject(d))))
+  }
+
+  queryYears(): Observable<number[]> {
+    return this.database.queryYears().valueChanges
+      .pipe(map(result => this.reduceToYears(result.data.draws)))
+  }
+
+  private reduceToYears(draws: Partial<Draw>[]): number[] {
+    return draws.reduce((years, draw) => {
+      if (!draw.date)
+        return years
+
+      let year = new Date(draw.date).getFullYear()
+      if (year && !years.includes(year))
+        years.push(year)
+      return years
+    }, [] as number[])
   }
 
   private readDraws(dates: Date[]): Observable<DatesAndDraws> {
-    console.debug('readDraws')
     var firstDate = dates[dates.length - 1]
     var lastDate = dates[0]
     return this.database
@@ -85,12 +96,10 @@ export class LotteryService {
   }
 
   private maySaveDraw(date: Date, draws: Draw[]): Observable<Draw> {
-    console.debug(`maySaveDraw(date: ${date.toISOString()})`)
     var savedDraw = draws.find(d => d.date.getTime() == date.getTime())
     if (savedDraw)
       return of(savedDraw)
 
-    console.debug('save draw')
     return this.http
       .get(`${this._archiveUrl}&datum=${this.datePipe.transform(date, 'dd.MM.yyyy')}`, { responseType: 'text' })
       .pipe(

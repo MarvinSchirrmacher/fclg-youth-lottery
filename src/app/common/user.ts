@@ -1,5 +1,5 @@
 import { BSON } from "realm-web";
-import { Gender, personalPronoun, possessivePronoun, winnerNoun } from "./gendering";
+import { Gender } from "./gendering";
 
 
 export interface UserAddress {
@@ -55,5 +55,9 @@ export class User {
         iban: ''
       }
     })
+  }
+
+  get name(): string {
+    return `${this.firstName} ${this.lastName}`
   }
 }

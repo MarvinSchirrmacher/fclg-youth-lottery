@@ -2,7 +2,7 @@ import { Component, Inject } from "@angular/core"
 import { FormGroup, Validators } from "@angular/forms"
 import { MAT_DATE_LOCALE } from "@angular/material/core"
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog"
-import { Gender, personalPronoun, possessivePronoun, winnerNoun } from "src/app/common/gendering"
+import { Gender, perPronoun, posPronounNomMas, winnerNoun } from "src/app/common/gendering"
 import { Winner } from "src/app/common/winner"
 
 @Component({
@@ -32,8 +32,8 @@ export class InformWinnerDialog {
       this.winner = data
       let g = this.winner.user.gender
       this.noun = winnerNoun(g)
-      this.personalPronoun = personalPronoun(g)
-      this.possessivePronoun = possessivePronoun(g)
+      this.personalPronoun = perPronoun(g)
+      this.possessivePronoun = posPronounNomMas(g)
     }
 
     onNoClick(): void {

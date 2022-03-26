@@ -4,15 +4,14 @@ import { AuthService } from '../service/auth.service';
 
 @Component({
   selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  template: ''
 })
 export class HomeComponent implements OnInit {
 
   constructor(private auth: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-    this.router.navigate([this.auth.isLoggedIn ? 'admin-component' : 'login-component']);
+    this.router.navigate([this.auth.isLoggedIn ? 'lottery-component' : 'login-component']);
   }
 
 }

@@ -34,38 +34,40 @@
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef class="grow-2"></mat-header-cell>
         <mat-cell *matCellDef="let winner" class="grow-2">
-          <div class="flex end w-100">
-            <button class="mat-icon-button mat-primary"
-                    *ngIf="winner.informedOn && winner.paidOn"
-                    title="Bearbeitung zurücksetzen"
-                    (click)="onResetWinner(winner._id)">
-              <span class="mat-button-wrapper">
-                <mat-icon>check_circle_outline</mat-icon>
-              </span>
-            </button>
-            <button class="mat-icon-button mat-primary show-on-hover"
-                    *ngIf="winner.user.email"
-                    title="{{ winner.informedOn ? 'Gewinner wurde am ' + winner.informedOn + ' benachrichtigt' : 'Gewinner benachrichtigen' }}"
-              (click)="onInform(winner._id)" [disabled]="winner.informedOn">
-              <span class="mat-button-wrapper">
-                <mat-icon>mail_outline</mat-icon>
-              </span>
-            </button>
-            <button class="mat-icon-button mat-primary show-on-hover"
-                    *ngIf="winner.user.payment.iban"
-                    title="{{ winner.paidOn ? 'Gewinn wurde am ' + winner.paidOn + ' ausgezahlt' : 'Gewinn auszahlen' }}"
-                    (click)="onPay(winner._id)" [disabled]="winner.paidOn">
-              <span class="mat-button-wrapper">
-                <mat-icon>payment</mat-icon>
-              </span>
-            </button>
-            <button class="mat-icon-button mat-primary show-on-hover"
-                    title="Gewinn löschen" (click)="onDeleteWinner(winner._id)">
-              <span class="mat-button-wrapper">
-                <mat-icon color="warn">delete_outline</mat-icon>
-              </span>
-            </button>
-          </div>
+          <button class="mat-icon-button mat-primary"
+                  *ngIf="(winner.informedOn || !winner.canBeInformed()) && winner.paidOn"
+                  title="Bearbeitung zurücksetzen"
+                  (click)="onResetWinner(winner._id)">
+            <span class="mat-button-wrapper">
+              <mat-icon>check_circle_outline</mat-icon>
+            </span>
+          </button>
+          <button class="mat-icon-button mat-primary show-on-hover"
+                  title="{{ winner.canBeInformed()
+                    ? (winner.informedOn
+                      ? 'Gewinner wurde am ' + winner.informedOn + ' benachrichtigt'
+                      : 'Gewinner benachrichtigen')
+                    : 'Gewinner kann nicht benachrichtigt werden; es ist keine E-Mail-Adresse hinterlegt'
+                  }}"
+                  (click)="onInform(winner._id)" [disabled]="winner.informedOn || !winner.canBeInformed()">
+            <span class="mat-button-wrapper">
+              <mat-icon>mail_outline</mat-icon>
+            </span>
+          </button>
+          <button class="mat-icon-button mat-primary show-on-hover"
+                  *ngIf="winner.user.payment.iban"
+                  title="{{ winner.paidOn ? 'Gewinn wurde am ' + winner.paidOn + ' ausgezahlt' : 'Gewinn auszahlen' }}"
+                  (click)="onPay(winner._id)" [disabled]="winner.paidOn">
+            <span class="mat-button-wrapper">
+              <mat-icon>payment</mat-icon>
+            </span>
+          </button>
+          <button class="mat-icon-button mat-primary show-on-hover"
+                  title="Gewinn löschen" (click)="onDeleteWinner(winner._id)">
+            <span class="mat-button-wrapper">
+              <mat-icon color="warn">delete_outline</mat-icon>
+            </span>
+          </button>
         </mat-cell>
       </ng-container>
 
@@ -76,15 +78,6 @@
 
   <mat-card class="grow-1 basis-400 distant">
     <h2>Ziehungen</h2>
-
-    <form [formGroup]="form">
-      <mat-form-field class="form-field w-100">
-        <mat-label>Jahr</mat-label>
-        <mat-select formControlName="year">
-          <mat-option *ngFor="let year of years" [value]="year">{{ year }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </form>
 
     <div class="flex center padded" *ngIf="drawsLoading">
       <mat-spinner diameter="50"></mat-spinner>

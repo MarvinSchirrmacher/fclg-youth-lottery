@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
-import { snackBarConfig } from '../common/data'
+import { snackBarConfig } from '../common/common'
 import { ParticipationEnd, ParticipationService } from '../service/participation.service'
 import { EndPariticipationDialog as EndParticipationDialog } from './dialog/end-participation.component'
 import { DeletePariticipationDialog as RemoveParticipationDialog } from './dialog/delete-participation.component'
@@ -11,6 +11,8 @@ import { ApolloError } from '@apollo/client/errors'
 import { User } from '../common/user'
 import { Participation } from '../common/participation'
 import { DeleteUserDialog } from './dialog/delete-user.component'
+import { article, participantNoun } from '../common/gendering'
+import { EditUserDialog } from './dialog/edit-user.component'
 
 @Component({
   selector: 'app-participation',
@@ -29,8 +31,6 @@ export class ParticipationComponent implements OnInit {
     private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    console.debug('on init participation compo')
-
     this.participationService
       .queryParticipations()
       .subscribe({
@@ -74,8 +74,13 @@ export class ParticipationComponent implements OnInit {
       .subscribe(del => this.deleteParticipation(participation._id!, del))
   }
 
-  public onUserInfo(id: BSON.ObjectID): void {
+  public onEditUser(id: BSON.ObjectID): void {
+    var user = this.getUser(id)
 
+    this.dialog
+      .open(EditUserDialog, { data: user, panelClass: 'w-600px' })
+      .afterClosed()
+      .subscribe(editedUser => this.editUser(user._id!, editedUser))
   }
 
   public onDeleteUser(id: BSON.ObjectID): void {
@@ -91,18 +96,19 @@ export class ParticipationComponent implements OnInit {
     if (when === undefined)
       return
 
+    var name = this.getParticipation(id).user.name
     this.participationService.endParticipation(id, when, {
       next: id => {
         if (when === ParticipationEnd.Today)
-          this.snackBar.open('Die Teilnahme wird heute beendet', 'Gut', snackBarConfig)
+          this.snackBar.open(`Die Teilnahme von ${name} wird heute beendet`, 'Ok', snackBarConfig)
         if (when === ParticipationEnd.EndOfQuarter)
-          this.snackBar.open('Die Teilnahme wird zum Quartalsende beendet', 'Gut', snackBarConfig)
+          this.snackBar.open(`Die Teilnahme von ${name} wird zum Quartalsende beendet`, 'Ok', snackBarConfig)
         if (when === ParticipationEnd.EndOfYear)
-          this.snackBar.open('Die Teilnahme wird zum Jahresende beendet', 'Gut', snackBarConfig)
+          this.snackBar.open(`Die Teilnahme von ${name} wird zum Jahresende beendet`, 'Ok', snackBarConfig)
         if (when === ParticipationEnd.None)
-          this.snackBar.open('Die Teilnahme wird nicht beendet', 'Ok', snackBarConfig)
+          this.snackBar.open(`Die Teilnahme von ${name} wird nicht beendet`, 'Ok', snackBarConfig)
       },
-      error: error => this.snackBar.open('Die Teilnahme konnte nicht beendet werden', 'Ok', snackBarConfig)
+      error: error => this.snackBar.open(`Die Teilnahme konnte nicht beendet werden\n${error}`, 'Ok', snackBarConfig)
     })
   }
 
@@ -110,9 +116,20 @@ export class ParticipationComponent implements OnInit {
     if (del === undefined || !del)
       return
 
+    var name = this.getParticipation(id).user.name
     this.participationService.deleteParticipation(id!, {
-      next: id => this.snackBar.open(`Teilnahme wurde entfernt`, 'Gut', snackBarConfig),
-      error: error => this.snackBar.open(`Teilnahme mit der ID ${id} konnte nicht entfernt werden: ${error}`, 'Ok', snackBarConfig)
+      next: id => this.snackBar.open(`Die Teilnahme von ${name} wurde entfernt`, 'Ok', snackBarConfig),
+      error: error => this.snackBar.open(`Die Teilnahme von ${name} konnte nicht entfernt werden\n${error}`, 'Ok', snackBarConfig)
+    })
+  }
+
+  private editUser(id: BSON.ObjectID, user: User | undefined): void {
+    if (user === undefined)
+      return
+
+    this.participationService.updateUser(id, user, {
+      next: id => this.snackBar.open(`${article(user.gender).capitalize()} ${participantNoun(user.gender)} ${user.name} wurde aktualisiert`, 'Ok', snackBarConfig),
+      error: error => this.snackBar.open(`${article(user.gender).capitalize()} ${participantNoun(user.gender)} ${user.name} konnte nicht aktualisiert werden: ${error}`, 'Ok', snackBarConfig)
     })
   }
 
@@ -120,9 +137,12 @@ export class ParticipationComponent implements OnInit {
     if (del === undefined || !del)
       return
 
+    var participant = this.getParticipation(id)
+    var name = participant.user.name
+    var g = participant.user.gender
     this.participationService.deleteUser(id!, {
-      next: id => this.snackBar.open(`Teilnehmer wurde entfernt`, 'Gut', snackBarConfig),
-      error: error => this.snackBar.open(`Teilnehmer mit der ID ${id} konnte nicht entfernt werden: ${error}`, 'Ok', snackBarConfig)
+      next: id => this.snackBar.open(`${article(g)} ${participantNoun} ${name} wurde entfernt`, 'Ok', snackBarConfig),
+      error: error => this.snackBar.open(`${article(g)} ${participantNoun} ${name} konnte nicht entfernt werden: ${error}`, 'Ok', snackBarConfig)
     })
   }
 

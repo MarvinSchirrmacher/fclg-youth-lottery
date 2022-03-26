@@ -5,7 +5,9 @@
     <mat-icon>menu</mat-icon>
   </button>
   <mat-menu #menu="matMenu">
-    <button mat-menu-item routerLink="/">Start</button>
+    <button mat-menu-item routerLink="/">Lotterie</button>
+    <button mat-menu-item [disabled]="!auth.isLoggedIn" routerLink="/participation-component">Teilnahmen</button>
+    <button mat-menu-item [disabled]="!auth.isLoggedIn" routerLink="/settings-component">Einstellungen</button>
     <button mat-menu-item [disabled]="!auth.isLoggedIn" routerLink="/change-password-component">Passwort ändern</button>
     <button mat-menu-item [disabled]="!auth.isLoggedIn" (click)="onLogout()">Abmelden</button>
   </mat-menu>

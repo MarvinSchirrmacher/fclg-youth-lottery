@@ -6,51 +6,121 @@ export enum Gender {
   Diverse = 'diverse'
 }
 
+export function formOfAddress(gender: Gender): string  {
+  return formsOfAddress.get(gender)!
+}
+
+export var formsOfAddress = Immutable.Map<Gender, string>({
+  [Gender.Male]: 'Herr',
+  [Gender.Female]: 'Frau',
+  [Gender.Diverse]: 'Divers'
+})
+
 export function article(gender: Gender): string {
-  return _article.get(gender)!
+  return articles.get(gender)!
 }
 
-export function personalPronoun(gender: Gender): string {
-  return _personalPronoun.get(gender)!
-}
-
-export function possessivePronoun(gender: Gender): string {
-  return _possessivePronoun.get(gender)!
-}
-
-export function participantNoun(gender: Gender): string {
-  return _participantNoun.get(gender)!
-}
-
-export function winnerNoun(gender: Gender): string {
-  return _winnerNoun.get(gender)!
-}
-
-var _article = Immutable.Map<Gender, string>({
+var articles = Immutable.Map<Gender, string>({
   [Gender.Male]: 'der',
   [Gender.Female]: 'die',
   [Gender.Diverse]: 'das'
 })
 
-var _personalPronoun = Immutable.Map<Gender, string>({
+export function perPronoun(gender: Gender): string {
+  return perPronouns.get(gender)!
+}
+
+var perPronouns = Immutable.Map<Gender, string>({
   [Gender.Male]: 'er',
   [Gender.Female]: 'sie',
   [Gender.Diverse]: 'es'
 })
 
-var _possessivePronoun = Immutable.Map<Gender, string>({
+/* possessive pronoun */
+
+// nominative masculine
+export function posPronounNomMas(gender: Gender): string {
+  return posPronounsNomMas.get(gender)!
+}
+
+var posPronounsNomMas = Immutable.Map<Gender, string>({
   [Gender.Male]: 'sein',
   [Gender.Female]: 'ihr',
   [Gender.Diverse]: 'sein'
 })
 
-var _participantNoun = Immutable.Map<Gender, string>({
+// nominative feminine
+export function posPronounNomFem(gender: Gender): string {
+  return posPronounsNomFem.get(gender)!
+}
+
+var posPronounsNomFem = Immutable.Map<Gender, string>({
+  [Gender.Male]: 'seine',
+  [Gender.Female]: 'ihre',
+  [Gender.Diverse]: 'seine'
+})
+
+// nominative neuter
+export function posPronounNomNeu(gender: Gender): string {
+  return posPronounsNomNeu.get(gender)!
+}
+
+var posPronounsNomNeu = Immutable.Map<Gender, string>({
+  [Gender.Male]: 'sein',
+  [Gender.Female]: 'ihr',
+  [Gender.Diverse]: 'sein'
+})
+
+// accusative masculine
+export function posPronounAccMas(gender: Gender): string {
+  return posPronounsAccMas.get(gender)!
+}
+
+var posPronounsAccMas = Immutable.Map<Gender, string>({
+  [Gender.Male]: 'seinen',
+  [Gender.Female]: 'ihren',
+  [Gender.Diverse]: 'seinen'
+})
+
+// accusative feminine
+export function posPronounAccFem(gender: Gender): string {
+  return posPronounsAccFem.get(gender)!
+}
+
+var posPronounsAccFem = Immutable.Map<Gender, string>({
+  [Gender.Male]: 'seine',
+  [Gender.Female]: 'ihre',
+  [Gender.Diverse]: 'seine'
+})
+
+// accusative neuter
+export function posPronounAccNeu(gender: Gender): string {
+  return posPronounsAccNeu.get(gender)!
+}
+
+var posPronounsAccNeu = Immutable.Map<Gender, string>({
+  [Gender.Male]: 'seinen',
+  [Gender.Female]: 'ihren',
+  [Gender.Diverse]: 'seinen'
+})
+
+/* nouns */
+
+export function participantNoun(gender: Gender): string {
+  return participantNouns.get(gender)!
+}
+
+var participantNouns = Immutable.Map<Gender, string>({
   [Gender.Male]: 'Teilnehmer',
   [Gender.Female]: 'Teilnehmerin',
   [Gender.Diverse]: 'Teilnehmer'
 })
 
-var _winnerNoun = Immutable.Map<Gender, string>({
+export function winnerNoun(gender: Gender): string {
+  return winnerNouns.get(gender)!
+}
+
+var winnerNouns = Immutable.Map<Gender, string>({
   [Gender.Male]: 'Gewinner',
   [Gender.Female]: 'Gewinnerin',
   [Gender.Diverse]: 'Gewinner'

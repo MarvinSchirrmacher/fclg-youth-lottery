@@ -7,7 +7,7 @@ import { Participation } from '../common/participation'
 import { toWinnerInstance, WinnerDocument } from './database-documents'
 import { DatabaseService, Done, QueryWinnersResult } from './database.service'
 import { ParticipationService } from './participation.service'
-import { addUniqueOnly } from '../common/data'
+import { addUniqueOnly } from '../common/common'
 import { QueryRef } from 'apollo-angular'
 
 export interface DrawsAndWinners {
@@ -34,10 +34,10 @@ export class LotteryWinService {
     return this
   }
 
-  public updateWinners(draws: Draw[], force: boolean = false): Observable<Draw[]> {
-    var newDraws = force ? draws : draws.filter(d => !d.evaluated)
+  public updateWinners(draws: Draw[]): Observable<Draw[]> {
+    var newDraws = draws.filter(d => !d.evaluated)
     var newDrawsIds = newDraws.map(d => d._id!)
-    console.debug(`updateWinners ${JSON.stringify(newDraws)}`)
+
     return this.participation.queryParticipations()
       .pipe(
         map(participations => this.determineWinners(newDraws, participations)),
@@ -49,7 +49,6 @@ export class LotteryWinService {
 
   public queryWinners(draws: Draw[]): Observable<Winner[]> {
     var drawIds = draws.map(d => d._id!)
-    console.debug(`draw ids ${JSON.stringify(drawIds)}`)
     this._winnersQuery = this.database.queryWinners(drawIds) 
     return this._winnersQuery.valueChanges
       .pipe(switchMap(result => this.substituteReferences(result.data.winners, draws)))
@@ -90,7 +89,7 @@ export class LotteryWinService {
     let userIds = winners
       .map(d => d.user)
       .reduce(addUniqueOnly, [] as BSON.ObjectID[])
-    console.debug(`substituteReferences ${JSON.stringify(userIds)}`)
+
     return this.database.queryUsers(userIds).valueChanges
       .pipe(
         first(),
@@ -117,7 +116,6 @@ export class LotteryWinService {
   }
 
   public deleteWinner(id: BSON.ObjectID, done?: Done) {
-    console.debug('deleteWinner')
     this.database.deleteWinner(id)
       .subscribe({
         next: result => {
