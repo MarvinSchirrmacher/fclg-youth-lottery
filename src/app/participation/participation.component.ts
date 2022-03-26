@@ -130,7 +130,10 @@ export class ParticipationComponent implements OnInit, IQuerySubscriber {
 
     var name = this.getParticipation(id).user.name
     this.participationService.deleteParticipation(id!, {
-      next: id => this.snackBar.open(`Die Teilnahme von ${name} wurde entfernt`, 'Ok', snackBarConfig),
+      next: id => {
+        this.participationService.refetch()
+        this.snackBar.open(`Die Teilnahme von ${name} wurde entfernt`, 'Ok', snackBarConfig)
+      },
       error: error => this.snackBar.open(`Die Teilnahme von ${name} konnte nicht entfernt werden\n${error}`, 'Ok', snackBarConfig)
     })
   }
@@ -153,7 +156,10 @@ export class ParticipationComponent implements OnInit, IQuerySubscriber {
     var name = participant.user.name
     var g = participant.user.gender
     this.participationService.deleteUser(id!, {
-      next: id => this.snackBar.open(`${article(g)} ${participantNoun} ${name} wurde entfernt`, 'Ok', snackBarConfig),
+      next: id => {
+        this.participationService.refetch()
+        this.snackBar.open(`${article(g)} ${participantNoun} ${name} wurde entfernt`, 'Ok', snackBarConfig)
+      },
       error: error => this.snackBar.open(`${article(g)} ${participantNoun} ${name} konnte nicht entfernt werden: ${error}`, 'Ok', snackBarConfig)
     })
   }
