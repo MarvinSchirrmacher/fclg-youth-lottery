@@ -13,25 +13,33 @@ import { Participation } from '../common/participation'
 import { DeleteUserDialog } from './dialog/delete-user.component'
 import { article, participantNoun } from '../common/gendering'
 import { EditUserDialog } from './dialog/edit-user.component'
+import { QuerySubscriptionService } from '../service/subscription.service'
+import { IQuerySubscriber } from '../common/subscriber'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-participation',
   templateUrl: './participation.component.html'
 })
-export class ParticipationComponent implements OnInit {
+export class ParticipationComponent implements OnInit, IQuerySubscriber {
 
   participations = [] as Participation[]
   users = [] as User[]
   participationColumns = [ 'ticket', 'name', 'term', 'actions' ]
   userColumns = [ 'name', 'actions' ]
+  
+  private participationsSubscription: Subscription | undefined
+  private usersSubscription: Subscription | undefined
 
   constructor(
     private participationService: ParticipationService,
+    private subscription: QuerySubscriptionService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    this.participationService
+    this.subscription.register(this)
+    this.participationsSubscription = this.participationService
       .queryParticipations()
       .subscribe({
         next: participations => this.participations = participations,
@@ -40,7 +48,7 @@ export class ParticipationComponent implements OnInit {
         }
       })
 
-    this.participationService
+    this.usersSubscription = this.participationService
       .queryUsers()
       .subscribe({
         next: users => this.users = users,
@@ -50,13 +58,13 @@ export class ParticipationComponent implements OnInit {
       })
   }
 
-  public onInfo(id: BSON.ObjectID): void {
+  onInfo(id: BSON.ObjectID): void {
     var participation = this.getParticipation(id)
 
     this.dialog.open(PariticipationDetailsDialog, { data: participation })
   }
 
-  public onEnd(id: BSON.ObjectID): void {
+  onEnd(id: BSON.ObjectID): void {
     var participation = this.getParticipation(id)
 
     this.dialog
@@ -65,7 +73,7 @@ export class ParticipationComponent implements OnInit {
       .subscribe(when => this.endParticipation(participation._id!, when))
   }
 
-  public onDelete(id: BSON.ObjectID): void {
+  onDelete(id: BSON.ObjectID): void {
     var participation = this.getParticipation(id)
 
     this.dialog
@@ -74,7 +82,7 @@ export class ParticipationComponent implements OnInit {
       .subscribe(del => this.deleteParticipation(participation._id!, del))
   }
 
-  public onEditUser(id: BSON.ObjectID): void {
+  onEditUser(id: BSON.ObjectID): void {
     var user = this.getUser(id)
 
     this.dialog
@@ -83,13 +91,17 @@ export class ParticipationComponent implements OnInit {
       .subscribe(editedUser => this.editUser(user._id!, editedUser))
   }
 
-  public onDeleteUser(id: BSON.ObjectID): void {
+  onDeleteUser(id: BSON.ObjectID): void {
     var user = this.getUser(id)
 
     this.dialog
       .open(DeleteUserDialog, { data: user, panelClass: 'w-600px' })
       .afterClosed()
       .subscribe(del => this.deleteUser(user._id!, del))
+  }
+
+  getSubscriptions(): (Subscription | undefined)[] {
+    return [this.participationsSubscription, this.usersSubscription]
   }
 
   private endParticipation(id: BSON.ObjectID, when: ParticipationEnd): void {
