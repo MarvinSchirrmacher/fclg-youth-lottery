@@ -25,6 +25,8 @@ export class ParticipationComponent implements OnInit, OnDestroy {
   users = [] as User[]
   participationColumns = [ 'ticket', 'name', 'term', 'actions' ]
   userColumns = [ 'name', 'actions' ]
+  participationsLoading: boolean = true
+  participantsLoading: boolean = true
   
   private participationsSubscription: Subscription | undefined
   private usersSubscription: Subscription | undefined
@@ -38,7 +40,10 @@ export class ParticipationComponent implements OnInit, OnDestroy {
     this.participationsSubscription = this.participationService
       .queryParticipations()
       .subscribe({
-        next: participations => this.participations = participations,
+        next: participations => {
+          this.participations = participations
+          this.participationsLoading = false
+        },
         error: (error: ApolloError) => {
           this.snackBar.open(`Teilnahmeliste konnte nicht bezogen werden: ${error}`, 'Ok', snackBarConfig)
         }
@@ -47,7 +52,10 @@ export class ParticipationComponent implements OnInit, OnDestroy {
     this.usersSubscription = this.participationService
       .queryUsers()
       .subscribe({
-        next: users => this.users = users,
+        next: users => {
+          this.users = users
+          this.participantsLoading = false
+        },
         error: (error: ApolloError) => {
           this.snackBar.open(`Teilnehmerliste konnte nicht bezogen werden: ${error}`, 'Ok', snackBarConfig)
         }

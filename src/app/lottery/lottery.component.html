@@ -2,9 +2,15 @@
   
   <mat-card class="grow-3 basis-600 distant">
     <h2>Gewinner</h2>
-    <div *ngIf="winners.length == 0">
+
+    <div class="flex center padded" *ngIf="winnersLoading">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <div *ngIf="winners.length == 0 && !winnersLoading">
       <p>Für den gewählten Zeitraum gibt es keine Gewinner</p>
     </div>
+    
     <mat-table [dataSource]="winners" *ngIf="winners.length > 0">
 
       <ng-container matColumnDef="ticket">

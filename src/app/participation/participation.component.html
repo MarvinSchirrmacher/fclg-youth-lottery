@@ -2,7 +2,11 @@
   <mat-card class="grow-3 basis-500 distant">
     <h2>Teilnahmen</h2>
 
-    <div *ngIf="participations.length == 0">
+    <div class="flex center padded" *ngIf="participationsLoading">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <div *ngIf="participations.length == 0 && !participationsLoading">
       <p>Es sind keine Teilnahmen registriert.</p>
       <p>Über das Formular <i>Neue Teilnahme</i> kannst du neue Registrierungen vornehmen. Diese werden dann hier
         tabellarisch aufgelistet.</p>
@@ -68,7 +72,11 @@
   <mat-card class="grow-1 basis-300 distant">
     <h2>Teilnehmer</h2>
 
-    <div *ngIf="users.length == 0">
+    <div class="flex center padded" *ngIf="participantsLoading">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <div *ngIf="users.length == 0 && !participantsLoading">
       <p>Es sind keine Teilnehmer registriert.</p>
       <p>Über das Formular <i>Neue Teilnahme</i> kannst du neue Registrierungen vornehmen. Die Teilnehmer werden dann hier
         tabellarisch aufgelistet.</p>
