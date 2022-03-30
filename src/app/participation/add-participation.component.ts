@@ -108,6 +108,13 @@ export class AddParticipationComponent implements OnInit {
   private resetAllFieldsButAddMode(): void {
     var mode = this.addMode.value
     this.form.reset()
+    Object.keys(this.form.controls)
+      .map(key => this.form.controls[key])
+      .forEach(control => {
+        control.setErrors(null)
+        control.markAsPristine()
+        control.markAsUntouched()
+      });
     this.addMode.setValue(mode)
   }
 
