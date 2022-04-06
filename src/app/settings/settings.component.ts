@@ -15,6 +15,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   years: number[] = []
   form = {} as FormGroup
+  saved: boolean = true
+  initialized: boolean = false
   get year() { return this.form.get('year')! }
   
   constructor(
@@ -28,6 +30,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       year: [null, [Validators.required]]
     })
+    this.form.valueChanges
+      .subscribe(result => {
+        if (this.initialized)
+          this.saved = false
+        else
+          this.initialized = true
+      })
     this.lottery.readYears()
       .subscribe(years => {
         this.years = years.sort(descending)
@@ -36,7 +45,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (!this.form.dirty)
+    if (this.saved)
       return
 
     this.dialog
@@ -50,6 +59,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   save(): void {
     this.settings.year = this.year.value
     // this.settings.save()
+    this.saved = true
     this.snackBar.open('Einstellungen wurden gespeichert', 'Ok', snackBarConfig)
   }
 }
