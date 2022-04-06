@@ -1,5 +1,5 @@
-<section class="flex wrap">
-  <mat-card class="grow-3 basis-500 distant">
+<section fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign="center start" class="padded flex gap">
+  <mat-card fxFlex="3 1 500px">
     <h2>Teilnahmen</h2>
 
     <div class="flex center padded" *ngIf="participationsLoading">
@@ -31,35 +31,50 @@
       </ng-container>
 
       <ng-container matColumnDef="term">
-        <mat-header-cell *matHeaderCellDef class="grow-2">Laufzeit</mat-header-cell>
-        <mat-cell *matCellDef="let row" class="grow-2">
+        <mat-header-cell *matHeaderCellDef fxHide.lt-md="true" class="grow-2">Laufzeit</mat-header-cell>
+        <mat-cell *matCellDef="let row" fxHide.lt-md="true" class="grow-2">
           <span *ngIf="row.term.end; then termBlock; else startBlock"></span>
           <ng-template #termBlock>{{ row.term.start | date: 'dd.MM.yyyy' }} bis {{ row.term.end | date: 'dd.MM.yyyy' }}</ng-template>
-          <ng-template #startBlock>ab {{ row.term.start | date: 'dd.MM.yyyy' }}</ng-template>
+          <ng-template #startBlock>ab&nbsp;{{ row.term.start | date: 'dd.MM.yyyy' }}</ng-template>
         </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="actions">
-        <mat-header-cell *matHeaderCellDef class="grow-2"></mat-header-cell>
-        <mat-cell *matCellDef="let row" class="grow-2">
-          <button class="mat-icon-button mat-primary show-on-hover"
-                  title="Informationen anzeigen" (click)="onInfo(row._id)">
-            <span class="mat-button-wrapper">
-              <mat-icon>info_outline</mat-icon>
-            </span>
-          </button>
-          <button class="mat-icon-button mat-primary show-on-hover"
-                  title="Teilnahme beenden" (click)="onEnd(row._id)">
-            <span class="mat-button-wrapper">
-              <mat-icon>exit_to_app</mat-icon>
-            </span>
-          </button>
-          <button class="mat-icon-button mat-primary show-on-hover"
-                  title="Teilnahme löschen" (click)="onDelete(row._id)">
-            <span class="mat-button-wrapper">
-              <mat-icon color="warn">delete_outline</mat-icon>
-            </span>
-          </button>
+        <mat-header-cell *matHeaderCellDef class="actions"></mat-header-cell>
+        <mat-cell *matCellDef="let row" class="actions">
+
+          <section fxHide.gt-sm="true">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_horiz</mat-icon>
+            </button>
+
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="onInfo(row._id)">Informationen anzeigen</button>
+              <button mat-menu-item (click)="onEnd(row._id)">Teilnahme beenden</button>
+              <button mat-menu-item (click)="onDelete(row._id)">Teilnahme löschen</button>
+            </mat-menu>
+          </section>
+          
+          <section fxHide.lt-md="true">
+            <button class="mat-icon-button mat-primary show-on-hover"
+                    title="Informationen anzeigen" (click)="onInfo(row._id)">
+              <span class="mat-button-wrapper">
+                <mat-icon>info_outline</mat-icon>
+              </span>
+            </button>
+            <button class="mat-icon-button mat-primary show-on-hover"
+                    title="Teilnahme beenden" (click)="onEnd(row._id)">
+              <span class="mat-button-wrapper">
+                <mat-icon>exit_to_app</mat-icon>
+              </span>
+            </button>
+            <button class="mat-icon-button mat-primary show-on-hover"
+                    title="Teilnahme löschen" (click)="onDelete(row._id)">
+              <span class="mat-button-wrapper">
+                <mat-icon color="warn">delete_outline</mat-icon>
+              </span>
+            </button>
+          </section>
         </mat-cell>
       </ng-container>
 
@@ -69,7 +84,7 @@
     </mat-table>
   </mat-card>
 
-  <mat-card class="grow-1 basis-300 distant">
+  <mat-card fxFlex="1 1 300px">
     <h2>Teilnehmer</h2>
 
     <div class="flex center padded" *ngIf="participantsLoading">
@@ -96,16 +111,32 @@
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef class="grow-2"></mat-header-cell>
         <mat-cell *matCellDef="let user" class="grow-2">
-          <button class="mat-icon-button mat-primary show-on-hover" title="Teilnehmer bearbeiten" (click)="onEditUser(user._id)">
-            <span class="mat-button-wrapper">
-              <mat-icon>edit</mat-icon>
-            </span>
-          </button>
-          <button class="mat-icon-button mat-primary show-on-hover" title="Teilnehmer löschen" (click)="onDeleteUser(user._id)">
-            <span class="mat-button-wrapper">
-              <mat-icon color="warn">delete_outline</mat-icon>
-            </span>
-          </button>
+
+          <section fxHide.gt-xs="true">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_horiz</mat-icon>
+            </button>
+
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="onEditUser(user._id)">Teilnehmer bearbeiten</button>
+              <button mat-menu-item (click)="onDeleteUser(user._id)">Teilnehmer löschen</button>
+            </mat-menu>
+          </section>
+
+          <section fxHide.lt-sm="true">
+            <button class="mat-icon-button mat-primary show-on-hover" title="Teilnehmer bearbeiten" (click)="onEditUser(user._id)">
+              <span class="mat-button-wrapper">
+                <mat-icon>edit</mat-icon>
+              </span>
+            </button>
+
+            <button class="mat-icon-button mat-primary show-on-hover" title="Teilnehmer löschen" (click)="onDeleteUser(user._id)">
+              <span class="mat-button-wrapper">
+                <mat-icon color="warn">delete_outline</mat-icon>
+              </span>
+            </button>
+          </section>
+
         </mat-cell>
       </ng-container>
 
@@ -116,7 +147,7 @@
 
   </mat-card>
 
-  <mat-card id="add-participation" class="grow-1 basis-300 distant">
+  <mat-card fxFlex="1 1 300px" id="add-participation">
     <h2>Neue Teilnahme</h2>
     <app-add-participation></app-add-participation>
   </mat-card>

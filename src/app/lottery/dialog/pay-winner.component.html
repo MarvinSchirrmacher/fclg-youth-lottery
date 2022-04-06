@@ -3,12 +3,8 @@
 <form novalidate [formGroup]="form">
 
 <mat-dialog-content>
-  <section class="flex">
-    <div>
-      <p>Für die Gewinnausschüttung von <strong>{{ profit }} €</strong> an <strong>{{ firstName }} {{ lastName }}</strong> per Banküberweisung den nebenstehenden <strong>Giro Pay Code</strong> mit deiner Bank-App scannen und die vorausgefüllte Überweisung tätigen.</p>
-      <p>Falls die Auszahlung bereits zu einem früheren Zeitpunkt stattfand, bitte das Auszahlungsdatum entsprechend anpassen. Abschließend bitte die Gewinnausschüttung hier mit <i>Ausgezahlt</i> bestätigen.</p>  
-    </div>
-    <div style="width:160px">
+  <section>
+    <div class="float-right padded-left" style="width:176px">
       <qr-code class="qrcode" [value]="giroCode" [size]="160"></qr-code>
         <mat-form-field class="form-field w-100">
           <input matInput [matDatepicker]="datePicker" placeholder="Auszahlung" formControlName="paidOn">
@@ -16,10 +12,12 @@
           <mat-datepicker #datePicker></mat-datepicker>
         </mat-form-field>
     </div>
+    <p><strong>{{ firstName }} {{ lastName }}</strong> hat <strong>{{ profit }} €</strong> gewonnen. Für die Gewinn&shy;ausschüttung per Banküberweisung den nebenstehenden <strong>Giro Pay Code</strong> mit deiner Bank-App scannen und die vorausgefüllte Überweisung tätigen.</p>
+    <p>Falls die Auszahlung bereits zu einem früheren Zeitpunkt stattfand, bitte das Auszahlungsdatum entsprechend anpassen. Abschließend bitte die Gewinn&shy;ausschüttung hier mit <i>Ausgezahlt</i> bestätigen.</p>
   </section>
 </mat-dialog-content>
 
-<mat-dialog-actions class="flex end">
+<mat-dialog-actions class="flex end gap">
   <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>
   <button mat-raised-button color="primary" type="submit" (click)="paid()">Ausgezahlt</button>
 </mat-dialog-actions>

@@ -38,6 +38,23 @@ p {
   justify-content: space-between;
 }
 
+.flex.gap-sm {
+  gap: 8px;
+}
+
+.flex.gap {
+  gap: 16px;
+}
+
+[fxflex] {
+  min-width: auto !important;
+  max-width: 100vw !important;
+}
+
+.mat-row .actions {
+  flex: 1 1 40px;
+} 
+
 .grow-1 { flex-grow: 1 }
 .grow-2 { flex-grow: 2 }
 .grow-3 { flex-grow: 3 }
@@ -93,9 +110,11 @@ p {
   margin: 16px;
 }
 
-.padded {
-  padding: 16px;
-}
+.padded { padding: 16px; }
+.padded-left { padding-left: 16px; }
+.padded-right { padding-right: 16px; }
+.padded-top { padding-top: 16px; }
+.padded-bottom { padding-bottom: 16px; }
 
 .fixed {
   position: fixed;
@@ -105,6 +124,10 @@ p {
   > * {
     min-height: 68px; // single row to fit buttons
   }
+}
+
+.float-right {
+  float: right;
 }
 
 .h-100 {
@@ -127,10 +150,6 @@ p {
   }
 }
 
-.mat-dialog-container {
-  min-width: 400px;
-}
-
 .mat-toolbar.mat-primary {
   display: flex;
   justify-content: space-between;
@@ -144,11 +163,7 @@ p {
   background: #f2f3f4;
   padding: 5px;
   text-align: center;
-  width: 27px;
-}
-
-.tile + .tile {
-  margin-left: 5px;
+  min-width: 27px;
 }
 
 .tile:first-of-type {

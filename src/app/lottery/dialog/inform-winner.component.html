@@ -4,7 +4,7 @@
   <p>Für <strong>{{ winner.user.firstName }} {{ winner.user.lastName }}</strong> ist eine E-Mail-Adresse hinterlegt. Soll {{ personalPronoun }} über {{ possessivePronoun }} Gewinn benachrichtigt werden?</p>
 </mat-dialog-content>
 
-<mat-dialog-actions class="flex end">
+<mat-dialog-actions class="flex end gap">
   <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>
   <button mat-raised-button color="warn" (click)="doNotInform()">Nein</button>
   <button mat-raised-button color="primary" (click)="sendMail()">Per Mail benachrichtigen</button>

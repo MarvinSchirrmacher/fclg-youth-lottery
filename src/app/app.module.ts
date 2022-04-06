@@ -29,6 +29,7 @@ import './common/strings'
 import { UserFormComponent } from './participation/form/user-form.component';
 import { SettingsComponent } from './settings/settings.component';
 import { UnsavedChangesDialog } from './settings/dialog/unsaved-changes.component';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 @NgModule({
   declarations: [
@@ -61,7 +62,8 @@ import { UnsavedChangesDialog } from './settings/dialog/unsaved-changes.componen
     HttpClientModule,
     ReactiveFormsModule,
     MaterialModule,
-    QRCodeModule
+    QRCodeModule,
+    FlexLayoutModule
   ],
   entryComponents: [
     EndPariticipationDialog

@@ -28,7 +28,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
   winners = [] as Winner[]
   years = [] as number[]
   draws = [] as Draw[]
-  winnersColumns: string[] = ['ticket', 'name', 'date', 'profit', 'actions']
+  winnersColumns: string[] = ['name', 'ticket', 'week', 'profit', 'actions']
   drawsColumns: string[] = ['week', 'date', 'numbers', 'actions']
   winnersLoading: boolean = true
   drawsLoading: boolean = true
@@ -64,7 +64,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
     var winner = this.getWinner(id)
 
     this.dialog
-      .open(InformWinnerDialog, { data: winner, panelClass: 'w-600px' })
+      .open(InformWinnerDialog, { data: winner, panelClass: 'w-600px', maxWidth: '' })
       .afterClosed()
       .pipe(
         filter(inform => inform),
@@ -92,7 +92,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
     var winner = this.getWinner(id)
 
     this.dialog
-      .open(PayWinnerDialog, { data: winner, panelClass: 'w-600px' })
+      .open(PayWinnerDialog, { data: winner, panelClass: 'w-600px', maxWidth: '' })
       .afterClosed().subscribe((paidOn: Date) => {
         if (!paidOn) return
 
@@ -115,7 +115,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
     var winner = this.getWinner(id)
 
     this.dialog
-      .open(ResetProgressDialog, { data: winner, panelClass: 'w-600px' })
+      .open(ResetProgressDialog, { data: winner, panelClass: 'w-600px', maxWidth: '' })
       .afterClosed().subscribe((reset: boolean) => {
         if (!reset) return
 
@@ -137,7 +137,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
     var winner = this.getWinner(id)
 
     this.dialog
-      .open(DeleteWinnerDialog, { data: winner, panelClass: 'w-600px' })
+      .open(DeleteWinnerDialog, { data: winner, panelClass: 'w-600px', maxWidth: '' })
       .afterClosed()
       .subscribe(del => this.deleteWinner(winner._id!, del))
   }
