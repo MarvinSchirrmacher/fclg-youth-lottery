@@ -2,7 +2,7 @@
 <mat-dialog-content>
   <p>Soll der Gewinn von <strong>{{ firstName }} {{ lastName }}</strong> wirklich gelöscht werden?</p>
 </mat-dialog-content>
-<mat-dialog-actions class="flex end">
+<mat-dialog-actions class="flex end gap-sm">
   <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>
   <button mat-raised-button color="warn" (click)="yes()">Löschen</button>
 </mat-dialog-actions>

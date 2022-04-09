@@ -150,6 +150,10 @@ p {
   }
 }
 
+.flex.gap-sm .mat-button-base + .mat-button-base {
+  margin-left: 0;
+}
+
 .mat-toolbar.mat-primary {
   display: flex;
   justify-content: space-between;
@@ -178,6 +182,24 @@ p {
 
 span + span.separated:before {
   content: ", ";
+}
+
+.rotating {
+  animation: rotating 1s linear infinite;
+}
+
+@keyframes rotating {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.pulsating {
+  animation: pulsating 1s ease-in-out alternate infinite;
+}
+
+@keyframes pulsating {
+  from { background-color: rgba(0, 0, 0, 0.0); }
+  to { background-color: rgba(0, 0, 0, 0.05); }
 }
 
 @media (hover: hover) {

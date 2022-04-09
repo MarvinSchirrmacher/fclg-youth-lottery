@@ -70,14 +70,14 @@ export class ParticipationComponent implements OnInit, OnDestroy {
   onInfo(id: BSON.ObjectID): void {
     var participation = this.getParticipation(id)
 
-    this.dialog.open(PariticipationDetailsDialog, { data: participation })
+    this.dialog.open(PariticipationDetailsDialog, { data: participation, maxWidth: '' })
   }
 
   onEnd(id: BSON.ObjectID): void {
     var participation = this.getParticipation(id)
 
     this.dialog
-      .open(EndParticipationDialog, { data: participation, panelClass: 'w-600px' })
+      .open(EndParticipationDialog, { data: participation, panelClass: 'w-600px', maxWidth: '' })
       .afterClosed()
       .subscribe(when => this.endParticipation(participation._id!, when))
   }
@@ -86,7 +86,7 @@ export class ParticipationComponent implements OnInit, OnDestroy {
     var participation = this.getParticipation(id)
 
     this.dialog
-      .open(RemoveParticipationDialog, { data: participation, panelClass: 'w-600px' })
+      .open(RemoveParticipationDialog, { data: participation, panelClass: 'w-600px', maxWidth: '' })
       .afterClosed()
       .subscribe(del => this.deleteParticipation(participation._id!, del))
   }
@@ -95,7 +95,7 @@ export class ParticipationComponent implements OnInit, OnDestroy {
     var user = this.getUser(id)
 
     this.dialog
-      .open(EditUserDialog, { data: user, panelClass: 'w-600px' })
+      .open(EditUserDialog, { data: user, panelClass: 'w-600px', maxWidth: '' })
       .afterClosed()
       .subscribe(editedUser => this.editUser(user._id!, editedUser))
   }
@@ -104,7 +104,7 @@ export class ParticipationComponent implements OnInit, OnDestroy {
     var user = this.getUser(id)
 
     this.dialog
-      .open(DeleteUserDialog, { data: user, panelClass: 'w-600px' })
+      .open(DeleteUserDialog, { data: user, panelClass: 'w-600px', maxWidth: '' })
       .afterClosed()
       .subscribe(del => this.deleteUser(user._id!, del))
   }

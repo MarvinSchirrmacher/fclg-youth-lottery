@@ -30,6 +30,10 @@ import { UserFormComponent } from './participation/form/user-form.component';
 import { SettingsComponent } from './settings/settings.component';
 import { UnsavedChangesDialog } from './settings/dialog/unsaved-changes.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ReEvaluateDrawDialog } from './lottery/dialog/reevaluate-draw';
+import { registerLocaleData } from '@angular/common';
+import localeDe from '@angular/common/locales/de';
+registerLocaleData(localeDe);
 
 @NgModule({
   declarations: [
@@ -52,6 +56,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     PayWinnerDialog,
     DeleteWinnerDialog,
     ResetProgressDialog,
+    ReEvaluateDrawDialog,
     UnsavedChangesDialog
   ],
   imports: [
@@ -70,7 +75,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
   ],
   providers: [
     DatePipe,
-    { provide: LOCALE_ID, useValue: "en-US" }
+    { provide: LOCALE_ID, useValue: "de-DE" }
   ],
   bootstrap: [AppComponent],
 })

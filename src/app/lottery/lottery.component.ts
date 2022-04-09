@@ -17,6 +17,9 @@ import { DeleteWinnerDialog } from './dialog/delete-winner.component'
 import { Observer } from '@apollo/client/core'
 import { posPronounAccMas } from '../common/gendering'
 import { SettingsService } from '../service/settings.service'
+import { ReEvaluateDrawDialog } from './dialog/reevaluate-draw'
+import { TaggableList } from '../common/lists'
+import { DatePipe } from '@angular/common'
 
 @Component({
   selector: 'app-lottery',
@@ -24,10 +27,12 @@ import { SettingsService } from '../service/settings.service'
 })
 export class LotteryComponent implements OnInit, OnDestroy {
 
+  pipe = new DatePipe('de-DE');
+
   form = {} as FormGroup
   winners = [] as Winner[]
   years = [] as number[]
-  draws = [] as Draw[]
+  draws: TaggableList<Draw> = TaggableList.empty()
   winnersColumns: string[] = ['name', 'ticket', 'week', 'profit', 'actions']
   drawsColumns: string[] = ['week', 'date', 'numbers', 'actions']
   winnersLoading: boolean = true
@@ -144,16 +149,44 @@ export class LotteryComponent implements OnInit, OnDestroy {
 
   onReEvaluateDraw(id: BSON.ObjectID): void {
     var draw = this.getDraw(id)
+
+    this.dialog
+      .open(ReEvaluateDrawDialog, { data: draw, panelClass: 'w-600px', maxWidth: '' })
+      .afterClosed()
+      .subscribe(evaluate => this.reEvaluateDraw(draw, evaluate))
+  }
+
+  private reEvaluateDraw(draw: Draw, evaluate: boolean): void {
+    if (!evaluate) return
+
+    this.draws.tag(draw)
     draw.reset()
     this.winnersSubscription?.unsubscribe()
     this.winnersSubscription = this.lotteryWin.updateWinners([draw])
-      .pipe(switchMap(draws => this.lotteryWin.queryWinners(this.draws)))
-      .subscribe(this.updateWinners)
+      .pipe(switchMap(draws => this.lotteryWin.queryWinners(this.draws.export())))
+      .subscribe({
+        next: winners => {
+          if (winners.length == this.winners.length)
+            this.snackBar.open(
+              `Keine neuen Gewinnnerinnen und Gewinner für die Ziehung vom ${this.pipe.transform(draw.date, 'dd.MM.yyyy')}`,
+              'Ok', snackBarConfig)
+          this.winners = winners
+          this.draws.untag(draw)
+          this.winnersLoading = false
+        },
+        error: error => {
+          this.snackBar.open(
+            'Die Gewinnnerinnen und Gewinner konnten nicht erneut ermittelt werden\n' + error,
+            'Ok', snackBarConfig)
+          this.draws.untag(draw)
+          this.winnersLoading = false
+        }
+      })
   }
 
   private updateDraws: Observer<Draw[]> = {
     next: draws => {
-      this.draws = draws
+      this.draws = new TaggableList<Draw>(draws, (a, b) => a._id === b._id)
       this.drawsLoading = false
       this.winnersSubscription?.unsubscribe()
       this.winnersSubscription = this.lotteryWin.updateWinners(draws)
@@ -170,9 +203,12 @@ export class LotteryComponent implements OnInit, OnDestroy {
       this.winners = winners
       this.winnersLoading = false
     },
-    error: error => this.snackBar.open(
+    error: error => {
+      this.snackBar.open(
       'Die Gewinnnerinnen und Gewinner konnten nicht aktualisiert werden\n' + error,
       'Ok', snackBarConfig)
+      this.winnersLoading = false
+    }
   }
 
   private informWinner(winner: Winner): Observable<Date> {
@@ -203,7 +239,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
   }
 
   private getDraw(id: BSON.ObjectID): Draw {
-    var d = this.draws.find(d => d._id === id)
+    var d = this.draws.export().find(d => d._id === id)
     if (d === undefined)
       this.snackBar.open(`Für die ID ${id} gibt es keine Ziehung`, 'Ok', snackBarConfig)
     return d!
@@ -215,7 +251,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
 
     this.lotteryWin.deleteWinner(id!, {
       next: id => {
-        this.snackBar.open(`Gewinner wurde entfernt`, 'Gut', snackBarConfig)
+        this.snackBar.open(`Gewinner wurde entfernt`, 'Ok', snackBarConfig)
         this.lotteryWin.refetchWinners()
       },
       error: error => this.snackBar.open(`Gewinner mit der ID ${id} konnte nicht entfernt werden: ${error}`, 'Ok', snackBarConfig)

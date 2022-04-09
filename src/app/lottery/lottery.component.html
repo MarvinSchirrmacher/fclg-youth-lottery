@@ -134,7 +134,7 @@
       <p>In dem gewählten Jahr gab es keine Ziehungen</p>
     </div>
 
-    <mat-table [dataSource]="draws" *ngIf="draws.length > 0 && !drawsLoading">
+    <mat-table [dataSource]="draws.export()" *ngIf="draws.length > 0 && !drawsLoading">
       <ng-container matColumnDef="week">
         <mat-header-cell *matHeaderCellDef class="grow-1">Woche</mat-header-cell>
         <mat-cell *matCellDef="let draw" class="grow-1">{{ draw.date | date: 'w' }}</mat-cell>
@@ -157,8 +157,10 @@
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef class="grow-1"></mat-header-cell>
         <mat-cell *matCellDef="let draw" class="grow-1">
-          <button class="mat-icon-button mat-primary show-on-hover"
+          <button class="mat-icon-button mat-primary"
+                  [ngClass]="draws.isTagged(draw) ? 'rotating' : 'show-on-hover'"
                   title="Gewinner erneut ermitteln"
+                  [disabled]="draws.isTagged(draw)"
                   (click)="onReEvaluateDraw(draw._id)">
             <span class="mat-button-wrapper">
               <mat-icon>autorenew</mat-icon>
@@ -168,7 +170,9 @@
       </ng-container>
 
       <mat-header-row *matHeaderRowDef="drawsColumns"></mat-header-row>
-      <mat-row *matRowDef="let draw; columns: drawsColumns"></mat-row>
+      <mat-row *matRowDef="let draw; columns: drawsColumns"
+               [ngClass]="draws.isTagged(draw) ? 'pulsating' : ''">
+      </mat-row>
 
     </mat-table>
   </mat-card>

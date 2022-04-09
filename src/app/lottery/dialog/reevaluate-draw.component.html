@@ -1,0 +1,9 @@
+<h2 mat-dialog-title>Gewinnerinnen und Gewinner erneut ermitteln</h2>
+<mat-dialog-content>
+  <p>Sollen für die <strong>Ziehung vom {{ draw.date | date: 'dd.MM.yyyy' }}</strong> die Gewinner erneut ermittelt werden? Als Grundlage dient die jetzige Teilnehmerliste.</p>
+  <p>Die für diese Ziehung bereits ermittelten Gewinnerinnen und Gewinner bleiben erhalten. Dadurch kann es zu Dopplungen der Einträge kommen, die manuell entfernt werden müssen.</p>
+</mat-dialog-content>
+<mat-dialog-actions class="flex end gap-sm">
+  <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>
+  <button mat-raised-button color="primary" (click)="evaluate()">Erneut ermitteln</button>
+</mat-dialog-actions>

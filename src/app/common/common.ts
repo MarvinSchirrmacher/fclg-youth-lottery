@@ -19,3 +19,10 @@ export function ascending(a: number, b: number): number {
 export function descending(a: number, b: number): number {
   return b - a
 }
+
+export function remove<T>(list: T[], item: T): void {
+  const index = list.indexOf(item, 0);
+  if (index > -1) {
+    list.splice(index, 1);
+  }
+}
