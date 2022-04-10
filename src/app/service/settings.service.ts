@@ -19,4 +19,20 @@ export class SettingsService {
   set year(value: number) {
     Settings.year = value
   }
+
+  get emailReferenceTemplate(): string {
+    return Settings.emailReferenceTemplate
+  }
+
+  set emailReferenceTemplate(value: string) {
+    Settings.emailReferenceTemplate = value
+  }
+
+  get emailContentTemplate(): string {
+    return Settings.emailContentTemplate
+  }
+
+  set emailContentTemplate(value: string) {
+    Settings.emailContentTemplate = value
+  }
 }

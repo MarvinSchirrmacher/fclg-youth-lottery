@@ -1,3 +1,5 @@
 {
-  "year": 2022
+  "year": 2022,
+  "emailReferenceTemplate": "Dein Gewinn beim FCLG-Jugendlotto",
+  "emailContentTemplate": "Hallo ${firstName} ${lastName},\n\ndu hast am ${date} mit deinem Gewinnlos ${ticket} im FCLG Jugendlotto gewonnen! Die gezogene Reihenfolge aller Zahlen der Ziehung war ${draw}.\n\nWir bedanken uns für Deine Teilnahme und wünschen Dir weiterhin viel Glück.\n\nMit sportlichen Grüßen\nFC Löhne-Gohfeld"
 }

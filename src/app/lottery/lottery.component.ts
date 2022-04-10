@@ -10,7 +10,7 @@ import { Draw } from '../common/draw'
 import { DrawDay, LotteryService } from '../service/lottery.service'
 import { LotteryWinService } from '../service/lotterywin.service'
 import { MailService } from '../service/mail.service'
-import { InformWinnerDialog } from './dialog/inform-winner'
+import { InformWinnerData, InformWinnerDialog } from './dialog/inform-winner'
 import { PayWinnerDialog } from './dialog/pay-winner'
 import { ResetProgressDialog } from './dialog/reset-progress'
 import { DeleteWinnerDialog } from './dialog/delete-winner.component'
@@ -26,7 +26,7 @@ import { DatePipe } from '@angular/common'
   templateUrl: './lottery.component.html',
 })
 export class LotteryComponent implements OnInit, OnDestroy {
-
+  
   pipe = new DatePipe('de-DE');
 
   form = {} as FormGroup
@@ -72,9 +72,8 @@ export class LotteryComponent implements OnInit, OnDestroy {
       .open(InformWinnerDialog, { data: winner, panelClass: 'w-600px', maxWidth: '' })
       .afterClosed()
       .pipe(
-        filter(inform => inform),
-        concatMap(() => this.informWinner(winner!))
-      )
+        concatMap(data => this.informWinner(data)
+      ))
       .subscribe((informedOn: Date) => {
         if (!informedOn) return
 
@@ -205,30 +204,21 @@ export class LotteryComponent implements OnInit, OnDestroy {
     },
     error: error => {
       this.snackBar.open(
-      'Die Gewinnnerinnen und Gewinner konnten nicht aktualisiert werden\n' + error,
-      'Ok', snackBarConfig)
+        'Die Gewinnnerinnen und Gewinner konnten nicht aktualisiert werden\n' + error,
+        'Ok', snackBarConfig)
       this.winnersLoading = false
     }
   }
 
-  private informWinner(winner: Winner): Observable<Date> {
-    if (!winner.user.email)
+  private informWinner(data: InformWinnerData): Observable<Date> {
+    if (!data.sendEmail)
       return of(new Date())
 
     return this.mail
-      .address(winner.user.email)
-      .reference(`Dein Gewinn beim FCLG-Jugendlotto`)
-      .content(this.buildMailContent(winner))
+      .address(data.email!)
+      .reference(data.reference!)
+      .content(data.content!)
       .send()
-  }
-
-  private buildMailContent(winner: Winner): string {
-    return `Hallo ${winner.user.firstName} ${winner.user.lastName},
-    
-    am ${winner.draw.date.toLocaleDateString()} hat dein Gewinnlos ${winner.tickets[0]} gewonnen - Glückwunsch!
-    
-    Mit sportlichen Grüßen
-    FC Löhne-Gohfeld`
   }
 
   private getWinner(id: BSON.ObjectID): Winner {
