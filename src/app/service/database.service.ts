@@ -297,7 +297,7 @@ export class DatabaseService {
     })
   }
 
-  private toGraphQL(object: any, formats?: Map<string, string>): string {
+  private toGraphQL(object: any, formats?: Map<string, any>): string {
     if (!formats)
       formats = new Map()
     

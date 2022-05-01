@@ -47,7 +47,7 @@
               <mat-icon>more_horiz</mat-icon>
             </button>
             <button class="mat-icon-button mat-primary"
-                    *ngIf="(winner.informedOn || !winner.canBeInformed()) && winner.paidOn"
+                    *ngIf="winner.informedOn && winner.paidOn"
                     title="Bearbeitung zurücksetzen"
                     (click)="onResetWinner(winner._id)">
               <span class="mat-button-wrapper">
@@ -56,22 +56,16 @@
             </button>
 
             <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="onResetWinner(winner._id)"
-                    [disabled]="(!winner.informedOn && winner.canBeInformed()) || !winner.paidOn">
+              <button mat-menu-item (click)="onResetWinner(winner._id)">
                 Bearbeitung zurücksetzen
               </button>
               <button mat-menu-item (click)="onInform(winner._id)"
-                    [disabled]="winner.informedOn || !winner.canBeInformed()">
-                {{ winner.canBeInformed()
-                  ? (winner.informedOn
-                    ? 'Gewinner wurde am ' + winner.informedOn + ' benachrichtigt'
-                    : 'Gewinner benachrichtigen')
-                  : 'Gewinner kann nicht benachrichtigt werden; es ist keine E-Mail-Adresse hinterlegt'
-                }}
+                    [disabled]="(winner.informedOn && winner.informedOn != '')">
+                {{ createInformText(winner) }}
               </button>
               <button mat-menu-item (click)="onPay(winner._id)"
-                    [disabled]="winner.paidOn" *ngIf="winner.user.payment.iban">
-                {{ winner.paidOn ? 'Gewinn wurde am ' + winner.paidOn + ' ausgezahlt' : 'Gewinn auszahlen' }}
+                    [disabled]="(winner.paidOn && winner.paidOn != '')" *ngIf="winner.user.payment.iban">
+                {{ createPayText(winner) }}
               </button>
               <button mat-menu-item (click)="onDeleteWinner(winner._id)">
                 Gewinn löschen
@@ -81,20 +75,15 @@
           
           <section fxHide.lt-lg="true">
             <button class="mat-icon-button mat-primary show-on-hover"
-                    title="{{ winner.canBeInformed()
-                      ? (winner.informedOn
-                        ? 'Gewinner wurde am ' + winner.informedOn + ' benachrichtigt'
-                        : 'Gewinner benachrichtigen')
-                      : 'Gewinner kann nicht benachrichtigt werden; es ist keine E-Mail-Adresse hinterlegt'
-                    }}"
-                    (click)="onInform(winner._id)" [disabled]="winner.informedOn || !winner.canBeInformed()">
+                    title="{{ createInformText(winner) }}"
+                    (click)="onInform(winner._id)" [disabled]="winner.informedOn">
               <span class="mat-button-wrapper">
                 <mat-icon>mail_outline</mat-icon>
               </span>
             </button>
             <button class="mat-icon-button mat-primary show-on-hover"
                     *ngIf="winner.user.payment.iban"
-                    title="{{ winner.paidOn ? 'Gewinn wurde am ' + winner.paidOn + ' ausgezahlt' : 'Gewinn auszahlen' }}"
+                    title="{{ createPayText(winner) }}"
                     (click)="onPay(winner._id)" [disabled]="winner.paidOn">
               <span class="mat-button-wrapper">
                 <mat-icon>payment</mat-icon>
@@ -107,7 +96,7 @@
               </span>
             </button>
             <button class="mat-icon-button mat-primary"
-                    *ngIf="(winner.informedOn || !winner.canBeInformed()) && winner.paidOn"
+                    *ngIf="winner.informedOn && winner.paidOn"
                     title="Bearbeitung zurücksetzen"
                     (click)="onResetWinner(winner._id)">
               <span class="mat-button-wrapper">

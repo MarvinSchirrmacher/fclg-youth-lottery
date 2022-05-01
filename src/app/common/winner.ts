@@ -32,8 +32,4 @@ export class Winner {
   public setProfit(value: number): void {
     this.profit = value
   }
-
-  public canBeInformed(): boolean {
-    return this.user.email != undefined
-  }
 }

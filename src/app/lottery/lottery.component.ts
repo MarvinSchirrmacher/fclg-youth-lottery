@@ -15,7 +15,7 @@ import { PayWinnerDialog } from './dialog/pay-winner'
 import { ResetProgressDialog } from './dialog/reset-progress'
 import { DeleteWinnerDialog } from './dialog/delete-winner.component'
 import { Observer } from '@apollo/client/core'
-import { posPronounAccMas } from '../common/gendering'
+import { posPronounAccMas, winnerNoun } from '../common/gendering'
 import { SettingsService } from '../service/settings.service'
 import { ReEvaluateDrawDialog } from './dialog/reevaluate-draw'
 import { TaggableList } from '../common/lists'
@@ -199,6 +199,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
 
   private updateWinners: Observer<Winner[]> = {
     next: winners => {
+      console.debug(JSON.stringify(winners, undefined, 2))
       this.winners = winners
       this.winnersLoading = false
     },
@@ -235,16 +236,27 @@ export class LotteryComponent implements OnInit, OnDestroy {
     return d!
   }
 
-  private deleteWinner(id: BSON.ObjectID, del: boolean | undefined): void {
-    if (del === undefined || !del)
+  private deleteWinner(id: BSON.ObjectID, del: boolean): void {
+    if (!del)
       return
 
     this.lotteryWin.deleteWinner(id!, {
       next: id => {
-        this.snackBar.open(`Gewinner wurde entfernt`, 'Ok', snackBarConfig)
+        this.snackBar.open(`Gewinner:in wurde entfernt`, 'Ok', snackBarConfig)
         this.lotteryWin.refetchWinners()
       },
-      error: error => this.snackBar.open(`Gewinner mit der ID ${id} konnte nicht entfernt werden: ${error}`, 'Ok', snackBarConfig)
+      error: error => this.snackBar.open(`Gewinner:in mit der ID ${id} konnte nicht entfernt werden: ${error}`, 'Ok', snackBarConfig)
     })
+  }
+
+  createInformText(winner: Winner): string {
+    let g = winner.user.gender
+    return winner.informedOn
+      ? `${winnerNoun(g)} wurde am ${winner.informedOn} benachrichtigt`
+      : `${winnerNoun(g)} benachrichtigen`
+  }
+
+  createPayText(winner: Winner): string {
+    return winner.paidOn ? `Gewinn wurde am ${winner.paidOn} ausgezahlt` : 'Gewinn auszahlen'
   }
 }
