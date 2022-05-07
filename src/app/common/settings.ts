@@ -1,6 +1,6 @@
 export interface EmailTemplate {
-  reference: String
-  content: String
+  reference: string
+  content: string
 }
 
 export class Settings {
