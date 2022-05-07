@@ -1,3 +1,6 @@
+
+$padding: 16px;
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
@@ -43,7 +46,7 @@ p {
 }
 
 .flex.gap {
-  gap: 16px;
+  gap: $padding;
 }
 
 [fxflex] {
@@ -118,14 +121,16 @@ p {
 .h-1000px { height: 1000px; }
 
 .distant {
-  margin: 16px;
+  margin: $padding;
 }
 
-.padded { padding: 16px; }
-.padded-left { padding-left: 16px; }
-.padded-right { padding-right: 16px; }
-.padded-top { padding-top: 16px; }
-.padded-bottom { padding-bottom: 16px; }
+.padded { padding: $padding; }
+.padded-left { padding-left: $padding; }
+.padded-right { padding-right: $padding; }
+.padded-top { padding-top: $padding; }
+.padded-bottom { padding-bottom: $padding; }
+
+$min-card-height: 68px;
 
 .fixed {
   position: fixed;
@@ -133,8 +138,12 @@ p {
   bottom: 0;
   width: 100%;
   > * {
-    min-height: 68px; // single row to fit buttons
+    min-height: $min-card-height; // single row to fit buttons
   }
+}
+
+.fixed-card-bottom {
+  padding-bottom: calc(#{$padding} + #{$min-card-height});
 }
 
 .float-right {
