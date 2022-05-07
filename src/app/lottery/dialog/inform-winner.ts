@@ -56,7 +56,7 @@ export class InformWinnerDialog {
 
     this.form = this.formBuilder.group({
       email: [this.winner.user.email, [Validators.email, Validators.required]],
-      reference: [this.settings.emailReferenceTemplate, [Validators.required]],
+      reference: [this.settings.settings.emailTemplate.reference, [Validators.required]],
       content: [this.buildMailContent(this.winner), [Validators.required]]
     })
   }
@@ -85,7 +85,7 @@ export class InformWinnerDialog {
   }
 
   private buildMailContent(winner: Winner): string {
-    return this.settings.emailContentTemplate
+    return this.settings.settings.emailTemplate.content
       .replace('${firstName}', winner.user.firstName)
       .replace('${lastName}', winner.user.lastName)
       .replace('${date}', winner.draw.date.toLocaleDateString())

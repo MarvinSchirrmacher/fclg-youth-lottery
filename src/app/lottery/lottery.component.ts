@@ -50,7 +50,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    this.drawsSubscription = this.lottery.saveNewDraws(this.settings.year, DrawDay.Saturday)
+    this.drawsSubscription = this.lottery.saveNewDraws(this.settings.settings.year, DrawDay.Saturday)
       .pipe(
         switchMap(draws => {
           var firstDate = draws[draws.length - 1].date

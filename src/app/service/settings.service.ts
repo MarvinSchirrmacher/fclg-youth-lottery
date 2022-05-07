@@ -1,38 +1,27 @@
 import { Injectable } from '@angular/core'
-import * as saveAs from 'file-saver';
-import Settings from '../../../settings.json'
+import SettingsFile from '../../assets/settings.json'
+import { Settings } from '../common/settings';
+
+const SETTINGS_KEY = "fclg-youth-lottery-settings";
 
 @Injectable({
   providedIn: 'root'
 })
 export class SettingsService {
 
+  public settings: Settings
+
+  constructor() {
+    let storedSettings = localStorage.getItem(SETTINGS_KEY)
+    this.settings = new Settings((storedSettings ? JSON.parse(storedSettings) : SettingsFile) as Settings)
+  }
+
   save(): void {
-    // TODO: should overwrite settings file, saveAs triggers a download of a new file
-    saveAs(JSON.stringify(this), '../../../settings.json')
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings))
   }
 
-  get year(): number {
-    return Settings.year
-  }
-
-  set year(value: number) {
-    Settings.year = value
-  }
-
-  get emailReferenceTemplate(): string {
-    return Settings.emailReferenceTemplate
-  }
-
-  set emailReferenceTemplate(value: string) {
-    Settings.emailReferenceTemplate = value
-  }
-
-  get emailContentTemplate(): string {
-    return Settings.emailContentTemplate
-  }
-
-  set emailContentTemplate(value: string) {
-    Settings.emailContentTemplate = value
+  reset(): void {
+    localStorage.removeItem(SETTINGS_KEY)
+    this.settings = SettingsFile
   }
 }

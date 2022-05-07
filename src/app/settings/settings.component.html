@@ -1,7 +1,8 @@
-<section class="flex wrap">
-    <form novalidate (ngSubmit)="save()" [formGroup]="form">
-        <mat-card class="basis-300 w-300px distant">
+<form novalidate (ngSubmit)="save()" [formGroup]="form">
+    <section fxLayout="row wrap" fxLayoutAlign="center start" class="padded flex gap">
+        <mat-card fxFlex="1 1 auto">
             <h2>Allgemein</h2>
+
             <mat-form-field class="form-field w-100">
                 <mat-label>Jahr</mat-label>
                 <mat-select formControlName="year">
@@ -11,12 +12,31 @@
                 </mat-select>
             </mat-form-field>
         </mat-card>
+
+        <mat-card fxFlex="3 1 auto" formGroupName="mailTemplate">
+            <h2>E-Mail</h2>
+
+            <mat-form-field class="form-field w-100">
+                <mat-label>Betreffvorlage</mat-label>
+                <input matInput type="text" formControlName="reference">
+            </mat-form-field>
+
+            <mat-form-field class="form-field w-100">
+                <mat-label>Nachrichtvorlage</mat-label>
+                <textarea matInput formControlName="content" class="h-200px"></textarea>
+            </mat-form-field>
+        </mat-card>
+
         <section class="fixed bottom">
-            <mat-card>
-                <button class="mat-raised-button mat-primary right" type="submit" [disabled]="form.invalid">
+            <mat-card class="flex end gap">
+                <button class="mat-raised-button" type="reset" color="warn" (click)="reset()">
+                    Zurücksetzen
+                </button>
+                <button class="mat-raised-button mat-primary" type="submit" [disabled]="form.invalid">
                     Speichern
                 </button>
             </mat-card>
         </section>
-    </form>
-</section>
+
+    </section>
+</form>
