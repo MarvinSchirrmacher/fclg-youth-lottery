@@ -154,6 +154,14 @@ $min-card-height: 68px;
   min-height: calc(100% - 64px);
 }
 
+.overflow-x {
+  overflow-x: auto;
+  scrollbar-width: none;
+  & ::-webkit-scrollbar {
+      width: 0px;
+  }
+}
+
 .mat-table {
   width: 100%;
 }
@@ -187,7 +195,7 @@ $min-card-height: 68px;
   background: #f2f3f4;
   padding: 5px;
   text-align: center;
-  min-width: 27px;
+  min-width: 28px;
 }
 
 .tile:first-of-type {

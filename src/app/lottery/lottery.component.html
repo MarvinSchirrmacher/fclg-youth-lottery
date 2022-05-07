@@ -136,7 +136,7 @@
       <ng-container matColumnDef="numbers">
         <mat-header-cell *matHeaderCellDef class="grow-3">Gewinnzahlen</mat-header-cell>
         <mat-cell *matCellDef="let draw" class="grow-3 inner-shadow white">
-          <div class="flex gap-sm">
+          <div class="flex gap-sm overflow-x">
             <span *ngFor="let n of draw.numbers" class="tile">{{n}}</span>
           </div>
         </mat-cell>
