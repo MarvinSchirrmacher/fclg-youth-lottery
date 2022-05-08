@@ -1,6 +1,9 @@
 <section fxLayout="row wrap" fxLayoutAlign="center start" class="padded flex gap">
+
+  <h1 class="w-100 center">Teilnahmen</h1>
+
   <mat-card fxFlex="3 1 auto">
-    <h2>Teilnahmen</h2>
+    <h3>Teilnahmen</h3>
 
     <div class="flex center padded" *ngIf="participationsLoading">
       <mat-spinner diameter="50"></mat-spinner>
@@ -85,7 +88,7 @@
   </mat-card>
 
   <mat-card fxFlex="auto">
-    <h2>Teilnehmer</h2>
+    <h3>Teilnehmer</h3>
 
     <div class="flex center padded" *ngIf="participantsLoading">
       <mat-spinner diameter="50"></mat-spinner>
@@ -148,7 +151,7 @@
   </mat-card>
 
   <mat-card fxFlex="auto" id="add-participation">
-    <h2>Neue Teilnahme</h2>
+    <h3>Neue Teilnahme</h3>
     <app-add-participation></app-add-participation>
   </mat-card>
 </section>

@@ -1,7 +1,9 @@
 <section fxLayout="row wrap" fxLayoutAlign="center start" class="padded flex gap">
-  
+
+  <h1 class="w-100 center">Lotterie</h1>
+
   <mat-card fxFlex="3 1 auto">
-    <h2>Gewinner</h2>
+    <h3>Gewinner</h3>
 
     <div class="flex center padded" *ngIf="winnersLoading">
       <mat-spinner diameter="50"></mat-spinner>
@@ -112,7 +114,7 @@
   </mat-card>
 
   <mat-card fxFlex="1 1 auto">
-    <h2>Ziehungen</h2>
+    <h3>Ziehungen</h3>
 
     <div class="flex center padded" *ngIf="drawsLoading">
       <mat-spinner diameter="50"></mat-spinner>
