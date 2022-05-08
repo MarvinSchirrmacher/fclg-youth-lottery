@@ -59,11 +59,11 @@
                 Bearbeitung zurücksetzen
               </button>
               <button mat-menu-item (click)="onInform(winner._id)"
-                    [disabled]="(winner.informedOn && winner.informedOn != '')">
+                    [disabled]="winner.informedOn">
                 {{ createInformText(winner) }}
               </button>
               <button mat-menu-item (click)="onPay(winner._id)"
-                    [disabled]="(winner.paidOn && winner.paidOn != '')" *ngIf="winner.user.payment.iban">
+                    [disabled]="winner.paidOn" *ngIf="winner.user.payment.iban">
                 {{ createPayText(winner) }}
               </button>
               <button mat-menu-item (click)="onDeleteWinner(winner._id)">
