@@ -43,10 +43,10 @@
       </ng-container>
 
       <ng-container matColumnDef="actions">
-        <mat-header-cell *matHeaderCellDef class="actions"></mat-header-cell>
-        <mat-cell *matCellDef="let row" class="actions">
+        <mat-header-cell *matHeaderCellDef class="controls"></mat-header-cell>
+        <mat-cell *matCellDef="let row" class="controls show-on-hover">
 
-          <section fxHide.gt-sm="true">
+          <section fxHide.gt-sm="true" class="flex overflow-x">
             <button mat-icon-button [matMenuTriggerFor]="menu">
               <mat-icon>more_horiz</mat-icon>
             </button>
@@ -57,21 +57,21 @@
               <button mat-menu-item (click)="onDelete(row._id)">Teilnahme löschen</button>
             </mat-menu>
           </section>
-          
-          <section fxHide.lt-md="true">
-            <button class="mat-icon-button mat-primary show-on-hover"
+
+          <section fxHide.lt-md="true" class="flex overflow-x">
+            <button class="mat-icon-button mat-primary"
                     title="Informationen anzeigen" (click)="onInfo(row._id)">
               <span class="mat-button-wrapper">
                 <mat-icon>info_outline</mat-icon>
               </span>
             </button>
-            <button class="mat-icon-button mat-primary show-on-hover"
+            <button class="mat-icon-button mat-primary"
                     title="Teilnahme beenden" (click)="onEnd(row._id)">
               <span class="mat-button-wrapper">
                 <mat-icon>exit_to_app</mat-icon>
               </span>
             </button>
-            <button class="mat-icon-button mat-primary show-on-hover"
+            <button class="mat-icon-button mat-primary"
                     title="Teilnahme löschen" (click)="onDelete(row._id)">
               <span class="mat-button-wrapper">
                 <mat-icon color="warn">delete_outline</mat-icon>
@@ -82,8 +82,7 @@
       </ng-container>
 
       <mat-header-row *matHeaderRowDef="participationColumns"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: participationColumns" id="{{ row._id }}">
-      </mat-row>
+      <mat-row *matRowDef="let row; columns: participationColumns" id="{{ row._id }}"></mat-row>
     </mat-table>
   </mat-card>
 
@@ -112,8 +111,8 @@
       </ng-container>
 
       <ng-container matColumnDef="actions">
-        <mat-header-cell *matHeaderCellDef class="grow-2"></mat-header-cell>
-        <mat-cell *matCellDef="let user" class="grow-2">
+        <mat-header-cell *matHeaderCellDef class="controls"></mat-header-cell>
+        <mat-cell *matCellDef="let user" class="controls show-on-hover">
 
           <section fxHide.gt-xs="true">
             <button mat-icon-button [matMenuTriggerFor]="menu">

@@ -20,6 +20,11 @@ export function descending(a: number, b: number): number {
   return b - a
 }
 
+export function contains<T>(list: T[], item: T): boolean {
+  const index = list.indexOf(item, 0);
+  return index > -1
+}
+
 export function remove<T>(list: T[], item: T): void {
   const index = list.indexOf(item, 0);
   if (index > -1) {

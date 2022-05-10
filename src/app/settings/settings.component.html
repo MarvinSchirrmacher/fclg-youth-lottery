@@ -31,13 +31,15 @@
         </mat-card>
 
         <section class="fixed bottom">
-            <mat-card class="flex end gap">
-                <button class="mat-raised-button" type="reset" color="warn" (click)="reset()">
-                    Zurücksetzen
-                </button>
-                <button class="mat-raised-button mat-primary" type="submit" [disabled]="form.invalid">
-                    Speichern
-                </button>
+            <mat-card>
+                <section class="flex end gap">
+                    <button class="mat-raised-button" type="reset" color="warn" (click)="reset()">
+                        Zurücksetzen
+                    </button>
+                    <button class="mat-raised-button mat-primary" type="submit" [disabled]="form.invalid">
+                        Speichern
+                    </button>
+                </section>
             </mat-card>
         </section>
 

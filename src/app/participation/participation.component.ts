@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
-import { snackBarConfig } from '../common/common'
+import { contains, remove, snackBarConfig } from '../common/common'
 import { ParticipationEnd, ParticipationService } from '../service/participation.service'
 import { EndPariticipationDialog as EndParticipationDialog } from './dialog/end-participation.component'
 import { DeletePariticipationDialog as RemoveParticipationDialog } from './dialog/delete-participation.component'
@@ -27,6 +27,7 @@ export class ParticipationComponent implements OnInit, OnDestroy {
   userColumns = [ 'name', 'actions' ]
   participationsLoading: boolean = true
   participantsLoading: boolean = true
+  selectedParticipations: BSON.ObjectID[] = []
   
   private participationsSubscription: Subscription | undefined
   private usersSubscription: Subscription | undefined
@@ -107,6 +108,18 @@ export class ParticipationComponent implements OnInit, OnDestroy {
       .open(DeleteUserDialog, { data: user, panelClass: 'w-600px', maxWidth: '' })
       .afterClosed()
       .subscribe(del => this.deleteUser(user._id!, del))
+  }
+
+  selectParticipation(id: BSON.ObjectID): void {
+    if (contains(this.selectedParticipations, id)) {
+      remove(this.selectedParticipations, id)
+    } else {
+      this.selectedParticipations.push(id)
+    }
+  }
+
+  participationIsSelected(id: BSON.ObjectID): boolean {
+    return contains(this.selectedParticipations, id)
   }
 
   private endParticipation(id: BSON.ObjectID, when: ParticipationEnd): void {

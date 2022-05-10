@@ -24,7 +24,7 @@ h1, h2, h3, h4, h5, h6, p {
 }
 
 .flex {
-  display: flex !important;
+  display: flex;
   align-items: flex-start;
 }
 
@@ -138,6 +138,10 @@ h1, h2, h3, h4, h5, h6, p {
 
 $min-card-height: 68px;
 
+.relative {
+  position: relative;
+}
+
 .fixed {
   position: fixed;
   left: 0;
@@ -146,6 +150,12 @@ $min-card-height: 68px;
   > * {
     min-height: $min-card-height; // single row to fit buttons
   }
+}
+
+.absolute {
+  position: absolute;
+  &.left { left: 0; }
+  &.right { right: 0; }
 }
 
 .fixed-card-bottom {
@@ -172,6 +182,17 @@ $min-card-height: 68px;
   width: 100%;
 }
 
+.mat-cell,
+.mat-header-cell,
+.mat-footer-cell {
+  &:first-of-type {
+    padding-left: 0px !important;
+  }
+  &:last-of-type {
+    padding-right: 0px !important;
+  }
+}
+
 .mat-button,
 .mat-icon-button,
 .mat-stroked-button,
@@ -195,6 +216,17 @@ $min-card-height: 68px;
 
 .mat-row {
   align-items: flex-start;
+  position: relative;
+  &.selected {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.mat-header-row .controls,
+.mat-row .controls {
+  position: absolute;
+  right: 0;
+  background: linear-gradient(to right, transparent, white 8px);
 }
 
 .tile {
