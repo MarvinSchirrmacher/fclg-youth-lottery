@@ -203,6 +203,9 @@ $min-card-height: 68px;
     color: grey;
     cursor: default;
   }
+  &.pale {
+    color: lightgrey;
+  }
 }
 
 .flex.gap-sm .mat-button-base + .mat-button-base {
@@ -226,7 +229,10 @@ $min-card-height: 68px;
 .mat-row .controls {
   position: absolute;
   right: 0;
-  background: linear-gradient(to right, transparent, white 8px);
+}
+
+.controls .mat-icon-button {
+  background: radial-gradient(white 14px, transparent 18px);
 }
 
 .tile {

@@ -10,8 +10,8 @@ import { ParticipationDocument, toParticipationDocument, toWinnerDocument, Winne
 import { toGraphQL } from "../common/graphql"
 
 
-export interface Done {
-  next?: (id?: BSON.ObjectID) => void,
+export interface Done<NextParameter> {
+  next?: (parameter?: NextParameter) => void,
   error?: <E extends Error> (error?: E) => void
 }
 
@@ -35,16 +35,20 @@ export interface QueryYearsResult {
   draws: Partial<Draw>[]
 }
 
+interface IdPayload {
+  _id: BSON.ObjectID
+}
+
 export interface InsertUserResult {
-  insertOneUser: { _id: BSON.ObjectID }
+  insertOneUser: IdPayload
 }
 
 export interface InsertParticipationResult {
-  insertOneParticipation: { _id: BSON.ObjectID }
+  insertOneParticipation: IdPayload
 }
 
 export interface InsertDrawResult {
-  insertOneDraw: { _id: BSON.ObjectID }
+  insertOneDraw: IdPayload
 }
 
 export interface InsertWinnersResult {
@@ -52,19 +56,19 @@ export interface InsertWinnersResult {
 }
 
 export interface UpdateParticipationResult {
-  updateOneParticipation: { _id: BSON.ObjectID }
+  updateOneParticipation: IdPayload
 }
 
 export interface UpdateUserResult {
-  updateOneUser: { _id: BSON.ObjectID }
+  updateOneUser: IdPayload
 }
 
 export interface UpdateDrawResult {
-  updateOneDraw: { _id: BSON.ObjectID }
+  updateOneDraw: IdPayload
 }
 
 export interface UpdateWinnerResult {
-  updateOneWinner: { _id: BSON.ObjectID }
+  updateOneWinner: IdPayload
 }
 
 export interface UpdateManyPayload {
@@ -73,15 +77,31 @@ export interface UpdateManyPayload {
 }
 
 export interface DeleteParticipationResult {
-  deleteOneParticipation: { _id: BSON.ObjectID }
+  deleteOneParticipation: IdPayload
 }
 
 export interface DeleteUserResult {
-  deleteOneUser: { _id: BSON.ObjectID }
+  deleteOneUser: IdPayload
 }
 
 export interface DeleteWinnerResult {
-  deleteOneWinner: { _id: BSON.ObjectID }
+  deleteOneWinner: IdPayload
+}
+
+interface DeleteManyPayload {
+  deletedCount: number[]
+}
+
+export interface DeleteParticipationsResult {
+  deleteManyParticipations: DeleteManyPayload
+}
+
+export interface DeleteUsersResult {
+  deleteManyUsers: DeleteManyPayload
+}
+
+export interface DeleteWinnersResult {
+  deleteManyWinners: DeleteManyPayload
 }
 
 
@@ -253,6 +273,18 @@ export class DatabaseService {
     return this.delete<DeleteWinnerResult>('deleteOneWinner', id)
   }
 
+  public deleteParticipations(ids: BSON.ObjectID[]): Observable<MutationResult<DeleteParticipationsResult>> {
+    return this.deleteMany<DeleteParticipationsResult>('deleteManyParticipations', ids)
+  }
+
+  public deleteUsers(ids: BSON.ObjectID[]): Observable<MutationResult<DeleteUsersResult>> {
+    return this.deleteMany<DeleteUsersResult>('deleteManyUsers', ids)
+  }
+
+  public deleteWinners(ids: BSON.ObjectID[]): Observable<MutationResult<DeleteWinnersResult>> {
+    return this.deleteMany<DeleteWinnersResult>('deleteManyWinners', ids)
+  }
+
   public query<ResultType>(
     collection: string, query: string | undefined, sortBy: string | undefined, fields: string):
       QueryRef<ResultType> {
@@ -295,6 +327,16 @@ export class DatabaseService {
           query: { _id:"${id}" }
         ) { _id } }`
     })
+  }
+
+  private deleteMany<ResultType>(mutation: string, ids: BSON.ObjectID[]):
+    Observable<MutationResult<ResultType>> {
+      return this.apollo.mutate<ResultType>({
+        mutation: gql`mutation {
+          ${mutation}(
+            query: { _id_in:${JSON.stringify(ids)} }
+          ) { deletedCount } }`
+      })
   }
 
   private toGraphQL(object: any, formats?: Map<string, any>): string {

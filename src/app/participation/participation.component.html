@@ -44,9 +44,9 @@
 
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef class="controls"></mat-header-cell>
-        <mat-cell *matCellDef="let row" class="controls show-on-hover">
+        <mat-cell *matCellDef="let row" class="controls">
 
-          <section fxHide.gt-sm="true" class="flex overflow-x">
+          <section fxHide.gt-sm="true" class="flex overflow-x show-on-hover">
             <button mat-icon-button [matMenuTriggerFor]="menu">
               <mat-icon>more_horiz</mat-icon>
             </button>
@@ -59,31 +59,56 @@
           </section>
 
           <section fxHide.lt-md="true" class="flex overflow-x">
-            <button class="mat-icon-button mat-primary"
+            <button class="mat-icon-button mat-primary show-on-hover"
                     title="Informationen anzeigen" (click)="onInfo(row._id)">
               <span class="mat-button-wrapper">
                 <mat-icon>info_outline</mat-icon>
               </span>
             </button>
-            <button class="mat-icon-button mat-primary"
+            <button class="mat-icon-button mat-primary show-on-hover"
                     title="Teilnahme beenden" (click)="onEnd(row._id)">
               <span class="mat-button-wrapper">
                 <mat-icon>exit_to_app</mat-icon>
               </span>
             </button>
-            <button class="mat-icon-button mat-primary"
+            <button class="mat-icon-button mat-primary show-on-hover"
                     title="Teilnahme löschen" (click)="onDelete(row._id)">
               <span class="mat-button-wrapper">
                 <mat-icon color="warn">delete_outline</mat-icon>
               </span>
             </button>
           </section>
+
+          <section *ngIf="participationIsSelected(row._id); then deselectButton; else selectButton"></section>
+          <ng-template #selectButton>
+            <button class="mat-icon-button show-on-hover pale"
+                    (click)="selectParticipation(row._id)">
+              <span class="mat-button-wrapper">
+                <mat-icon>check_circle_outline</mat-icon>
+              </span>
+            </button>
+          </ng-template>
+
+          <ng-template #deselectButton>  
+            <button class="mat-icon-button mat-primary"
+                    (click)="selectParticipation(row._id)">
+              <span class="mat-button-wrapper">
+                <mat-icon>check_circle</mat-icon>
+              </span>
+            </button>
+          </ng-template>
+
         </mat-cell>
       </ng-container>
 
       <mat-header-row *matHeaderRowDef="participationColumns"></mat-header-row>
       <mat-row *matRowDef="let row; columns: participationColumns" id="{{ row._id }}"></mat-row>
     </mat-table>
+
+    <p class="flex end gap">
+      <button mat-raised-button mat-primary (click)="endAllSelected()" [disabled]="!anyIsSelected()">Beenden</button>
+      <button mat-raised-button mat-primary color="warn" (click)="deleteAllSelected()" [disabled]="!anyIsSelected()">Löschen</button>
+    </p>
   </mat-card>
 
   <mat-card fxFlex="auto">
@@ -112,7 +137,7 @@
 
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef class="controls"></mat-header-cell>
-        <mat-cell *matCellDef="let user" class="controls show-on-hover">
+        <mat-cell *matCellDef="let user" class="controls">
 
           <section fxHide.gt-xs="true">
             <button mat-icon-button [matMenuTriggerFor]="menu">
@@ -139,6 +164,25 @@
             </button>
           </section>
 
+          <section *ngIf="userIsSelected(user._id); then deselectButton; else selectButton"></section>
+          <ng-template #selectButton>
+            <button class="mat-icon-button show-on-hover pale"
+                    (click)="selectUser(user._id)">
+              <span class="mat-button-wrapper">
+                <mat-icon>check_circle_outline</mat-icon>
+              </span>
+            </button>
+          </ng-template>
+
+          <ng-template #deselectButton>  
+            <button class="mat-icon-button mat-primary"
+                    (click)="selectUser(user._id)">
+              <span class="mat-button-wrapper">
+                <mat-icon>check_circle</mat-icon>
+              </span>
+            </button>
+          </ng-template>
+
         </mat-cell>
       </ng-container>
 
@@ -146,6 +190,10 @@
       <mat-row *matRowDef="let user; columns: userColumns" id="{{ user._id }}">
       </mat-row>
     </mat-table>
+
+    <p class="flex end gap">
+      <button mat-raised-button mat-primary color="warn" (click)="deleteAllSelectedUsers()" [disabled]="!anyUserIsSelected()">Löschen</button>
+    </p>
 
   </mat-card>
 

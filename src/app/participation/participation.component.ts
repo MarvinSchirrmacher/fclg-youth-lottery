@@ -2,10 +2,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
-import { contains, remove, snackBarConfig } from '../common/common'
+import { contains, empty, remove, snackBarConfig } from '../common/common'
 import { ParticipationEnd, ParticipationService } from '../service/participation.service'
 import { EndPariticipationDialog as EndParticipationDialog } from './dialog/end-participation.component'
-import { DeletePariticipationDialog as RemoveParticipationDialog } from './dialog/delete-participation.component'
+import { DeletePariticipationDialog, DeletePariticipationDialog as RemoveParticipationDialog } from './dialog/delete-participation.component'
 import { PariticipationDetailsDialog } from './dialog/participation-details.component'
 import { ApolloError } from '@apollo/client/errors'
 import { User } from '../common/user'
@@ -14,6 +14,7 @@ import { DeleteUserDialog } from './dialog/delete-user.component'
 import { article, participantNoun } from '../common/gendering'
 import { EditUserDialog } from './dialog/edit-user.component'
 import { Subscription } from 'rxjs'
+import { ListSelection } from '../common/lists'
 
 @Component({
   selector: 'app-participation',
@@ -27,7 +28,9 @@ export class ParticipationComponent implements OnInit, OnDestroy {
   userColumns = [ 'name', 'actions' ]
   participationsLoading: boolean = true
   participantsLoading: boolean = true
-  selectedParticipations: BSON.ObjectID[] = []
+
+  selectedParticipations: ListSelection<BSON.ObjectID> = new ListSelection<BSON.ObjectID>()
+  selectedUsers: ListSelection<BSON.ObjectID> = new ListSelection<BSON.ObjectID>()
   
   private participationsSubscription: Subscription | undefined
   private usersSubscription: Subscription | undefined
@@ -87,7 +90,7 @@ export class ParticipationComponent implements OnInit, OnDestroy {
     var participation = this.getParticipation(id)
 
     this.dialog
-      .open(RemoveParticipationDialog, { data: participation, panelClass: 'w-600px', maxWidth: '' })
+      .open(RemoveParticipationDialog, { data: [participation], panelClass: 'w-600px', maxWidth: '' })
       .afterClosed()
       .subscribe(del => this.deleteParticipation(participation._id!, del))
   }
@@ -105,21 +108,61 @@ export class ParticipationComponent implements OnInit, OnDestroy {
     var user = this.getUser(id)
 
     this.dialog
-      .open(DeleteUserDialog, { data: user, panelClass: 'w-600px', maxWidth: '' })
+      .open(DeleteUserDialog, { data: [user], panelClass: 'w-600px', maxWidth: '' })
       .afterClosed()
       .subscribe(del => this.deleteUser(user._id!, del))
   }
 
   selectParticipation(id: BSON.ObjectID): void {
-    if (contains(this.selectedParticipations, id)) {
-      remove(this.selectedParticipations, id)
-    } else {
-      this.selectedParticipations.push(id)
-    }
+    this.selectedParticipations.select(id)
   }
 
   participationIsSelected(id: BSON.ObjectID): boolean {
-    return contains(this.selectedParticipations, id)
+    return this.selectedParticipations.isSelected(id)
+  }
+
+  anyIsSelected(): boolean {
+    return this.selectedParticipations.anyIsSelected()
+  }
+
+  endAllSelected(): void {
+
+  }
+
+  deleteAllSelected(): void {
+    var participations = this.selectedParticipations.get().map(id => this.getParticipation(id))
+
+    this.dialog
+      .open(DeletePariticipationDialog, { data: participations, panelClass: 'w-600px', maxWidth: '' })
+      .afterClosed()
+      .subscribe(del => {
+        this.deleteParticipations(this.selectedParticipations.get(), del)
+        this.selectedParticipations.deselectAll()
+      })
+  }
+
+  selectUser(id: BSON.ObjectID): void {
+    this.selectedUsers.select(id)
+  }
+
+  userIsSelected(id: BSON.ObjectID): boolean {
+    return this.selectedUsers.isSelected(id)
+  }
+
+  anyUserIsSelected(): boolean {
+    return this.selectedUsers.anyIsSelected()
+  }
+
+  deleteAllSelectedUsers(): void {
+    var users = this.selectedUsers.get().map(id => this.getUser(id))
+
+    this.dialog
+      .open(DeleteUserDialog, { data: users, panelClass: 'w-600px', maxWidth: '' })
+      .afterClosed()
+      .subscribe(del => {
+        this.deleteUsers(this.selectedUsers.get(), del)
+        this.selectedUsers.deselectAll()
+      })
   }
 
   private endParticipation(id: BSON.ObjectID, when: ParticipationEnd): void {
@@ -156,6 +199,19 @@ export class ParticipationComponent implements OnInit, OnDestroy {
     })
   }
 
+  private deleteParticipations(ids: BSON.ObjectID[], del: boolean | undefined): void {
+    if (del === undefined || !del)
+      return
+
+    this.participationService.deleteParticipations(ids, {
+      next: count => {
+        this.participationService.refetch()
+        this.snackBar.open(`${count} Teilnahmen wurden entfernt`, 'Ok', snackBarConfig)
+      },
+      error: error => this.snackBar.open(`Die Teilnahmen konnten nicht entfernt werden: ${error}`, 'Ok', snackBarConfig)
+    })
+  }
+
   private editUser(id: BSON.ObjectID, user: User | undefined): void {
     if (user === undefined)
       return
@@ -179,6 +235,19 @@ export class ParticipationComponent implements OnInit, OnDestroy {
         this.snackBar.open(`${article(g)} ${participantNoun} ${name} wurde entfernt`, 'Ok', snackBarConfig)
       },
       error: error => this.snackBar.open(`${article(g)} ${participantNoun} ${name} konnte nicht entfernt werden: ${error}`, 'Ok', snackBarConfig)
+    })
+  }
+
+  private deleteUsers(ids: BSON.ObjectID[], del: boolean | undefined): void {
+    if (del === undefined || !del)
+      return
+
+    this.participationService.deleteUsers(ids, {
+      next: count => {
+        this.participationService.refetch()
+        this.snackBar.open(`${count} Teilnehmerinnen und Teilnehmer wurden entfernt`, 'Ok', snackBarConfig)
+      },
+      error: error => this.snackBar.open(`Die Teilnehmerinnen und Teilnehmer konnten nicht entfernt werden: ${error}`, 'Ok', snackBarConfig)
     })
   }
 

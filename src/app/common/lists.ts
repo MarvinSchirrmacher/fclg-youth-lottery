@@ -1,3 +1,32 @@
+import { contains, empty, remove } from "./common"
+
+export class ListSelection<T> {
+  private list: T[] = []
+
+  get(): T[] {
+    return this.list
+  }
+
+  select(item: T) {
+    if (contains(this.list, item))
+      remove(this.list, item)
+    else
+      this.list.push(item)
+  }
+
+  deselectAll() {
+    this.list = []
+  }
+
+  isSelected(item: T) {
+    return contains(this.list, item)
+  }
+
+  anyIsSelected() {
+    return !empty(this.list)
+  }
+}
+
 export class TaggableList<T> {
   objects: Taggable<T>[]
   equals: (a: T, b: T) => boolean

@@ -1,6 +1,15 @@
 <h2 mat-dialog-title>Teilnahme löschen</h2>
 <mat-dialog-content>
-  <p>Soll die Teilnahme von <strong>{{ firstName }} {{ lastName }}</strong> mit dem Gewinnlos <strong>{{ ticket }}</strong> wirklich gelöscht werden?</p>
+  <section *ngIf="participations.length > 1; then deleteMany; else deleteOne"></section>
+
+  <ng-template #deleteMany>
+    <p>Sollen die Teilnahmen von <span class="separated" *ngFor="let p of participations"><strong>{{ p.user.firstName }} {{ p.user.lastName }} ({{ p.ticket }})</strong></span> wirklich gelöscht werden?</p>
+  </ng-template>
+
+  <ng-template #deleteOne>
+    <p>Soll die Teilnahme von <span class="separated" *ngFor="let p of participations"><strong>{{ p.user.firstName }} {{ p.user.lastName }} ({{ p.ticket }})</strong></span> wirklich gelöscht werden?</p>
+  </ng-template>
+
 </mat-dialog-content>
 <mat-dialog-actions class="flex end">
   <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>

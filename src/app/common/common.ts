@@ -20,6 +20,10 @@ export function descending(a: number, b: number): number {
   return b - a
 }
 
+export function empty<T>(list: T[]): boolean {
+  return list.length == 0
+}
+
 export function contains<T>(list: T[], item: T): boolean {
   const index = list.indexOf(item, 0);
   return index > -1

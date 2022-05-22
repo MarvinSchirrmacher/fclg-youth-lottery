@@ -88,7 +88,7 @@ export class ParticipationService {
       } as Participation))
   }
 
-  public addParticipation(participation: Participation, done?: Done): void {
+  public addParticipation(participation: Participation, done?: Done<BSON.ObjectID>): void {
     var error = this.hasError(participation)
     if (error && done?.error) {
       done.error(error)
@@ -105,7 +105,7 @@ export class ParticipationService {
       })
   }
 
-  public addParticipationWithNewUser(participation: Participation, user: User, done?: Done): void {
+  public addParticipationWithNewUser(participation: Participation, user: User, done?: Done<BSON.ObjectID>): void {
     this.database.insertParticipation(participation)
       .subscribe({
         next: result => {
@@ -117,7 +117,7 @@ export class ParticipationService {
       })
   }
 
-  public addUser(user: User, participationId?: BSON.ObjectID, done?: Done): void {
+  public addUser(user: User, participationId?: BSON.ObjectID, done?: Done<BSON.ObjectID>): void {
     this.database.insertUser(user)
       .subscribe({
         next: result => {
@@ -138,7 +138,7 @@ export class ParticipationService {
       })
   }
 
-  public deleteParticipation(id: BSON.ObjectID, done?: Done): void {
+  public deleteParticipation(id: BSON.ObjectID, done?: Done<BSON.ObjectID>): void {
     this.database.deleteParticipation(id)
       .subscribe({
         next: result => {
@@ -150,7 +150,19 @@ export class ParticipationService {
       })
   }
 
-  public endParticipation(id: BSON.ObjectID, end: ParticipationEnd, done?: Done): void {
+  public deleteParticipations(ids: BSON.ObjectID[], done?: Done<number[]>): void {
+    this.database.deleteParticipations(ids)
+      .subscribe({
+        next: result => {
+          let count = result.data?.deleteManyParticipations.deletedCount
+          this.refetch()
+          if (done?.next) done?.next(count)
+        },
+        error: error => { if (done?.error) done.error(error) }
+      })
+  }
+
+  public endParticipation(id: BSON.ObjectID, end: ParticipationEnd, done?: Done<BSON.ObjectID>): void {
     var current = this.getCurrentParticipation(id)
     if (current === undefined)
       return
@@ -173,7 +185,7 @@ export class ParticipationService {
       })
   }
 
-  public updateUser(id: BSON.ObjectID, user: User, done?: Done): void {
+  public updateUser(id: BSON.ObjectID, user: User, done?: Done<BSON.ObjectID>): void {
     this.database.updateUser(id, user)
       .subscribe({
         next: result => {
@@ -185,13 +197,25 @@ export class ParticipationService {
       })
   }
 
-  public deleteUser(id: BSON.ObjectID, done?: Done): void {
+  public deleteUser(id: BSON.ObjectID, done?: Done<BSON.ObjectID>): void {
     this.database.deleteUser(id)
       .subscribe({
         next: result => {
           let id = result.data?.deleteOneUser._id
           this.refetch()
           if (done?.next) done?.next(id)
+        },
+        error: error => { if (done?.error) done.error(error) }
+      })
+  }
+
+  public deleteUsers(ids: BSON.ObjectID[], done?: Done<number[]>): void {
+    this.database.deleteUsers(ids)
+      .subscribe({
+        next: result => {
+          let count = result.data?.deleteManyUsers.deletedCount
+          this.refetch()
+          if (done?.next) done?.next(count)
         },
         error: error => { if (done?.error) done.error(error) }
       })

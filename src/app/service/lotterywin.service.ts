@@ -115,7 +115,7 @@ export class LotteryWinService {
       .updateWinner(id, { informedOn: undefined, paidOn: undefined })
   }
 
-  public deleteWinner(id: BSON.ObjectID, done?: Done) {
+  public deleteWinner(id: BSON.ObjectID, done?: Done<BSON.ObjectID>) {
     this.database.deleteWinner(id)
       .subscribe({
         next: result => {

@@ -1,6 +1,5 @@
 import { Component, Inject } from "@angular/core"
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog"
-import { article, participantNoun } from "src/app/common/gendering"
 import { User } from "src/app/common/user"
 
 
@@ -10,18 +9,12 @@ import { User } from "src/app/common/user"
 })
 export class DeleteUserDialog {
 
-    firstName: string = ''
-    lastName: string = ''
-    the: string = ''
-    noun: string = ''
+    users: User[] = []
 
     constructor(
         public dialogRef: MatDialogRef<DeleteUserDialog>,
-        @Inject(MAT_DIALOG_DATA) public data: User) {
-        this.firstName = data.firstName
-        this.lastName = data.lastName
-        this.the = article(data.gender)
-        this.noun = participantNoun(data.gender)
+        @Inject(MAT_DIALOG_DATA) public data: User[]) {
+        this.users = data
     }
 
     onNoClick(): void {
