@@ -1,7 +1,6 @@
 import { Component, Inject } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Participation } from "src/app/common/participation";
-import { WinningTicket } from "../../common/winning-ticket";
 import { ParticipationEnd } from "../../service/participation.service";
 
 @Component({
@@ -9,17 +8,13 @@ import { ParticipationEnd } from "../../service/participation.service";
     templateUrl: './end-participation.component.html',
 })
 export class EndPariticipationDialog {
-
-    firstName: string = "";
-    lastName: string = "";
-    ticket: string = "";
+    
+    participations: Participation[];
 
     constructor(
         public dialogRef: MatDialogRef<EndPariticipationDialog>,
-        @Inject(MAT_DIALOG_DATA) public data: Participation) {
-        this.firstName = data.user.firstName;
-        this.lastName = data.user.lastName;
-        this.ticket = new WinningTicket(data.ticket.list, data.ticket.number).toString();
+        @Inject(MAT_DIALOG_DATA) public data: Participation[]) {
+        this.participations = data
     }
 
     onNoClick(): void {

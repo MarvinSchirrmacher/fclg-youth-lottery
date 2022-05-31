@@ -81,7 +81,7 @@ export class ParticipationComponent implements OnInit, OnDestroy {
     var participation = this.getParticipation(id)
 
     this.dialog
-      .open(EndParticipationDialog, { data: participation, panelClass: 'w-600px', maxWidth: '' })
+      .open(EndParticipationDialog, { data: [participation], panelClass: 'w-600px', maxWidth: '' })
       .afterClosed()
       .subscribe(when => this.endParticipation(participation._id!, when))
   }
@@ -126,7 +126,18 @@ export class ParticipationComponent implements OnInit, OnDestroy {
   }
 
   endAllSelected(): void {
+    var participations = this.selectedParticipations.get().map(id => this.getParticipation(id))
 
+    this.dialog
+      .open(EndParticipationDialog, { data: participations, panelClass: 'w-600px', maxWidth: '' })
+      .afterClosed()
+      .subscribe(end => {
+        if (participations.length == 1)
+          this.endParticipation(this.selectedParticipations.get()[0], end)
+        else
+          this.endParticipations(this.selectedParticipations.get(), end)
+        this.selectedParticipations.deselectAll()
+      })
   }
 
   deleteAllSelected(): void {
@@ -165,24 +176,43 @@ export class ParticipationComponent implements OnInit, OnDestroy {
       })
   }
 
-  private endParticipation(id: BSON.ObjectID, when: ParticipationEnd): void {
-    if (when === undefined)
+  private endParticipation(id: BSON.ObjectID, end: ParticipationEnd): void {
+    if (end === undefined)
       return
 
     var name = this.getParticipation(id).user.name
-    this.participationService.endParticipation(id, when, {
+    this.participationService.endParticipation(id, end, {
       next: id => {
-        if (when === ParticipationEnd.Today)
-          this.snackBar.open(`Die Teilnahme von ${name} wird heute beendet`, 'Ok', snackBarConfig)
-        if (when === ParticipationEnd.EndOfQuarter)
-          this.snackBar.open(`Die Teilnahme von ${name} wird zum Quartalsende beendet`, 'Ok', snackBarConfig)
-        if (when === ParticipationEnd.EndOfYear)
-          this.snackBar.open(`Die Teilnahme von ${name} wird zum Jahresende beendet`, 'Ok', snackBarConfig)
-        if (when === ParticipationEnd.None)
-          this.snackBar.open(`Die Teilnahme von ${name} wird nicht beendet`, 'Ok', snackBarConfig)
+        this.participationService.refetch()
+        let endDescription = this.getEndDescription(end)
+        this.snackBar.open(`Die Teilnahme von ${name} wird ${endDescription} beendet`, 'Ok', snackBarConfig)
       },
       error: error => this.snackBar.open(`Die Teilnahme konnte nicht beendet werden\n${error}`, 'Ok', snackBarConfig)
     })
+  }
+
+  private endParticipations(ids: BSON.ObjectID[], end: ParticipationEnd): void {
+    if (end === undefined)
+      return
+
+    this.participationService.endParticipations(ids, end, {
+      next: count => {
+        this.participationService.refetch()
+        let endDescription = this.getEndDescription(end)
+        this.snackBar.open(`Die ${count} Teilnahmen werden ${endDescription} beendet`, 'Ok', snackBarConfig)
+      },
+      error: error => this.snackBar.open(`Die Teilnahmen konnten nicht beendet werden: ${error}`, 'Ok', snackBarConfig)
+    })
+  }
+
+  private getEndDescription(end: ParticipationEnd): string {
+    if (end === ParticipationEnd.Today)
+      return 'heute'
+    if (end === ParticipationEnd.EndOfQuarter)
+      return 'zum Quartalsende'
+    if (end === ParticipationEnd.EndOfYear)
+      return 'zum Jahresende'
+    return 'nicht'
   }
 
   private deleteParticipation(id: BSON.ObjectID, del: boolean | undefined): void {

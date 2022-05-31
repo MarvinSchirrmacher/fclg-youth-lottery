@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { QueryRef } from 'apollo-angular'
 import { BSON } from 'realm-web'
-import { map, Observable, zip } from 'rxjs'
+import { forkJoin, map, Observable, zip } from 'rxjs'
 import { endOfQuarter, endOfToday, endOfYear } from '../common/dates'
 import { Participation } from '../common/participation'
 import { Term } from '../common/term'
@@ -180,6 +180,32 @@ export class ParticipationService {
           let id = result.data?.updateOneParticipation._id
           this.refetch()
           if (done?.next) done.next(id)
+        },
+        error: error => { if (done?.error) done.error(error) }
+      })
+  }
+
+  public endParticipations(ids: BSON.ObjectID[], end: ParticipationEnd, done?: Done<number[]>): void {
+    var updates = ids
+        .map(id => this.getCurrentParticipation(id))
+        .filter(participation => participation !== undefined)
+        .map(participation => {
+          let update = {
+            term: {
+              start: participation?.term.start,
+              end: this.calculateEndDate(participation!, end)
+            }
+          } as Participation
+
+          return this.database.updateParticipation(participation?._id!, update)
+        })
+
+    forkJoin(updates)
+      .subscribe({
+        next: result => {
+          let count = result.length
+          this.refetch()
+          if (done?.next) done.next([count])
         },
         error: error => { if (done?.error) done.error(error) }
       })

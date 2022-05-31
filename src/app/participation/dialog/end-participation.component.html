@@ -1,6 +1,15 @@
 <h2 mat-dialog-title>Teilnahme beenden</h2>
 <mat-dialog-content>
-  <p>Zu wann soll die Teilnahme von <strong>{{ firstName }} {{ lastName }}</strong> mit dem Gewinnlos <strong>{{ ticket }}</strong> beendet werden?</p>
+  <section *ngIf="participations.length > 1; then deleteMany; else deleteOne"></section>
+
+  <ng-template #deleteMany>
+    <p>Zu wann sollen die Teilnahmen von <span class="separated" *ngFor="let p of participations"><strong>{{ p.user.firstName }} {{ p.user.lastName }} ({{ p.ticket.toString() }})</strong></span> beendet werden?</p>
+  </ng-template>
+
+  <ng-template #deleteOne>
+    <p>Zu wann soll die Teilnahme von <span class="separated" *ngFor="let p of participations"><strong>{{ p.user.firstName }} {{ p.user.lastName }}</strong> mit dem Gewinnlos <strong>{{ p.ticket.toString() }}</strong></span> beendet werden?</p>
+  </ng-template>
+  
 </mat-dialog-content>
 <mat-dialog-actions class="flex end">
   <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>
