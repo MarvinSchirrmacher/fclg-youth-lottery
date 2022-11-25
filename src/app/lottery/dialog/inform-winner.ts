@@ -11,6 +11,7 @@ export interface InformWinnerData {
     email?: string
     reference?: string
     content?: string
+    informedOn?: Date
 }
 
 @Component({

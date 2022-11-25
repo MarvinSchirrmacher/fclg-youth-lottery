@@ -17,7 +17,17 @@
 
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef class="grow-3">Name</mat-header-cell>
-        <mat-cell *matCellDef="let winner" class="grow-3">{{ winner.user.firstName }} {{ winner.user.lastName }}</mat-cell>
+        <mat-cell *matCellDef="let winner" class="grow-3">
+          {{ winner.user.firstName }} {{ winner.user.lastName }}
+          <button class="mat-icon-button mat-primary"
+                  *ngIf="winner.paidOn"
+                  title="Bearbeitung zurücksetzen"
+                  (click)="openResetDialog(winner._id)">
+            <span class="mat-button-wrapper">
+              <mat-icon>check_circle_outline</mat-icon>
+            </span>
+          </button>
+        </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="ticket">
@@ -50,58 +60,39 @@
             <button class="mat-icon-button mat-primary"
                     *ngIf="winner.informedOn && winner.paidOn"
                     title="Bearbeitung zurücksetzen"
-                    (click)="onResetWinner(winner._id)">
+                    (click)="openResetDialog(winner._id)">
               <span class="mat-button-wrapper">
                 <mat-icon>check_circle_outline</mat-icon>
               </span>
             </button>
 
             <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="onResetWinner(winner._id)">
+              <button mat-menu-item (click)="openResetDialog(winner._id)">
                 Bearbeitung zurücksetzen
               </button>
-              <button mat-menu-item (click)="onInform(winner._id)"
-                    [disabled]="winner.informedOn">
-                {{ createInformText(winner) }}
-              </button>
-              <button mat-menu-item (click)="onPay(winner._id)"
+              <button mat-menu-item (click)="openPayDialog(winner._id)"
                     [disabled]="winner.paidOn" *ngIf="winner.user.payment.iban">
                 {{ createPayText(winner) }}
               </button>
-              <button mat-menu-item (click)="onDeleteWinner(winner._id)">
-                Gewinn löschen
+              <button mat-menu-item (click)="openDeleteDialog(winner._id)">
+                Gewinneintrag löschen
               </button>
             </mat-menu>
           </section>
           
           <section fxHide.lt-lg="true">
             <button class="mat-icon-button mat-primary show-on-hover"
-                    title="{{ createInformText(winner) }}"
-                    (click)="onInform(winner._id)" [disabled]="winner.informedOn">
-              <span class="mat-button-wrapper">
-                <mat-icon>mail_outline</mat-icon>
-              </span>
-            </button>
-            <button class="mat-icon-button mat-primary show-on-hover"
                     *ngIf="winner.user.payment.iban"
                     title="{{ createPayText(winner) }}"
-                    (click)="onPay(winner._id)" [disabled]="winner.paidOn">
+                    (click)="openPayDialog(winner._id)" [disabled]="winner.paidOn">
               <span class="mat-button-wrapper">
                 <mat-icon>payment</mat-icon>
               </span>
             </button>
             <button class="mat-icon-button mat-primary show-on-hover"
-                    title="Gewinn löschen" (click)="onDeleteWinner(winner._id)">
+                    title="Gewinneintrag löschen" (click)="openDeleteDialog(winner._id)">
               <span class="mat-button-wrapper">
                 <mat-icon color="warn">delete_outline</mat-icon>
-              </span>
-            </button>
-            <button class="mat-icon-button mat-primary"
-                    *ngIf="winner.informedOn && winner.paidOn"
-                    title="Bearbeitung zurücksetzen"
-                    (click)="onResetWinner(winner._id)">
-              <span class="mat-button-wrapper">
-                <mat-icon>check_circle_outline</mat-icon>
               </span>
             </button>
           </section>
@@ -151,7 +142,7 @@
                   [ngClass]="draws.isTagged(draw) ? 'rotating' : 'show-on-hover'"
                   title="Gewinner erneut ermitteln"
                   [disabled]="draws.isTagged(draw)"
-                  (click)="onReEvaluateDraw(draw._id)">
+                  (click)="openReEvaluateDialog(draw._id)">
             <span class="mat-button-wrapper">
               <mat-icon>autorenew</mat-icon>
             </span>

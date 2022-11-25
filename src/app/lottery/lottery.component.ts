@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { BSON } from 'realm-web'
-import { concatMap, filter, Observable, of, Subscription, switchMap } from 'rxjs'
+import { concatMap, map, Observable, of, Subscription, switchMap } from 'rxjs'
 import { snackBarConfig } from '../common/common'
 import { Winner } from '../common/winner'
 import { Draw } from '../common/draw'
@@ -65,34 +65,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
     this.winnersSubscription?.unsubscribe()
   }
 
-  onInform(id: BSON.ObjectID): void {
-    var winner = this.getWinner(id)
-
-    this.dialog
-      .open(InformWinnerDialog, { data: winner, panelClass: 'w-600px', maxWidth: '' })
-      .afterClosed()
-      .pipe(
-        concatMap(data => this.informWinner(data)
-      ))
-      .subscribe((informedOn: Date) => {
-        if (!informedOn) return
-
-        let name = winner.user.name
-        let g = winner.user.gender
-        this.lotteryWin.saveWinnerInformedOn(id, informedOn)
-          .subscribe({
-            next: result => {
-              this.snackBar.open(`${name} wurde über ${posPronounAccMas(g)} Gewinn informiert`, 'Ok', snackBarConfig)
-              this.lotteryWin.refetchWinners()
-            },
-            error: error => {
-              this.snackBar.open(`${name} wurde nicht über ${posPronounAccMas(g)} Gewinn informiert\n${error}`, 'Ok', snackBarConfig)
-            }
-          })
-        })
-  }
-
-  onPay(id: BSON.ObjectID): void {
+  openPayDialog(id: BSON.ObjectID): void {
     var winner = this.getWinner(id)
 
     this.dialog
@@ -106,6 +79,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
           .subscribe({
             next: result => {
               this.snackBar.open(`Der Gewinn wurde an ${name} ausgezahlt`, 'Ok', snackBarConfig)
+              this.openInformDialog(id)
               this.lotteryWin.refetchWinners()
             },
             error: error => {
@@ -115,7 +89,37 @@ export class LotteryComponent implements OnInit, OnDestroy {
         })
   }
 
-  onResetWinner(id: BSON.ObjectID): void {
+  openInformDialog(id: BSON.ObjectID): void {
+    var winner = this.getWinner(id)
+
+    this.dialog
+      .open(InformWinnerDialog, { data: winner, panelClass: 'w-600px', maxWidth: '' })
+      .afterClosed()
+      .pipe(
+        concatMap(data => this.informWinner(data)
+      ))
+      .subscribe((data: InformWinnerData) => {
+        let name = winner.user.name
+        let g = winner.user.gender
+        
+        if (!data.sendEmail) {
+          this.snackBar.open(`${name} wurde nicht über ${posPronounAccMas(g)} Gewinn informiert`, 'Ok', snackBarConfig)
+          return
+        }
+
+        this.lotteryWin.saveWinnerInformedOn(id, data.informedOn!)
+          .subscribe({
+            next: result => {
+              this.snackBar.open(`${name} wurde über ${posPronounAccMas(g)} Gewinn informiert`, 'Ok', snackBarConfig)
+            },
+            error: error => {
+              this.snackBar.open(`${name} konnte nicht über ${posPronounAccMas(g)} Gewinn informiert werden\n${error}`, 'Ok', snackBarConfig)
+            }
+          })
+        })
+  }
+
+  openResetDialog(id: BSON.ObjectID): void {
     var winner = this.getWinner(id)
 
     this.dialog
@@ -137,7 +141,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
       })
   }
 
-  onDeleteWinner(id: BSON.ObjectID): void {
+  openDeleteDialog(id: BSON.ObjectID): void {
     var winner = this.getWinner(id)
 
     this.dialog
@@ -146,7 +150,7 @@ export class LotteryComponent implements OnInit, OnDestroy {
       .subscribe(del => this.deleteWinner(winner._id!, del))
   }
 
-  onReEvaluateDraw(id: BSON.ObjectID): void {
+  openReEvaluateDialog(id: BSON.ObjectID): void {
     var draw = this.getDraw(id)
 
     this.dialog
@@ -211,15 +215,21 @@ export class LotteryComponent implements OnInit, OnDestroy {
     }
   }
 
-  private informWinner(data: InformWinnerData): Observable<Date> {
+  private informWinner(data: InformWinnerData): Observable<InformWinnerData> {
     if (!data.sendEmail)
-      return of(new Date())
+      return of(data)
 
     return this.mail
       .address(data.email!)
       .reference(data.reference!)
       .content(data.content!)
       .send()
+      .pipe(
+        map(date => {
+          data.informedOn = date
+          return data
+        })
+      )
   }
 
   private getWinner(id: BSON.ObjectID): Winner {
@@ -257,6 +267,6 @@ export class LotteryComponent implements OnInit, OnDestroy {
   }
 
   createPayText(winner: Winner): string {
-    return winner.paidOn ? `Gewinn wurde am ${winner.paidOn} ausgezahlt` : 'Gewinn auszahlen'
+    return winner.paidOn ? `Gewinn wurde am ${this.pipe.transform(winner.paidOn, 'dd.MM.yyyy') } ausgezahlt` : 'Gewinn auszahlen'
   }
 }

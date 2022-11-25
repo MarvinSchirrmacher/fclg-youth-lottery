@@ -3,7 +3,7 @@
 <form novalidate [formGroup]="form">
 
 <mat-dialog-content>
-  <p>Für <strong>{{ winner.user.firstName }} {{ winner.user.lastName }}</strong> ist eine E-Mail-Adresse hinterlegt. Soll {{ personalPronoun }} über {{ possessivePronoun }} Gewinn benachrichtigt werden?</p>
+  <p>Soll <strong>{{ winner.user.firstName }} {{ winner.user.lastName }}</strong> über {{ possessivePronoun }} Gewinn benachrichtigt werden?</p>
 
   <mat-form-field class="form-field w-100">
     <input matInput type="text" placeholder="E-Mail-Adresse" formControlName="email">
@@ -21,7 +21,7 @@
 
 <mat-dialog-actions class="flex end gap-sm">
   <button mat-stroked-button color="primary" (click)="close()">Abbrechen</button>
-  <button mat-raised-button color="warn" (click)="doNotInform()">Nein</button>
+  <button mat-raised-button color="warn" (click)="doNotInform()">Nicht benachrichtigen</button>
   <button mat-raised-button color="primary" (click)="sendMail()">Mail senden</button>
 </mat-dialog-actions>
 
